@@ -67,7 +67,7 @@ def init_services(app: FastAPI) -> None:
 async def start_server(app: FastAPI) -> None:
     app_config = uvicorn.Config(
         app=app,
-        host="127.0.0.1",
+        host="0.0.0.0",
         port=8080,
         reload=True,
         use_colors=True,
