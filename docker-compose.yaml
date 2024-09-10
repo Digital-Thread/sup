@@ -30,6 +30,30 @@ services:
           memory: 1GB
     networks:
       - custom
+  alembic:
+    build: .
+    env_file:
+      - '.env'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - custom
+    command: alembic upgrade head
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend
+    env_file:
+      - '.env'
+    depends_on:
+      - alembic
+    networks:
+      - custom
+    command: python -m src.main
+    ports:
+      - "8080:8080"
 
 networks:
   custom:
