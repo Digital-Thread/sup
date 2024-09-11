@@ -4,7 +4,7 @@ help:
 
 # Install package with dependencies
 install:
-	poetry install --with dev,test,lint
+	poetry install --with dev
 
 # Run pre-commit
 lint:
