@@ -9,15 +9,11 @@ from apps.feature.domain.entities.feature import Status
 def test_feature_entity_init():
     project_id = uuid.uuid4()
     owner_id = uuid.uuid4()
-    _id = uuid.uuid4()
-    dt = datetime.now()
 
     feature = Feature(
         'New awesome feature',
         project_id,
-        owner_id,
-        id=_id,
-        created_at=dt
+        owner_id
     )
 
     assert feature.name == 'New awesome feature'
@@ -27,5 +23,3 @@ def test_feature_entity_init():
     assert feature.description is None
     assert feature.priority == Priority.NO_PRIORITY
     assert feature.status == Status.NEW
-    assert feature.id == _id
-    assert feature.created_at == dt
