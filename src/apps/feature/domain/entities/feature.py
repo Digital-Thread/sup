@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
+from typing import Any
 from uuid import UUID, uuid4
 
 
@@ -39,10 +40,27 @@ class Status(Enum):
 class Feature:
     name: str
     project_id: UUID
-    owner_id: UUID
+    _owner_id: UUID
     assigned_to: UUID | None = field(default=None)
     description: str | None = field(default=None)
     priority: Priority = field(default=Priority.NO_PRIORITY)
     status: Status = field(default=Status.NEW)
-    id: UUID = field(default_factory=uuid4)
-    created_at: datetime = field(default_factory=datetime.now)
+    _id: UUID = field(default_factory=uuid4, init=False)
+    _created_at: datetime = field(default_factory=datetime.now, init=False)
+    _updated_at: datetime = field(default_factory=datetime.now, init=False)
+
+    @property
+    def owner_id(self):
+        return self._owner_id
+
+    @property
+    def id(self):
+        return self._id
+
+    @property
+    def created_at(self):
+        return self._created_at
+
+    @property
+    def updated_at(self):
+        return self._updated_at
