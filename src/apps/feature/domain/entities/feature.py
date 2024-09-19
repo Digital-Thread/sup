@@ -1,5 +1,11 @@
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from dataclasses import (
+    dataclass,
+    field,
+)
+from datetime import (
+    datetime,
+    timezone,
+)
 from enum import IntEnum
 from re import match
 from typing import Any
