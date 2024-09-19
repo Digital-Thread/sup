@@ -56,7 +56,7 @@ strict_equality = true
 
 [tool.isort]
 profile = "black"
-force_grid_wrap = 1
+force_grid_wrap = 2
 multi_line_output = 3
 honor_noqa = true
 float_to_top = true
