@@ -2,13 +2,9 @@ from fastapi import (
     FastAPI,
     Request,
 )
-from fastapi.responses import (
-    JSONResponse,
-)
+from fastapi.responses import JSONResponse
 
-from src.apps import (
-    ApplicationError,
-)
+from src.apps import ApplicationError
 
 __all__ = ("init_exception_handlers",)
 

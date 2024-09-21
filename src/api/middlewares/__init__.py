@@ -1,16 +1,8 @@
-from fastapi import (
-    FastAPI,
-)
-from starlette.middleware.base import (
-    BaseHTTPMiddleware,
-)
-from starlette.middleware.cors import (
-    CORSMiddleware,
-)
+from fastapi import FastAPI
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.cors import CORSMiddleware
 
-from .logging import (
-    logging_middleware,
-)
+from .logging import logging_middleware
 
 
 def init_middlewares(app: FastAPI) -> None:

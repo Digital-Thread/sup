@@ -1,7 +1,5 @@
 import dataclasses
-from typing import (
-    ClassVar,
-)
+from typing import ClassVar
 
 
 @dataclasses.dataclass(eq=False)

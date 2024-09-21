@@ -3,12 +3,10 @@ from sqlalchemy.orm import (
     mapped_column,
 )
 
-from . import (
-    models,
-)
+from .models import Model
 
 
-class User(models.Model):
+class User(Model):
     __tablename__ = "users"
 
     first_name: Mapped[str]

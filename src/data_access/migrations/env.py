@@ -1,30 +1,14 @@
 import asyncio
-from logging.config import (
-    fileConfig,
-)
+from logging.config import fileConfig
 
-from alembic import (
-    context,
-)
-from environs import (
-    Env,
-)
-from sqlalchemy import (
-    pool,
-)
-from sqlalchemy.engine import (
-    Connection,
-)
-from sqlalchemy.ext.asyncio import (
-    async_engine_from_config,
-)
+from alembic import context
+from environs import Env
+from sqlalchemy import pool
+from sqlalchemy.engine import Connection
+from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from src.config import (
-    DbConfig,
-)
-from src.data_access import (
-    models,
-)
+from src.config import DbConfig
+from src.data_access import models
 
 # from src1.infrastructure.database import models
 # from src1.shared.config import load_config
