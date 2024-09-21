@@ -1,11 +1,7 @@
-from .adapters import (
-    ConfigProvider,
-    RepositoriesProvider,
-    SqlalchemyProvider,
-)
+from .adapters import ConfigProvider, RepositoriesProvider, SqlalchemyProvider
 
 __all__ = (
-    "SqlalchemyProvider",
-    "ConfigProvider",
-    "RepositoriesProvider",
+    'SqlalchemyProvider',
+    'ConfigProvider',
+    'RepositoriesProvider',
 )
