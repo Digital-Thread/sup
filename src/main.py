@@ -1,21 +1,15 @@
 import asyncio
-from contextlib import asynccontextmanager
 import logging
+from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
-from dishka import (
-    AsyncContainer,
-    make_async_container,
-)
-from dishka.integrations.fastapi import setup_dishka
-from fastapi import FastAPI
 import structlog
 import uvicorn
+from dishka import AsyncContainer, make_async_container
+from dishka.integrations.fastapi import setup_dishka
+from fastapi import FastAPI
 
-from src.api import (
-    init_exception_handlers,
-    init_routes,
-)
+from src.api import init_exception_handlers, init_routes
 from src.api.middlewares import init_middlewares
 from src.providers.adapters import (
     ConfigProvider,
@@ -30,7 +24,7 @@ logger = structlog.stdlib.get_logger()
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     yield
-    if hasattr(app.state, "container"):
+    if hasattr(app.state, 'container'):
         await app.state.container.close()
 
 
@@ -55,22 +49,22 @@ def init_services(app: FastAPI) -> None:
 async def start_server(app: FastAPI) -> None:
     app_config = uvicorn.Config(
         app=app,
-        host="0.0.0.0",
+        host='0.0.0.0',
         port=8080,
         reload=True,
         use_colors=True,
-        log_level="debug",
+        log_level='debug',
     )
     server = uvicorn.Server(config=app_config)
-    await logger.info("Starting server")
+    await logger.info('Starting server')
     await server.serve()
 
 
 def create_app() -> FastAPI:
     app = FastAPI(
-        title="Sup API",
-        version="0.1.0",
-        swagger_ui_parameters={"syntaxHighlight.theme": "obsidian"},
+        title='Sup API',
+        version='0.1.0',
+        swagger_ui_parameters={'syntaxHighlight.theme': 'obsidian'},
         lifespan=lifespan,
     )
     init_services(app)
@@ -81,10 +75,10 @@ def create_app() -> FastAPI:
     return app
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     application = create_app()
     try:
         with asyncio.Runner() as runner:
             runner.run(start_server(application))
     except (KeyboardInterrupt, SystemExit):
-        logging.info("Shutting down")
+        logging.info('Shutting down')

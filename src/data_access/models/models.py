@@ -1,19 +1,10 @@
 from datetime import datetime
 from typing import Annotated
 
-from sqlalchemy import (
-    TIMESTAMP,
-    func,
-)
-from sqlalchemy.orm import (
-    DeclarativeBase,
-    Mapped,
-    mapped_column,
-)
+from sqlalchemy import TIMESTAMP, func
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-pk = Annotated[
-    int, mapped_column(primary_key=True, autoincrement=True, unique=True)
-]
+pk = Annotated[int, mapped_column(primary_key=True, autoincrement=True, unique=True)]
 
 
 class Model(DeclarativeBase):

@@ -10,4 +10,4 @@ class ApplicationError(Exception):
 
     @property
     def message(self) -> str:
-        return "An app error occurred"
+        return 'An app error occurred'
