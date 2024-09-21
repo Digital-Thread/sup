@@ -1,11 +1,5 @@
-from dataclasses import (
-    dataclass,
-    field,
-)
-from datetime import (
-    datetime,
-    timezone,
-)
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from enum import IntEnum
 from re import match
 from typing import Any
@@ -30,11 +24,11 @@ class Priority(IntEnum):
     @property
     def display(self) -> str:
         return {
-            5: "Критическая",
-            4: "Высокая",
-            3: "Средняя",
-            2: "Низкая",
-            1: "Не задана",
+            5: 'Критическая',
+            4: 'Высокая',
+            3: 'Средняя',
+            2: 'Низкая',
+            1: 'Не задана',
         }[self.value]
 
 
@@ -47,10 +41,10 @@ class Status(IntEnum):
     @property
     def display(self) -> str:
         return {
-            4: "Готово",
-            3: "Тестирование",
-            2: "Разработка",
-            1: "Новая",
+            4: 'Готово',
+            3: 'Тестирование',
+            2: 'Разработка',
+            1: 'Новая',
         }[self.value]
 
 
@@ -66,12 +60,8 @@ class Feature:
     tags: set[TagId] = field(default_factory=set)
     members: set[UserId] = field(default_factory=set)
     _id: FeatureId = field(default_factory=uuid4, init=False)
-    _created_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc), init=False
-    )
-    _updated_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc), init=False
-    )
+    _created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc), init=False)
+    _updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc), init=False)
 
     @property
     def name(self) -> str:
@@ -92,23 +82,19 @@ class Feature:
         self._description = value
 
     def _validate_name(self, name: str) -> None:
-        pattern = r"^[a-zA-Zа-яА-ЯёЁ]+$"
+        pattern = r'^[a-zA-Zа-яА-ЯёЁ]+$'
         max_length = 50
         if not match(pattern, name):
             raise ValueError(
-                "В названии допускается использование только букв латинского и кириллического алфавитов."
+                'В названии допускается использование только букв латинского и кириллического алфавитов.'
             )
         if len(name) > max_length:
-            raise ValueError(
-                f"В названии может быть максимум {max_length} символов."
-            )
+            raise ValueError(f'В названии может быть максимум {max_length} символов.')
 
     def _validate_description(self, description: str | None) -> None:
         max_length = 10_000
         if description is not None and len(description) > max_length:
-            raise ValueError(
-                f"В описании может быть максимум {max_length} символов."
-            )
+            raise ValueError(f'В описании может быть максимум {max_length} символов.')
 
     @property
     def owner_id(self) -> OwnerId:
@@ -127,6 +113,6 @@ class Feature:
         return self._updated_at
 
     def __setattr__(self, key: str, value: Any) -> None:
-        if key != "updated_at" and hasattr(self, "_updated_at"):
-            super().__setattr__("_updated_at", datetime.now(timezone.utc))
+        if key != 'updated_at' and hasattr(self, '_updated_at'):
+            super().__setattr__('_updated_at', datetime.now(timezone.utc))
         super().__setattr__(key, value)
