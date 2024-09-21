@@ -1,22 +1,14 @@
 import asyncio
-from contextlib import (
-    asynccontextmanager,
-)
+from contextlib import asynccontextmanager
 import logging
-from typing import (
-    AsyncIterator,
-)
+from typing import AsyncIterator
 
 from dishka import (
     AsyncContainer,
     make_async_container,
 )
-from dishka.integrations.fastapi import (
-    setup_dishka,
-)
-from fastapi import (
-    FastAPI,
-)
+from dishka.integrations.fastapi import setup_dishka
+from fastapi import FastAPI
 import structlog
 import uvicorn
 
@@ -24,17 +16,13 @@ from src.api import (
     init_exception_handlers,
     init_routes,
 )
-from src.api.middlewares import (
-    init_middlewares,
-)
+from src.api.middlewares import init_middlewares
 from src.providers.adapters import (
     ConfigProvider,
     RepositoriesProvider,
     SqlalchemyProvider,
 )
-from src.utils import (
-    log,
-)
+from src.utils import log
 
 logger = structlog.stdlib.get_logger()
 

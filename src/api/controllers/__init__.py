@@ -1,10 +1,6 @@
-from fastapi import (
-    FastAPI,
-)
+from fastapi import FastAPI
 
-from .health_check import (
-    router,
-)
+from .health_check import router
 
 
 def init_routes(app: FastAPI) -> None:
