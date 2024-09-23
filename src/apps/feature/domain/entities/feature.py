@@ -1,4 +1,3 @@
-from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import IntEnum
 from re import match
@@ -48,20 +47,32 @@ class Status(IntEnum):
         }[self.value]
 
 
-@dataclass
 class Feature:
-    _name: str
-    project_id: ProjectId
-    _owner_id: OwnerId
-    assigned_to: UserId | None = field(default=None)
-    _description: str | None = field(default=None)
-    priority: Priority = field(default=Priority.NO_PRIORITY)
-    status: Status = field(default=Status.NEW)
-    tags: set[TagId] = field(default_factory=set)
-    members: set[UserId] = field(default_factory=set)
-    _id: FeatureId = field(default_factory=uuid4, init=False)
-    _created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc), init=False)
-    _updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc), init=False)
+
+    def __init__(
+        self,
+        name: str,
+        project_id: ProjectId,
+        owner_id: OwnerId,
+        assigned_to: UserId | None = None,
+        description: str | None = None,
+        priority: Priority = Priority.NO_PRIORITY,
+        status: Status = Status.NEW,
+        tags: set[TagId] | None = None,
+        members: set[UserId] | None = None,
+    ):
+        self.name = name
+        self.project_id = project_id
+        self._owner_id = owner_id
+        self.assigned_to = assigned_to
+        self.description = description
+        self.priority = priority
+        self.status = status
+        self.tags = tags if tags else set()
+        self.members = members if members else set()
+        self._id = uuid4()
+        self._created_at = datetime.now(timezone.utc)
+        self._updated_at = datetime.now(timezone.utc)
 
     @property
     def name(self) -> str:
@@ -73,16 +84,16 @@ class Feature:
         self._name = value
 
     @property
-    def description(self) -> str:
+    def description(self) -> str | None:
         return self._description
 
     @description.setter
-    def description(self, value: str) -> None:
+    def description(self, value: str | None) -> None:
         self._validate_description(value)
         self._description = value
 
     def _validate_name(self, name: str) -> None:
-        pattern = r'^[a-zA-Zа-яА-ЯёЁ]+$'
+        pattern = r'^[a-zA-Zа-яА-ЯёЁ ]+$'
         max_length = 50
         if not match(pattern, name):
             raise ValueError(
