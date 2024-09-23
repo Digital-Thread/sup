@@ -1,28 +1,15 @@
-from dataclasses import (
-    dataclass,
-    field,
-)
-from datetime import (
-    datetime,
-    timedelta,
-    timezone,
-)
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta, timezone
 from enum import Enum
-from uuid import (
-    UUID,
-    uuid4,
-)
+from uuid import UUID, uuid4
 
-from src.apps.workspace.domain.value_objects import (
-    InviteID,
-    WorkspaceID,
-)
+from src.apps.workspace.domain.value_objects import InviteID, WorkspaceID
 
 
 class StatusInvite(Enum):
-    ACTIVE = "Активна"
-    USED = "Использована"
-    EXPIRED = "Истекла"
+    ACTIVE = 'Активна'
+    USED = 'Использована'
+    EXPIRED = 'Истекла'
 
 
 @dataclass
@@ -33,9 +20,7 @@ class WorkspaceInvite:
     workspace_id: WorkspaceID
     code: UUID = field(default_factory=uuid4)
     _status: StatusInvite = field(default=StatusInvite.ACTIVE)
-    created_at: datetime = field(
-        default_factory=lambda: datetime.now(timezone.utc)
-    )
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     expired_at: datetime = field(init=False)
 
     def __post_init__(self) -> None:
@@ -57,7 +42,7 @@ class WorkspaceInvite:
 
     def _validate_status_change(self, new_status: StatusInvite) -> None:
         if new_status not in StatusInvite:
-            raise ValueError(f"Такого статуса нет: {new_status}")
+            raise ValueError(f'Такого статуса нет: {new_status}')
         if new_status == self._status:
             raise ValueError('Статус уже установлен')
 

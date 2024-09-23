@@ -1,19 +1,14 @@
 import logging
-from typing import (
-    Any,
-    Callable,
-)
+from typing import Any, Callable
 
 import structlog
 
 
-def _extract_from_record(
-    _: Any, __: Any, event_dict: dict[str, Any]
-) -> dict[str, Any]:
+def _extract_from_record(_: Any, __: Any, event_dict: dict[str, Any]) -> dict[str, Any]:
     # Extract thread and process names and add them to the event dict.
-    record = event_dict["_record"]
-    event_dict["thread_name"] = record.threadName
-    event_dict["process_name"] = record.processName
+    record = event_dict['_record']
+    event_dict['thread_name'] = record.threadName
+    event_dict['process_name'] = record.processName
     return event_dict
 
 

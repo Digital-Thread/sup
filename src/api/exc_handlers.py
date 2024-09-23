@@ -1,12 +1,9 @@
-from fastapi import (
-    FastAPI,
-    Request,
-)
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from src.apps import ApplicationError
 
-__all__ = ("init_exception_handlers",)
+__all__ = ('init_exception_handlers',)
 
 
 async def exception_handler(
@@ -15,7 +12,7 @@ async def exception_handler(
 ) -> JSONResponse:
     return JSONResponse(
         status_code=ApplicationError.status_code,
-        content={"message": exc.message},
+        content={'message': exc.message},
     )
 
 

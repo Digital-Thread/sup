@@ -1,21 +1,15 @@
 import time
-from typing import (
-    Awaitable,
-    Callable,
-)
+from typing import Awaitable, Callable
 
-from fastapi import (
-    Request,
-    Response,
-)
 import structlog
+from fastapi import Request, Response
 
 
 async def logging_middleware(
     request: Request,
     call_next: Callable[[Request], Awaitable[Response]],
 ) -> Response:
-    req_id = request.headers.get("request-id")
+    req_id = request.headers.get('request-id')
 
     structlog.contextvars.clear_contextvars()
     structlog.contextvars.bind_contextvars(
@@ -30,7 +24,7 @@ async def logging_middleware(
     response_time = end_time - start_time
 
     await structlog.get_logger().info(
-        "Request processed",
+        'Request processed',
         request_id=req_id,
         method=request.method,
         path=request.url.path,
