@@ -4,9 +4,7 @@ from structlog.processors import (
     CallsiteParameterAdder,
 )
 
-from .configuration import (
-    _configure_default_logging_by_custom,
-)
+from .configuration import _configure_default_logging_by_custom
 
 
 def configure_logging(enable_json_logs: bool = False) -> None:

@@ -1,15 +1,11 @@
-from typing import (
-    AsyncIterable,
-)
+from typing import AsyncIterable
 
 from dishka import (
     Provider,
     Scope,
     provide,
 )
-from environs import (
-    Env,
-)
+from environs import Env
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,

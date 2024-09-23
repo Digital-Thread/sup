@@ -1,11 +1,7 @@
 import dataclasses
 
-from environs import (
-    Env,
-)
-from sqlalchemy import (
-    URL,
-)
+from environs import Env
+from sqlalchemy import URL
 
 
 @dataclasses.dataclass(frozen=True, slots=True)

@@ -3,9 +3,7 @@ from sqlalchemy.orm import (
     mapped_column,
 )
 
-from . import (
-    models,
-)
+from . import models
 
 
 class User(models.Model):
