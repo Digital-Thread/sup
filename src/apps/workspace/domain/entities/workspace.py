@@ -1,63 +1,67 @@
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Optional, Set
+from re import match
+from typing import Dict, Optional, Set
+from uuid import UUID, uuid4
 
-from src.apps.workspace.domain.value_objects import (
-    CategoryID,
-    OwnerID,
-    RoleID,
-    TagID,
-    WorkspaceID,
+from src.apps.workspace.domain.entities.validator_mixins import (
+    DescriptionValidatorMixin,
 )
 
 
 @dataclass
-class Workspace:
-    id_: WorkspaceID
-    owner_id: OwnerID
-    name: str
-    _category_id: Optional[CategoryID] = field(default=None)
-    description: Optional[str] = field(default=None, compare=False)
-    logo: Optional[str] = field(default=None, compare=False)
-    _role_ids: Set[RoleID] = field(default_factory=set, compare=False)
-    _tag_ids: Set[TagID] = field(default_factory=set, compare=False)
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+class Workspace(DescriptionValidatorMixin):
+    _owner_id: UUID
+    _name: str
+    __id: UUID = field(default_factory=uuid4)
+    _description: Optional[str] = field(default=None)
+    logo: Optional[str] = field(default=None)
+    __created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    project_ids: Set[int] = field(default_factory=set)
+    meet_ids: Set[int] = field(default_factory=set)
+    tag_ids: Set[int] = field(default_factory=set)
+    role_ids: Set[int] = field(default_factory=set)
+    member_ids: Set[UUID] = field(default_factory=set)
+    member_roles: Dict[UUID, int] = field(default_factory=dict)
 
-    def add_role(self, role_id: RoleID) -> None:
-        if role_id < 0:
-            raise ValueError('Id роли не может быть отрицательным.')
-        self._role_ids.add(role_id)
+    def __post_init__(self) -> None:
+        self._is_valid_name(self._name, 'рабочего пространства')
 
-    def remove_role(self, role_id: RoleID) -> None:
-        if role_id not in self._role_ids:
-            raise ValueError('Роль не найдена в этом рабочем пространстве.')
-        self._role_ids.remove(role_id)
+        if self._description:
+            self._is_valid_description(self._description, 'рабочего пространства')
 
-    def add_tag(self, tag_id: TagID) -> None:
-        if tag_id < 0:
-            raise ValueError('Id тега не может быть отрицательным.')
-        self._tag_ids.add(tag_id)
-
-    def remove_tag(self, tag_id: TagID) -> None:
-        if tag_id not in self._tag_ids:
-            raise ValueError('Тег не найден в этом рабочем пространстве')
-        self._tag_ids.remove(tag_id)
+    @staticmethod
+    def _is_valid_name(name: str, attr_name: str) -> None:
+        pattern = r'^[a-zA-Zа-яА-ЯёЁ\s]{1,50}$'
+        if not bool(match(pattern, name)):
+            raise ValueError(f'Неверный формат названия {attr_name}')
 
     @property
-    def category(self) -> CategoryID:
-        return self._category_id
-
-    @category.setter
-    def category(self, category_id: CategoryID) -> None:
-        if category_id < 0:
-            raise ValueError(f'Id категории не может быть отрицательным.')
-
-        self._category_id = category_id
+    def id(self) -> UUID:
+        return self.__id
 
     @property
-    def roles(self) -> Set[RoleID]:
-        return self._role_ids
+    def owner_id(self) -> UUID:
+        return self._owner_id
 
     @property
-    def tags(self) -> Set[TagID]:
-        return self._tag_ids
+    def name(self) -> str:
+        return self._name
+
+    @name.setter
+    def name(self, new_name: str) -> None:
+        self._is_valid_name(new_name, attr_name='рабочего пространства')
+        self._name = new_name
+
+    @property
+    def description(self) -> str:
+        return self._description
+
+    @description.setter
+    def description(self, new_description: str) -> None:
+        self._is_valid_description(new_description, 'рабочего пространства')
+        self._description = new_description
+
+    @property
+    def created_at(self) -> datetime:
+        return self.__created_at
