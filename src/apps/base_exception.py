@@ -1,7 +1,5 @@
 import dataclasses
-from typing import (
-    ClassVar,
-)
+from typing import ClassVar
 
 
 @dataclasses.dataclass(eq=False)
@@ -12,4 +10,4 @@ class ApplicationError(Exception):
 
     @property
     def message(self) -> str:
-        return "An app error occurred"
+        return 'An app error occurred'

@@ -1,11 +1,7 @@
-from .models import (
-    Model,
-)
-from .user import (
-    User,
-)
+from .base import Base
+from .user import User
 
 __all__ = (
-    "Model",
-    "User",
+    'Base',
+    'User',
 )

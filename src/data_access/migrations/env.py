@@ -1,30 +1,14 @@
 import asyncio
-from logging.config import (
-    fileConfig,
-)
+from logging.config import fileConfig
 
-from alembic import (
-    context,
-)
-from environs import (
-    Env,
-)
-from sqlalchemy import (
-    pool,
-)
-from sqlalchemy.engine import (
-    Connection,
-)
-from sqlalchemy.ext.asyncio import (
-    async_engine_from_config,
-)
+from alembic import context
+from environs import Env
+from sqlalchemy import pool
+from sqlalchemy.engine import Connection
+from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from src.config import (
-    DbConfig,
-)
-from src.data_access import (
-    models,
-)
+from src.config import DbConfig
+from src.data_access.models import Base
 
 # from src1.infrastructure.database import models
 # from src1.shared.config import load_config
@@ -42,7 +26,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 
 # target_metadata = mymodel.Base.metadata
-target_metadata = models.Model.metadata
+target_metadata = Base.metadata
 
 
 # other values from the config, defined by the needs of env.py,
@@ -75,7 +59,7 @@ def run_migrations_offline() -> None:
         url=url,
         target_metadata=target_metadata,
         literal_binds=True,
-        dialect_opts={"paramstyle": "named"},
+        dialect_opts={'paramstyle': 'named'},
     )
 
     with context.begin_transaction():
@@ -96,10 +80,10 @@ async def run_async_migrations() -> None:
     """
 
     configuration = config.get_section(config.config_ini_section, {})
-    configuration["sqlalchemy.url"] = db_config().construct_sqlalchemy_url
+    configuration['sqlalchemy.url'] = db_config().construct_sqlalchemy_url
     connectable = async_engine_from_config(
         configuration,
-        prefix="sqlalchemy.",
+        prefix='sqlalchemy.',
         poolclass=pool.NullPool,
     )
 
