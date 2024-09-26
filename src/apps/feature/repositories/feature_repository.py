@@ -2,9 +2,9 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 from typing import Literal, NamedTuple, TypedDict
-from uuid import UUID
 
 from apps.feature.domain.entities.feature import Feature
+from apps.feature.domain.value_objects import FeatureId, ProjectId, TagId, UserId
 
 
 class OrderByField(Enum):
@@ -27,10 +27,10 @@ class SortBy(NamedTuple):
 
 
 class FilterField(TypedDict, total=False):
-    member: list[UUID]
-    tag: list[UUID]
+    member: list[UserId]
+    tag: list[TagId]
     status: list[int]
-    project: list[UUID]
+    project: list[ProjectId]
 
 
 @dataclass
@@ -48,7 +48,7 @@ class FeatureRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_by_id(self, feature_id: UUID) -> Feature | None:
+    async def get_by_id(self, feature_id: FeatureId) -> Feature | None:
         pass
 
     @abstractmethod
@@ -56,7 +56,7 @@ class FeatureRepository(ABC):
         pass
 
     @abstractmethod
-    async def delete(self, feature_id: UUID) -> None:
+    async def delete(self, feature_id: FeatureId) -> None:
         pass
 
     @abstractmethod

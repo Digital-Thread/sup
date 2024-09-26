@@ -1,10 +1,14 @@
 from dataclasses import dataclass, field
 from typing import TypedDict
-from uuid import UUID
-
 
 from apps.feature.domain.entities.feature import Priority, Status
-from apps.feature.domain.value_objects import OwnerId, ProjectId, TagId, UserId
+from apps.feature.domain.value_objects import (
+    FeatureId,
+    OwnerId,
+    ProjectId,
+    TagId,
+    UserId,
+)
 
 
 @dataclass
@@ -33,5 +37,5 @@ class OptionalFeatureUpdateFields(TypedDict, total=False):
 
 @dataclass
 class FeatureUpdateDTO:
-    id: UUID
+    id: FeatureId
     updated_fields: OptionalFeatureUpdateFields

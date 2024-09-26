@@ -1,7 +1,6 @@
 from datetime import datetime, timezone
 from enum import IntEnum
 from re import match
-from uuid import uuid4
 
 from apps.feature.domain.value_objects import (
     FeatureId,
@@ -69,7 +68,7 @@ class Feature:
         self.status = status
         self.tags = tags if tags else set()
         self.members = members if members else set()
-        self._id = uuid4()
+        self._id = None
         self._created_at = datetime.now(timezone.utc)
         self._updated_at = datetime.now(timezone.utc)
 

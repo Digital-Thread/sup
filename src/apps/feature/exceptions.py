@@ -1,4 +1,4 @@
-from uuid import UUID
+from apps.feature.domain.value_objects import FeatureId
 
 
 class FeatureError(Exception):
@@ -6,7 +6,7 @@ class FeatureError(Exception):
 
 
 class FeatureDoesNotExistError(FeatureError):
-    def __init__(self, feature_id: UUID, message: str = None):
+    def __init__(self, feature_id: FeatureId, message: str = None):
         self.feature_id = feature_id
         self.message = message or f'Фича с ID {self.feature_id} не найдена.'
         super().__init__(self.message)
