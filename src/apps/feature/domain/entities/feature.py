@@ -122,5 +122,5 @@ class Feature:
     def updated_at(self) -> datetime:
         return self._updated_at
 
-    def mark_as_updated(self):
+    def mark_as_updated(self) -> None:
         self._updated_at = datetime.now(timezone.utc)
