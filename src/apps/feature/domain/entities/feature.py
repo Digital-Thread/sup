@@ -1,7 +1,6 @@
 from datetime import datetime, timezone
 from enum import IntEnum
 from re import match
-from typing import Any
 from uuid import uuid4
 
 from apps.feature.domain.value_objects import (
@@ -123,7 +122,5 @@ class Feature:
     def updated_at(self) -> datetime:
         return self._updated_at
 
-    def __setattr__(self, key: str, value: Any) -> None:
-        if key != 'updated_at' and hasattr(self, '_updated_at'):
-            super().__setattr__('_updated_at', datetime.now(timezone.utc))
-        super().__setattr__(key, value)
+    def mark_as_updated(self):
+        self._updated_at = datetime.now(timezone.utc)
