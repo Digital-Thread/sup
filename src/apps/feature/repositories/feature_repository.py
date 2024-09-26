@@ -36,7 +36,7 @@ class FilterField(TypedDict, total=False):
 @dataclass
 class FeatureListQuery:
     filters: FilterField | None = None
-    order_by: SortBy[OrderByField, SortOrder] | None = SortBy(OrderByField.PRIORITY, SortOrder.DESC)
+    order_by: SortBy | None = SortBy(OrderByField.PRIORITY, SortOrder.DESC)
     paginate_by: Literal[5, 10] | None = 10
     page: int = 1
 
