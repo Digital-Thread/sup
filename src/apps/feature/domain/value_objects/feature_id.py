@@ -1,3 +1,1 @@
-from uuid import UUID
-
-FeatureId = UUID
+FeatureId = int

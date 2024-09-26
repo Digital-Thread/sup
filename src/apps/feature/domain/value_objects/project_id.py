@@ -1,3 +1,1 @@
-from uuid import UUID
-
-ProjectId = UUID
+ProjectId = int
