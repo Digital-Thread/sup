@@ -157,6 +157,24 @@ class SMTPConfig:
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
+class JWTConfig:
+    SECRET_KEY: str
+    ALGORITHM: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int
+
+    @staticmethod
+    def from_env(env: Env) -> 'JWTConfig':
+        SECRET_KEY = env.str('SECRET_KEY')
+        ALGORITHM = env.str('ALGORITHM')
+        ACCESS_TOKEN_EXPIRE_MINUTES = env.int('ACCESS_TOKEN_EXPIRE_MINUTES')
+        return JWTConfig(
+            SECRET_KEY=SECRET_KEY,
+            ALGORITHM=ALGORITHM,
+            ACCESS_TOKEN_EXPIRE_MINUTES=ACCESS_TOKEN_EXPIRE_MINUTES,
+        )
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
 class Miscellaneous:
     """
     Miscellaneous settings class.
