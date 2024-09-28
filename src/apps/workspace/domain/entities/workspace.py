@@ -11,12 +11,12 @@ from src.apps.workspace.domain.entities.validator_mixins import (
 
 @dataclass
 class Workspace(DescriptionValidatorMixin):
-    _owner_id: UUID
+    owner_id: UUID
     _name: str
-    __id: UUID = field(default_factory=uuid4)
+    id: UUID = field(default_factory=uuid4)
     _description: Optional[str] = field(default=None)
     logo: Optional[str] = field(default=None)
-    __created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     project_ids: Set[int] = field(default_factory=set)
     meet_ids: Set[int] = field(default_factory=set)
     tag_ids: Set[int] = field(default_factory=set)
@@ -37,14 +37,6 @@ class Workspace(DescriptionValidatorMixin):
             raise ValueError(f'Неверный формат названия {attr_name}')
 
     @property
-    def id(self) -> UUID:
-        return self.__id
-
-    @property
-    def owner_id(self) -> UUID:
-        return self._owner_id
-
-    @property
     def name(self) -> str:
         return self._name
 
@@ -61,7 +53,3 @@ class Workspace(DescriptionValidatorMixin):
     def description(self, new_description: str) -> None:
         self._is_valid_description(new_description, 'рабочего пространства')
         self._description = new_description
-
-    @property
-    def created_at(self) -> datetime:
-        return self.__created_at

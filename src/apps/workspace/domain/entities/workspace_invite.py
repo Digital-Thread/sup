@@ -15,15 +15,15 @@ class StatusInvite(Enum):
 class WorkspaceInvite:
     EXPIRATION_DAYS = 7
 
-    _workspace_id: UUID
-    __id: Optional[int] = field(default=None)
-    __code: UUID = field(default_factory=uuid4)
+    workspace_id: UUID
+    id: Optional[int] = field(default=None)
+    code: UUID = field(default_factory=uuid4)
     _status: StatusInvite = field(default=StatusInvite.ACTIVE)
-    __created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    __expired_at: datetime = field(init=False)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    _expired_at: datetime = field(init=False)
 
     def __post_init__(self) -> None:
-        self.__expired_at = self._calculate_expired_at(self.__created_at)
+        self._expired_at = self._calculate_expired_at(self.created_at)
 
     def _calculate_expired_at(self, created_at: datetime) -> datetime:
         return created_at + timedelta(days=self.EXPIRATION_DAYS)
@@ -50,25 +50,9 @@ class WorkspaceInvite:
             raise ValueError('Статус уже установлен')
 
     @property
-    def id(self) -> int:
-        return self.__id
-
-    @property
-    def workspace_id(self) -> UUID:
-        return self._workspace_id
-
-    @property
-    def code(self) -> UUID:
-        return self.__code
-
-    @property
     def status(self) -> StatusInvite:
         return self._status
 
     @property
-    def created_at(self) -> datetime:
-        return self.__created_at
-
-    @property
     def expired_at(self) -> datetime:
-        return self.__expired_at
+        return self._expired_at
