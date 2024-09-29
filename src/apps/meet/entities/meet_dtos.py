@@ -6,7 +6,6 @@ from datetime import datetime
 class AddMeetDTO:
     name: str
     meet_at: datetime
-    workspace_id: int
     category_id: int
     owner_id: int
     assigned_to: int
@@ -15,3 +14,4 @@ class AddMeetDTO:
 @dataclass
 class MeetDTO(AddMeetDTO):
     id: int
+    workspace_id: int

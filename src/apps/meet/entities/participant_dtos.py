@@ -26,5 +26,4 @@ class ParticipantMeetDTO:
 @dataclass
 class UpdateStatusParticipantMeetDTO:
     user_id: int
-    meet_id: int
     status: UserMeetStatusEnum

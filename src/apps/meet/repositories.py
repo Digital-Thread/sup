@@ -10,7 +10,7 @@ from src.apps.meet.entities.participant_dtos import (
 
 class IMeetRepository(ABC):
     @abstractmethod
-    async def get_meets(self) -> list[MeetDTO]:
+    async def get_meets(self, **filter_by: str | int) -> list[MeetDTO]:
         raise NotImplementedError
 
     @abstractmethod
@@ -28,9 +28,19 @@ class IParticipantRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def invite(self, dto: InvitedMeetDTO) -> None:
+    async def invite(self, meet_id: int, dto: InvitedMeetDTO) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    async def check_participant(self, dto: UpdateStatusParticipantMeetDTO) -> None:
+    async def check_participant(self, meet_id: int, dto: UpdateStatusParticipantMeetDTO) -> None:
         raise NotImplementedError
+
+
+class IMeetRepositoryFactory(ABC):
+    @abstractmethod
+    def get_meet_repository(self) -> IMeetRepository:
+        pass
+
+    @abstractmethod
+    def get_participant_repository(self) -> IParticipantRepository:
+        pass

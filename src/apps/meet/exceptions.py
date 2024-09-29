@@ -1,4 +1,7 @@
 class MeetException(Exception):
+    def __init__(self, message: str):
+        self.message = message
+
     def __str__(self) -> str:
         return self.message
 
@@ -21,7 +24,13 @@ class MeetInviteException(MeetException):
         super().__init__(self.message)
 
 
-class MeetCheckException(MeetException):
+class ParticipantCheckException(MeetException):
     def __init__(self):
-        self.message = 'Meet check error'
+        self.message = 'Participant check error'
+        super().__init__(self.message)
+
+
+class ParticipantNotFoundException(MeetException):
+    def __init__(self):
+        self.message = 'Participant not found'
         super().__init__(self.message)
