@@ -12,15 +12,15 @@ from .exceptions import (
     ParticipantCheckException,
     ParticipantNotFoundException,
 )
-from .repositories import IMeetRepository, IParticipantRepository
 from .temp_dtos import UserInputDTO, WorkspaceInputDTO
 
 
 class MeetService:
     def __init__(
         self,
-        meet_repository: IMeetRepository,
-        participant_repository: IParticipantRepository,
+        repository_factory: IMeetRepositoryFactory,
+        user_service: 'UserServiceProtocol',
+        workspace_service: 'WorkspaceServiceProtocol',
     ):
         self.meet_repository = meet_repository
         self.participant_repository = participant_repository
