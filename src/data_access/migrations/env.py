@@ -8,7 +8,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from src.config import DbConfig
-from src.data_access import models
+from src.data_access.models import Base
 
 # from src1.infrastructure.database import models
 # from src1.shared.config import load_config
@@ -26,7 +26,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 
 # target_metadata = mymodel.Base.metadata
-target_metadata = models.Model.metadata
+target_metadata = Base.metadata
 
 
 # other values from the config, defined by the needs of env.py,

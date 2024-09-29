@@ -1,7 +1,7 @@
-from .models import Model
+from .base import Base
 from .user import User
 
 __all__ = (
-    'Model',
+    'Base',
     'User',
 )

@@ -70,6 +70,13 @@ class DbConfig:
     user: str
     database: str
     port: int
+    naming_convention = {
+        'ix': 'ix_%(column_0_label)s',
+        'uq': 'uq_%(table_name)s_%(column_0_N_name)s',
+        'ck': 'ck_%(table_name)s_%(constraint_name)s',
+        'fk': 'fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s',
+        'pk': 'pk_%(table_name)s',
+    }
 
     @staticmethod
     def from_env(env: Env) -> 'DbConfig':
@@ -81,6 +88,7 @@ class DbConfig:
         user = env.str('POSTGRES_USER')
         database = env.str('POSTGRES_DB')
         port = env.int('DB_PORT', 5432)
+
         return DbConfig(
             host=host,
             password=password,
