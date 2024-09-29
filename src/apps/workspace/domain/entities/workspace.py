@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from re import match
-from typing import Dict, Optional, Set
+from typing import Optional
 from uuid import UUID, uuid4
 
 from src.apps.workspace.domain.entities.validator_mixins import (
@@ -17,12 +17,12 @@ class Workspace(DescriptionValidatorMixin):
     _description: Optional[str] = field(default=None)
     logo: Optional[str] = field(default=None)
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    project_ids: Set[int] = field(default_factory=set)
-    meet_ids: Set[int] = field(default_factory=set)
-    tag_ids: Set[int] = field(default_factory=set)
-    role_ids: Set[int] = field(default_factory=set)
-    member_ids: Set[UUID] = field(default_factory=set)
-    member_roles: Dict[UUID, int] = field(default_factory=dict)
+    project_ids: set[int] = field(default_factory=set)
+    meet_ids: set[int] = field(default_factory=set)
+    tag_ids: set[int] = field(default_factory=set)
+    role_ids: set[int] = field(default_factory=set)
+    member_ids: set[UUID] = field(default_factory=set)
+    member_roles: dict[UUID, int] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         self._is_valid_name(self._name, 'рабочего пространства')

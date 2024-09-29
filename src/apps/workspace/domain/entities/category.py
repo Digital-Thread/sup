@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional, Set
+from typing import Optional
 from uuid import UUID
 
 from src.apps.workspace.domain.entities.validator_mixins import NameValidatorMixin
@@ -9,7 +9,7 @@ from src.apps.workspace.domain.entities.validator_mixins import NameValidatorMix
 class Category(NameValidatorMixin):
     _name: str
     id: Optional[int] = field(default=None)
-    workspace_ids: Set[UUID] = field(default_factory=set)
+    workspace_ids: set[UUID] = field(default_factory=set)
 
     def __post_init__(self) -> None:
         self._is_valid_name(self._name, 'Категории')
