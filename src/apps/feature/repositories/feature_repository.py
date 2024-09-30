@@ -41,7 +41,7 @@ class FeatureListQuery:
     page: int = 1
 
 
-class FeatureRepository(ABC):
+class IFeatureRepository(ABC):
 
     @abstractmethod
     async def create(self, feature: Feature) -> None:

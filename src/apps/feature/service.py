@@ -8,13 +8,13 @@ from apps.feature.exceptions import (
 )
 from apps.feature.repositories.feature_repository import (
     FeatureListQuery,
-    FeatureRepository,
+    IFeatureRepository,
 )
 
 
 class FeatureService:
 
-    def __init__(self, feature_repository: FeatureRepository):
+    def __init__(self, feature_repository: IFeatureRepository):
         self._repository = feature_repository
 
     async def create_feature(self, dto: FeatureInputDTO) -> None:
