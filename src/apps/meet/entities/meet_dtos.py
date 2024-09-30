@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 @dataclass
-class AddMeetDTO:
+class MeetInputDTO:
     name: str
     meet_at: datetime
     category_id: int
@@ -12,6 +12,6 @@ class AddMeetDTO:
 
 
 @dataclass
-class MeetDTO(AddMeetDTO):
+class MeetResponseDTO(MeetInputDTO):
     id: int
     workspace_id: int

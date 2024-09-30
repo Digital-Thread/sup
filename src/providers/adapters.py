@@ -9,8 +9,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from apps.meet.service import MeetService
-from src.apps import IMeetRepository, IMeetRepositoryFactory
+from src.apps import IMeetRepository, IParticipantRepository, MeetService
 from src.config import Config, DbConfig
 
 
@@ -46,5 +45,5 @@ class RepositoriesProvider(Provider):
     scope = Scope.REQUEST
 
     provide_meet_repository = provide(IMeetRepository)
-    provide_meet_repository_factory = provide(IMeetRepositoryFactory)
-    provide_meet_service = provide(MeetService(IMeetRepository, UserService, WorkspaceService))
+    provide_participant_repository = provide(IParticipantRepository)
+    provide_meet_service = provide(MeetService)

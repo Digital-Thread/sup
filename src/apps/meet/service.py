@@ -1,6 +1,4 @@
-from typing import TYPE_CHECKING
-
-from apps.meet.entities.meet_dtos import AddMeetDTO, MeetDTO
+from apps.meet.entities.meet_dtos import MeetInputDTO, MeetResponseDTO
 from apps.meet.entities.participant_dtos import (
     InvitedMeetDTO,
     ParticipantMeetDTO,
@@ -14,49 +12,50 @@ from .exceptions import (
     ParticipantCheckException,
     ParticipantNotFoundException,
 )
-from .repositories import IMeetRepositoryFactory
-
-if TYPE_CHECKING:
-    from .protocols import UserServiceProtocol, WorkspaceServiceProtocol
+from .repositories import IMeetRepository, IParticipantRepository
+from .temp_dtos import UserInputDTO, WorkspaceInputDTO
 
 
 class MeetService:
     def __init__(
         self,
-        repository_factory: IMeetRepositoryFactory,
-        user_service: 'UserServiceProtocol',
-        workspace_service: 'WorkspaceServiceProtocol',
+        meet_repository: IMeetRepository,
+        participant_repository: IParticipantRepository,
     ):
-        self.meet_repository = repository_factory.get_meet_repository()
-        self.participant_repository = repository_factory.get_participant_repository()
-        self.user_service = user_service
-        self.workspace_service = workspace_service
+        self.meet_repository = meet_repository
+        self.participant_repository = participant_repository
 
-    async def get_meets(self, **filter_by: int | str) -> list[MeetDTO]:
-        meets = await self.meet_repository.get_meets(**filter_by)
+    async def get_meets(
+        self, workspace: WorkspaceInputDTO, owner: UserInputDTO, **filter_by: int | str
+    ) -> list[MeetResponseDTO]:
+        meets = await self.meet_repository.get_meets(workspace, owner, **filter_by)
+        if not meets:
+            raise MeetNotFoundException()
         return meets
 
-    async def get_meet_by_id(self, meet_id: int) -> MeetDTO:
-        meet = await self.meet_repository.get_meet_by_id(meet_id)
+    async def get_meet_by_id(
+        self, workspace: WorkspaceInputDTO, owner: UserInputDTO, meet_id: int
+    ) -> MeetResponseDTO:
+        meet = await self.meet_repository.get_meet_by_id(workspace, owner, meet_id)
         if not meet:
             raise MeetNotFoundException()
         return meet
 
-    async def add_meet(self, dto: AddMeetDTO):
+    async def add_meet(self, workspace: WorkspaceInputDTO, owner: UserInputDTO, dto: MeetInputDTO):
         try:
-            await self.meet_repository.add_meet(dto)
+            await self.meet_repository.add_meet(workspace, owner, dto)
         except ValueError as e:
             raise MeetCreateException() from e
 
     async def invite(self, meet_id: int, dto: InvitedMeetDTO):
-        await self.get_meet_by_id(meet_id)
+        # await self.get_meet_by_id(meet_id)
         try:
             await self.participant_repository.invite(meet_id, dto)
         except ValueError as e:
             raise MeetInviteException() from e
 
     async def get_participants(self, meet_id: int) -> list[ParticipantMeetDTO]:
-        await self.get_meet_by_id(meet_id)
+        # await self.get_meet_by_id(meet_id)
         participants = await self.participant_repository.get_participants_by_meet_id(meet_id)
         if not participants:
             raise ParticipantNotFoundException()

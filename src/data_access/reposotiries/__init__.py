@@ -1,5 +1,6 @@
-from .meet import MeetRepository
+from .meet import MeetRepository, ParticipantRepository
 
 __all__ = [
     'MeetRepository',
+    'ParticipantRepository',
 ]
