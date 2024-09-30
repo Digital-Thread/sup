@@ -10,3 +10,7 @@ class InvalidTokenError(JWTException):
 class TokenExpireError(JWTException):
     def __init__(self, message: str = 'Время токена истекло'):
         super().__init__(message)
+
+class TokenRefreshExpireError(JWTException):
+    def __init__(self, message: str = 'Токен обновления недействителен или срок его действия истек. Пожалуйста, войдите в систему еще раз.'):
+        super().__init__(message)

@@ -6,7 +6,7 @@ import redis
 from pydantic import EmailStr
 
 from src.apps.auth.dto import AccessTokenDTO, RefreshTokenDTO
-from src.apps.auth.exceptions import InvalidTokenError, TokenExpireError
+from src.apps.auth.exceptions import InvalidTokenError, TokenExpireError, TokenRefreshExpireError
 from src.config import JWTConfig, RedisConfig
 
 
@@ -54,9 +54,6 @@ class JWTService:
         self.redis_client.set(
             f'refresh_token:{email}', refresh_token, ex=self.refresh_token_lifetime
         )
-
-        print(f'Успешный вход! Токен доступа: {access_token}')
-        print(f'Токен обновления: {refresh_token}')
         return access_token, refresh_token
 
     def removing_tokens(self, email: EmailStr) -> None:
@@ -69,12 +66,8 @@ class JWTService:
         if access_token:
             decoded = self.decode_token(access_token)
             if decoded:
-                print(f"Предоставлен доступ для электронной почты: {decoded['email']}")
                 return True
         else:
-            print(
-                'Срок действия токена доступа истек или он отсутствует, при попытке обновления...'
-            )
             return self.refresh_access_token(email)
         return False
 
@@ -91,9 +84,5 @@ class JWTService:
                 self.redis_client.set(
                     f'refresh_token:{email}', new_refresh_token, ex=self.refresh_token_lifetime
                 )
-                print(f'Обновлен токен доступа! Новый токен доступа: {new_access_token}')
                 return True
-        print(
-            'Токен обновления недействителен или срок его действия истек. Пожалуйста, войдите в систему еще раз.'
-        )
-        return False
+        raise TokenRefreshExpireError()
