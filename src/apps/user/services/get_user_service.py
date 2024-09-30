@@ -2,10 +2,12 @@ from typing import List
 
 from src.apps.user.dtos import UserResponseDTO
 from src.apps.user.exceptions import UserNotFoundError
-from src.apps.user.services import UserService
+from src.apps.user.repositories import IUserRepository
 
 
-class GetUserService(UserService):
+class GetUserService:
+    def __init__(self, repository: IUserRepository):
+        self.repository = repository
 
     def get_user_by_email(self, email: str) -> UserResponseDTO:
         user = self.repository.find_by_email(email)

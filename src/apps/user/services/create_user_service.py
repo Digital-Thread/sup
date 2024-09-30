@@ -1,13 +1,38 @@
+import uuid
+from datetime import timedelta
+from typing import TYPE_CHECKING
+
+import redis
 from passlib.context import CryptContext
 
 from src.apps.user.domain.entities import User
 from src.apps.user.dtos import UserCreateDTO, UserResponseDTO
-from src.apps.user.exceptions import UserAlreadyExistsError, UserNotFoundError
+from src.apps.user.exceptions import (
+    TokenActivationExpire,
+    UserAlreadyExistsError,
+    UserNotFoundError,
+)
+from src.apps.user.repositories import IUserRepository
 from src.apps.user.services import GetUserService, UserService
+from src.config import RedisConfig
+
+if TYPE_CHECKING:
+    from src.apps.user.protocols import SendMailServiceProtocol
 
 
-class CreateUserService(UserService):
-    pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
+class CreateUserService:
+    def __init__(
+        self,
+        pwd_context: CryptContext,
+        send_mail_service: SendMailServiceProtocol,
+        repository: IUserRepository,
+        redis_config: RedisConfig,
+    ):
+        self.repository = repository
+        self.pwd_context = pwd_context or CryptContext(schemes=['bcrypt'], deprecated='auto')
+        self.send_mail_service = send_mail_service
+        dsn = redis_config.construct_redis_dsn
+        self.redis_client = redis.StrictRedis.from_url(dsn)
 
     def create_user(self, dto: UserCreateDTO) -> UserResponseDTO:
         get_user_service = GetUserService(self.repository)
@@ -17,16 +42,36 @@ class CreateUserService(UserService):
         user = User(**dto.model_dump())
         user.password = self.get_password_hash(dto.password)
         self.repository.save(user)
-        return user
+        activation_token = self.generate_activation_token(user.email)
+        self.redis_client.set(
+            f'activation_token:{user.email}', activation_token, ex=timedelta(days=7)
+        )
+        self.send_mail_service.send_activation_email(user.email, activation_token)
+        return UserResponseDTO.model_validate(user)
 
     def activate_user(self, email: str) -> UserResponseDTO:
         user = self.repository.find_by_email(email)
         if user is None:
-            raise UserNotFoundError('Пользователь не найден.')
+            raise UserNotFoundError()
         user.is_active = True
         self.repository.save(user)
         return user
 
+    def activate_user_by_token(self, email: str, token: str) -> UserResponseDTO:
+        stored_token = self.redis_client.get(f'activation_token:{email}')
+        if stored_token is None or stored_token.decode() != token:
+            raise TokenActivationExpire()
+        user = self.repository.find_by_email(email)
+        if user is None:
+            raise UserNotFoundError()
+        user.is_active = True
+        self.repository.save(user)
+        self.redis_client.delete(f'activation_token:{email}')
+        return user
+
     def get_password_hash(self, password: str) -> str:
-        """Получение хеш-пароля"""
         return self.pwd_context.hash(password)
+
+    @staticmethod
+    def generate_activation_token(email: str) -> str:
+        return str(uuid.uuid4())

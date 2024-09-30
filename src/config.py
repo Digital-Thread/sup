@@ -1,4 +1,5 @@
 import dataclasses
+from datetime import timedelta
 
 from environs import Env
 from sqlalchemy import URL
@@ -158,19 +159,21 @@ class SMTPConfig:
 
 @dataclasses.dataclass(frozen=True, slots=True)
 class JWTConfig:
-    SECRET_KEY: str
-    ALGORITHM: str
-    ACCESS_TOKEN_EXPIRE_MINUTES: int
+    secret_key: str
+    algorithm: str
+    access_token_expire_minutes: int
+    access_token_lifetime: timedelta = timedelta(minutes=15)
+    refresh_token_lifetime: timedelta = timedelta(days=7)
 
     @staticmethod
     def from_env(env: Env) -> 'JWTConfig':
-        SECRET_KEY = env.str('SECRET_KEY')
-        ALGORITHM = env.str('ALGORITHM')
-        ACCESS_TOKEN_EXPIRE_MINUTES = env.int('ACCESS_TOKEN_EXPIRE_MINUTES')
+        secret_key = env.str('SECRET_KEY')
+        algorithm = env.str('ALGORITHM')
+        access_token_expire_minutes = env.int('ACCESS_TOKEN_EXPIRE_MINUTES')
         return JWTConfig(
-            SECRET_KEY=SECRET_KEY,
-            ALGORITHM=ALGORITHM,
-            ACCESS_TOKEN_EXPIRE_MINUTES=ACCESS_TOKEN_EXPIRE_MINUTES,
+            secret_key=secret_key,
+            algorithm=algorithm,
+            access_token_expire_minutes=access_token_expire_minutes,
         )
 
 

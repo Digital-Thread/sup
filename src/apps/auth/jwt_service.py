@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from typing import Any, Dict, Optional, Union
 
 import jwt
@@ -6,31 +6,31 @@ import redis
 from pydantic import EmailStr
 
 from src.apps.auth.dto import AccessTokenDTO, RefreshTokenDTO
+from src.apps.auth.exceptions import InvalidTokenError, TokenExpireError
 from src.config import JWTConfig, RedisConfig
 
 
 class JWTService:
 
     def __init__(self, jwt_config: JWTConfig, redis_config: RedisConfig):
-        self.secret_key = jwt_config.SECRET_KEY
-        self.algorithm = jwt_config.ALGORITHM
-        self.token_expire_minutes = jwt_config.ACCESS_TOKEN_EXPIRE_MINUTES
-
-        self.ACCESS_TOKEN_LIFETIME = timedelta(minutes=15)
-        self.REFRESH_TOKEN_LIFETIME = timedelta(days=7)
+        self.secret_key = jwt_config.secret_key
+        self.algorithm = jwt_config.algorithm
+        self.token_expire_minutes = jwt_config.access_token_expire_minutes
+        self.access_token_lifetime = jwt_config.access_token_lifetime
+        self.refresh_token_lifetime = jwt_config.refresh_token_lifetime
 
         dsn = redis_config.construct_redis_dsn
         self.redis_client = redis.StrictRedis.from_url(dsn)
 
     def create_access_token(self, email: EmailStr) -> AccessTokenDTO:
-        expiration = datetime.now(timezone.utc) + self.ACCESS_TOKEN_LIFETIME
+        expiration = datetime.now(timezone.utc) + self.access_token_lifetime
         token = jwt.encode(
             {'email': email, 'exp': expiration}, self.secret_key, algorithm=self.algorithm
         )
         return token
 
     def create_refresh_token(self, email: EmailStr) -> RefreshTokenDTO:
-        expiration = datetime.now(timezone.utc) + self.REFRESH_TOKEN_LIFETIME
+        expiration = datetime.now(timezone.utc) + self.refresh_token_lifetime
         token = jwt.encode(
             {'email': email, 'exp': expiration}, self.secret_key, algorithm=self.algorithm
         )
@@ -42,19 +42,17 @@ class JWTService:
             print(payload)
             return payload
         except jwt.ExpiredSignatureError:
-            print('Токе истек!')
-            return None
+            raise TokenExpireError()
         except jwt.InvalidTokenError:
-            print('Невалидный токен!')
-            return None
+            raise InvalidTokenError()
 
     def creating_tokens(self, email: EmailStr) -> tuple[AccessTokenDTO, RefreshTokenDTO]:
         access_token = self.create_access_token(email)
         refresh_token = self.create_refresh_token(email)
 
-        self.redis_client.set(f'access_token:{email}', access_token, ex=self.ACCESS_TOKEN_LIFETIME)
+        self.redis_client.set(f'access_token:{email}', access_token, ex=self.access_token_lifetime)
         self.redis_client.set(
-            f'refresh_token:{email}', refresh_token, ex=self.REFRESH_TOKEN_LIFETIME
+            f'refresh_token:{email}', refresh_token, ex=self.refresh_token_lifetime
         )
 
         print(f'Успешный вход! Токен доступа: {access_token}')
@@ -80,7 +78,6 @@ class JWTService:
             return self.refresh_access_token(email)
         return False
 
-    # Функция для обновления access token с использованием refresh token
     def refresh_access_token(self, email: EmailStr) -> bool:
         refresh_token = self.redis_client.get(f'refresh_token:{email}')
         if refresh_token:
@@ -89,10 +86,10 @@ class JWTService:
                 new_access_token = self.create_access_token(email)
                 new_refresh_token = self.create_refresh_token(email)
                 self.redis_client.set(
-                    f'access_token:{email}', new_access_token, ex=self.ACCESS_TOKEN_LIFETIME
+                    f'access_token:{email}', new_access_token, ex=self.access_token_lifetime
                 )
                 self.redis_client.set(
-                    f'refresh_token:{email}', new_refresh_token, ex=self.REFRESH_TOKEN_LIFETIME
+                    f'refresh_token:{email}', new_refresh_token, ex=self.refresh_token_lifetime
                 )
                 print(f'Обновлен токен доступа! Новый токен доступа: {new_access_token}')
                 return True

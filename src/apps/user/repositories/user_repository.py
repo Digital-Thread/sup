@@ -5,7 +5,7 @@ from src.apps.user.domain.entities import User
 from src.apps.user.dtos import UserResponseDTO
 
 
-class UserRepository(ABC):
+class IUserRepository(ABC):
     @abstractmethod
     def save(self, user: User) -> None:
         pass
@@ -17,4 +17,3 @@ class UserRepository(ABC):
     @abstractmethod
     def find_all_users(self) -> List[UserResponseDTO]:
         pass
-
