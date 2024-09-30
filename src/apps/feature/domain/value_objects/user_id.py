@@ -1,3 +1,4 @@
+from typing import NewType
 from uuid import UUID
 
-UserId = UUID
+UserId = NewType('UserId', UUID)
