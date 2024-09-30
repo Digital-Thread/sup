@@ -1,9 +1,4 @@
-class MeetException(Exception):
-    def __init__(self, message: str):
-        self.message = message
-
-    def __str__(self) -> str:
-        return self.message
+from apps import ApplicationError
 
 
 class MeetNotFoundException(ApplicationError):
@@ -26,13 +21,11 @@ class ParticipantCheckException(ApplicationError):
         super().__init__(status_code=400, message='Participant check error')
 
 
-class ParticipantCheckException(MeetException):
+class ParticipantCheckException(ApplicationError):
     def __init__(self):
-        self.message = 'Participant check error'
-        super().__init__(self.message)
+        super().__init__(status_code=400, message='Participant check error')
 
 
-class ParticipantNotFoundException(MeetException):
+class ParticipantNotFoundException(ApplicationError):
     def __init__(self):
-        self.message = 'Participant not found'
-        super().__init__(self.message)
+        super().__init__(status_code=404, message='Participant not found')

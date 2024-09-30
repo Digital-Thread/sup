@@ -18,9 +18,8 @@ from .temp_dtos import UserInputDTO, WorkspaceInputDTO
 class MeetService:
     def __init__(
         self,
-        repository_factory: IMeetRepositoryFactory,
-        user_service: 'UserServiceProtocol',
-        workspace_service: 'WorkspaceServiceProtocol',
+        meet_repository: IMeetRepository,
+        participant_repository: IParticipantRepository,
     ):
         self.meet_repository = meet_repository
         self.participant_repository = participant_repository

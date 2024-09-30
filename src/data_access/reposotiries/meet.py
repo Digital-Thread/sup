@@ -17,21 +17,8 @@ from src.apps.meet.temp_dtos import UserInputDTO, WorkspaceInputDTO
 from src.data_access.models import Meet
 
 
-class RepositoryFactory(IMeetRepositoryFactory):
-    def __init__(self, workspace_id: int, session: AsyncSession):
-        self.workspace_id = workspace_id
-        self._session = session
-
-    def get_meet_repository(self) -> IMeetRepository:
-        return MeetRepository(self.workspace_id, self._session)
-
-    def get_participant_repository(self) -> IParticipantRepository:
-        return ParticipantRepository(self.workspace_id, self._session)
-
-
 class MeetRepository(IMeetRepository):
-    def __init__(self, workspace_id: int, session: AsyncSession):
-        self.workspace_id = workspace_id
+    def __init__(self, session: AsyncSession):
         self._session = session
 
     async def get_meets(
@@ -107,13 +94,13 @@ class ParticipantRepository(IParticipantRepository):
         self.workspace_id = workspace_id
         self._session = session
 
-    async def get_participants_by_meet_id(self, meet_id: int) -> list[ParticipantMeetDTO]:
-        query = select(Meet).where(Meet.id == meet_id)
+    async def get_participants_by_meet_id(self, meet_id: int) -> list[ParticipantMeetDTO] | None:
+        query = select(Participant).where(Meet.id == meet_id)
         result = await self._session.execute(query)
-        meet = result.scalar_one_or_none()
-        if not meet:
-            raise Exception('Meet not found')
-        return meet.participants
+        data = result.mappings().all()
+        if not data:
+            return None
+        return [ParticipantMeetDTO(**d) for d in data]
 
     async def invite(self, meet_id: int, dto: InvitedMeetDTO) -> None:
         query = select(Meet).where(Meet.id == meet_id)
