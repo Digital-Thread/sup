@@ -1,7 +1,7 @@
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter
 
-from apps.meet.entities.meet_dtos import MeetInputDTO
+from apps.meet.dtos import MeetInputDTO
 from apps.meet.service import MeetService
 from apps.meet.temp_dtos import UserInputDTO, WorkspaceInputDTO
 from src.api.dtos.meet import MeetRequest

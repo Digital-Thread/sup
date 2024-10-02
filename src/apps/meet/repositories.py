@@ -1,12 +1,11 @@
 from abc import ABC, abstractmethod
 
-from src.apps.meet.entities.meet_dtos import MeetInputDTO, MeetResponseDTO
-from src.apps.meet.entities.participant_dtos import (
+from .dtos import MeetInputDTO, MeetResponseDTO
+from .entities.participant_dtos import (
     InvitedMeetDTO,
     ParticipantMeetDTO,
     UpdateStatusParticipantMeetDTO,
 )
-
 from .temp_dtos import UserInputDTO, WorkspaceInputDTO
 
 

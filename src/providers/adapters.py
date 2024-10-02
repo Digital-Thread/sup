@@ -1,6 +1,6 @@
 from typing import AsyncIterable
 
-from dishka import Provider, Scope, provide
+from dishka import Provider, Scope, provide, provide_all
 from environs import Env
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -44,6 +44,4 @@ class ConfigProvider(Provider):
 class RepositoriesProvider(Provider):
     scope = Scope.REQUEST
 
-    provide_meet_repository = provide(IMeetRepository)
-    provide_participant_repository = provide(IParticipantRepository)
-    provide_meet_service = provide(MeetService)
+    provide_meet = provide_all(IMeetRepository, IParticipantRepository, MeetService)

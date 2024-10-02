@@ -2,13 +2,13 @@ from sqlalchemy import and_, insert, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from apps.meet.dtos import MeetInputDTO, MeetResponseDTO
 from apps.meet.entities.participant_dtos import (
     InvitedMeetDTO,
     ParticipantMeetDTO,
     UpdateStatusParticipantMeetDTO,
 )
 from data_access.models.meet import Participant
-from src.apps.meet.entities.meet_dtos import MeetInputDTO, MeetResponseDTO
 from src.apps.meet.repositories import (
     IMeetRepository,
     IParticipantRepository,

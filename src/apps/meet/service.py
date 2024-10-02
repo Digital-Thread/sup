@@ -1,10 +1,9 @@
-from apps.meet.entities.meet_dtos import MeetInputDTO, MeetResponseDTO
-from apps.meet.entities.participant_dtos import (
+from .dtos import MeetInputDTO, MeetResponseDTO
+from .entities.participant_dtos import (
     InvitedMeetDTO,
     ParticipantMeetDTO,
     UpdateStatusParticipantMeetDTO,
 )
-
 from .exceptions import (
     MeetCreateException,
     MeetInviteException,
