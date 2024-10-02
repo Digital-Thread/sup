@@ -1,4 +1,4 @@
-class ApplicationError(Exception):
+class ApplicationException(Exception):
     """Base exception for application errors"""
 
     pass
