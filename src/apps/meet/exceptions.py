@@ -1,19 +1,25 @@
 from apps import ApplicationError
 
 
-class MeetNotFoundException(ApplicationError):
+class BaseMeetException(ApplicationError):
+    def __init__(self, message: str = 'Meet error'):
+        self.message = message
+        super().__init__(self.message)
+
+
+class MeetNotFoundException(BaseMeetException):
     def __init__(self):
-        super().__init__(status_code=404, message='Meet not found')
+        super().__init__(message='Meet not found')
 
 
-class MeetCreateException(ApplicationError):
+class MeetCreateException(BaseMeetException):
     def __init__(self):
-        super().__init__(status_code=400, message='Meet create error')
+        super().__init__(message='Meet create error')
 
 
-class MeetInviteException(ApplicationError):
+class MeetInviteException(BaseMeetException):
     def __init__(self):
-        super().__init__(status_code=400, message='Meet invite error')
+        super().__init__(message='Meet invite error')
 
 
 class ParticipantCheckException(ApplicationError):
@@ -28,4 +34,4 @@ class ParticipantCheckException(ApplicationError):
 
 class ParticipantNotFoundException(ApplicationError):
     def __init__(self):
-        super().__init__(status_code=404, message='Participant not found')
+        super().__init__(message='Participant not found')
