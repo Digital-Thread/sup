@@ -10,7 +10,7 @@ from src.apps.workspace.domain.entities.validator_mixins import (
 
 @dataclass
 class Role(NameValidatorMixin, ColorValidatorMixin):
-    workspace_id: UUID
+    _workspace_id: UUID
     _name: str
     _color: str
     id: Optional[int] = field(default=None)
@@ -18,6 +18,10 @@ class Role(NameValidatorMixin, ColorValidatorMixin):
     def __post_init__(self) -> None:
         self._is_valid_name(self._name, 'Роли')
         self._is_valid_color(self._color)
+
+    @property
+    def workspace_id(self) -> UUID:
+        return self._workspace_id
 
     @property
     def name(self) -> str:
