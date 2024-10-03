@@ -1,13 +1,4 @@
-import dataclasses
-from typing import ClassVar
+class ApplicationException(Exception):
+    """Base exception for application errors"""
 
-
-@dataclasses.dataclass(eq=False)
-class ApplicationError(Exception):
-    """Base Error"""
-
-    status_code: ClassVar[int] = 500
-
-    @property
-    def message(self) -> str:
-        return 'An app error occurred'
+    pass
