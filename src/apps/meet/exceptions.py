@@ -1,7 +1,7 @@
-from apps import ApplicationError
+from apps import ApplicationException
 
 
-class BaseMeetException(ApplicationError):
+class BaseMeetException(ApplicationException):
     def __init__(self, message: str = 'Meet error'):
         self.message = message
         super().__init__(self.message)
@@ -22,16 +22,11 @@ class MeetInviteException(BaseMeetException):
         super().__init__(message='Meet invite error')
 
 
-class ParticipantCheckException(ApplicationError):
+class ParticipantCheckException(BaseMeetException):
     def __init__(self):
-        super().__init__(status_code=400, message='Participant check error')
+        super().__init__(message='Participant check error')
 
 
-class ParticipantCheckException(ApplicationError):
-    def __init__(self):
-        super().__init__(status_code=400, message='Participant check error')
-
-
-class ParticipantNotFoundException(ApplicationError):
+class ParticipantNotFoundException(BaseMeetException):
     def __init__(self):
         super().__init__(message='Participant not found')

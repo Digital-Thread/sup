@@ -6,7 +6,6 @@ from apps.meet.dtos import MeetInputDTO, MeetResponseDTO
 from apps.meet.entities.participant_dtos import (
     InvitedMeetDTO,
     ParticipantMeetDTO,
-    UpdateStatusParticipantMeetDTO,
 )
 from data_access.models.meet import Participant
 from src.apps.meet.repositories import (
@@ -67,42 +66,7 @@ class ParticipantRepository(IParticipantRepository):
             return None
         return [ParticipantMeetDTO(**d) for d in data]
 
-    async def invite(self, meet_id: int, dto: InvitedMeetDTO) -> None:
-        query = select(Meet).where(Meet.id == meet_id)
-        result = await self._session.execute(query)
-        data = result.mappings().one_or_none()
-        if not data:
-            raise Exception('Meet not found')
-        data.participants.append(ParticipantMeetDTO(**dto.__dict__))
-        await self._session.commit()
-
-    async def check_participant(self, meet_id: int, dto: UpdateStatusParticipantMeetDTO) -> None:
-        query = select(Meet).where(Meet.id == meet_id)
-        result = await self._session.execute(query)
-        meet = result.mappings().one_or_none()
-        if not meet:
-            raise Exception('Meet not found')
-        if dto.status == 'accepted':
-            meet.participants.append(ParticipantMeetDTO(**dto.__dict__))
-        elif dto.status == 'declined':
-            meet.participants.remove(ParticipantMeetDTO(**dto.__dict__))
-        await self._session.commit()
-
-
-class ParticipantRepository(IParticipantRepository):
-    def __init__(self, workspace_id: int, session: AsyncSession):
-        self.workspace_id = workspace_id
-        self._session = session
-
-    async def get_participants_by_meet_id(self, meet_id: int) -> list[ParticipantMeetDTO] | None:
-        query = select(Participant).where(Meet.id == meet_id)
-        result = await self._session.execute(query)
-        data = result.mappings().all()
-        if not data:
-            return None
-        return [ParticipantMeetDTO(**d) for d in data]
-
-    async def invite(self, meet_id: int, dto: InvitedMeetDTO) -> None:
+    async def invite(self, meet_id: int, dto: InvitedMeetDTO) -> MeetResponseDTO | None:
         query = select(Meet).where(Meet.id == meet_id)
         result = await self._session.execute(query)
         meet = result.mappings().one_or_none()
@@ -119,38 +83,3 @@ class ParticipantRepository(IParticipantRepository):
         except SQLAlchemyError as e:
             await self._session.rollback()
             raise e
-
-
-class ParticipantRepository(IParticipantRepository):
-    def __init__(self, workspace_id: int, session: AsyncSession):
-        self.workspace_id = workspace_id
-        self._session = session
-
-    async def get_participants_by_meet_id(self, meet_id: int) -> list[ParticipantMeetDTO] | None:
-        query = select(Participant).where(Meet.id == meet_id)
-        result = await self._session.execute(query)
-        data = result.mappings().all()
-        if not data:
-            return None
-        return [ParticipantMeetDTO(**d) for d in data]
-
-    async def invite(self, meet_id: int, dto: InvitedMeetDTO) -> None:
-        query = select(Meet).where(Meet.id == meet_id)
-        result = await self._session.execute(query)
-        data = result.mappings().one_or_none()
-        if not data:
-            raise Exception('Meet not found')
-        data.participants.append(ParticipantMeetDTO(**dto.__dict__))
-        await self._session.commit()
-
-    async def check_participant(self, meet_id: int, dto: UpdateStatusParticipantMeetDTO) -> None:
-        query = select(Meet).where(Meet.id == meet_id)
-        result = await self._session.execute(query)
-        meet = result.mappings().one_or_none()
-        if not meet:
-            raise Exception('Meet not found')
-        if dto.status == 'accepted':
-            meet.participants.append(ParticipantMeetDTO(**dto.__dict__))
-        elif dto.status == 'declined':
-            meet.participants.remove(ParticipantMeetDTO(**dto.__dict__))
-        await self._session.commit()

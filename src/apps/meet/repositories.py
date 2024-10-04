@@ -36,10 +36,8 @@ class IParticipantRepository(ABC):
 
     @abstractmethod
     async def invite(self, meet_id: int, dto: InvitedMeetDTO) -> None:
-    async def invite(self, meet_id: int, dto: InvitedMeetDTO) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    async def check_participant(self, meet_id: int, dto: UpdateStatusParticipantMeetDTO) -> None:
     async def check_participant(self, meet_id: int, dto: UpdateStatusParticipantMeetDTO) -> None:
         raise NotImplementedError

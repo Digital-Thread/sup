@@ -11,6 +11,7 @@ from .exceptions import (
     ParticipantCheckException,
     ParticipantNotFoundException,
 )
+from .repositories import IMeetRepository, IParticipantRepository
 from .temp_dtos import UserInputDTO, WorkspaceInputDTO
 
 

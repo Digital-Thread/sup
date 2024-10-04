@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from src.apps import IMeetRepository, IParticipantRepository, MeetService
+from src.apps.meet import IMeetRepository, IParticipantRepository, MeetService
 from src.config import Config, DbConfig
 
 
