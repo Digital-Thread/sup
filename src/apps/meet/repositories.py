@@ -35,9 +35,9 @@ class MeetFilterFields(TypedDict, total=False):
 @dataclass
 class MeetListQuery:
     filters: MeetFilterFields | None = None
-    order_by: SortBy | None = SortBy(OrderByField.MEET_AT, SortOrder.DESC)
-    paginate_by: Literal[5, 10] | None = 10
-    page: int = 1
+    order_by: SortBy = SortBy(OrderByField.MEET_AT, SortOrder.DESC)
+    limit: Literal[5, 10] = 10
+    offset: int = 0
 
 
 class IMeetRepository(ABC):
@@ -46,7 +46,7 @@ class IMeetRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_meets(self, query: MeetListQuery) -> list[Meet] | None:
+    async def get_meets(self, workspace_id: int, query: MeetListQuery) -> list[Meet] | None:
         raise NotImplementedError
 
     @abstractmethod

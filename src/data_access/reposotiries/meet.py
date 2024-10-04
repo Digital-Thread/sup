@@ -1,85 +1,111 @@
-from sqlalchemy import and_, insert, select
+from sqlalchemy import insert, select, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from apps.meet.dtos import MeetInputDTO, MeetResponseDTO
-from apps.meet.entities.participant_dtos import (
-    InvitedMeetDTO,
-    ParticipantMeetDTO,
-)
-from data_access.models.meet import Participant
+from src.apps.meet.entities.meet import Meet
+from src.apps.meet.entities.participant import Participant
+from src.apps.meet.entities.value_objects import MeetId, ParticipantId
 from src.apps.meet.repositories import (
     IMeetRepository,
     IParticipantRepository,
+    MeetListQuery,
+    SortOrder,
 )
-from src.apps.meet.temp_dtos import UserInputDTO, WorkspaceInputDTO
-from src.data_access.models import Meet
+from src.data_access.models import Meet as MeetModel
+from src.data_access.models.meet import Participant as ParticipantModel
 
 
 class MeetRepository(IMeetRepository):
     def __init__(self, session: AsyncSession):
         self._session = session
+        self.model = MeetModel
 
-    async def get_meets(
-        self, workspace: WorkspaceInputDTO, owner: UserInputDTO, **filter_by: str | int
-    ) -> list[MeetResponseDTO] | None:
-        query = (
-            select(Meet)
-            .where(and_(Meet.workspace_id == workspace.id, Meet.owner_id == owner.id))
-            .filter_by(**filter_by)
+    async def create_meet(self, meet: Meet) -> MeetId | None:
+        try:
+            smtp = insert(self.model).values(**meet.__dict__).returning(self.model.id)
+            result = await self._session.execute(smtp)
+            await self._session.commit()
+            return MeetId(result.scalar_one()) if result else None
+        except SQLAlchemyError as e:
+            await self._session.rollback()
+            raise e
+
+    async def get_meets(self, workspace_id: int, query: MeetListQuery) -> list[Meet] | None:
+        smtp = (
+            select(self.model)
+            .filter_by(workspace_id=workspace_id, **query.filters.__dict__)
+            .order_by(
+                getattr(self.model, query.order_by.field.value).asc()
+                if query.order_by.order == SortOrder.ASC
+                else getattr(self.model, query.order_by.field.value).desc()
+            )
+            .limit(query.limit)
+            .offset(query.offset)
         )
-        result = await self._session.execute(query)
+        result = await self._session.execute(smtp)
         if not result:
             return None
         data = result.mappings().all()
-        return [MeetResponseDTO(**d) for d in data]
+        return [Meet(**d) for d in data]
 
-    async def get_meet_by_id(self, id_: int) -> MeetResponseDTO | None:
-        query = select(Meet).where(Meet.id == id_)
-        result = await self._session.execute(query)
+    async def get_meet_by_id(self, meet_id: MeetId) -> Meet | None:
+        smtp = select(self.model).where(self.model.id == meet_id)
+        result = await self._session.execute(smtp)
         meet = result.mappings().one_or_none()
         if not meet:
             return None
-        return MeetResponseDTO(**meet)
+        return Meet(**meet)
 
-    async def add_meet(self, dto: MeetInputDTO) -> int:
+    async def update_meet(self, meet: Meet) -> MeetId | None:
         try:
-            query = insert(Meet).values(**dto.__dict__).returning(Meet.id)
-            result = await self._session.execute(query)
+            smtp = (
+                update(self.model)
+                .where(self.model.id == meet.id)
+                .values(**meet.__dict__)
+                .returning(self.model)
+            )
+            result = await self._session.execute(smtp)
             await self._session.commit()
-            return result.scalar_one()
+            return MeetId(result.scalar_one().id) if result else None
         except SQLAlchemyError as e:
             await self._session.rollback()
             raise e
 
 
 class ParticipantRepository(IParticipantRepository):
-    def __init__(self, workspace_id: int, session: AsyncSession):
-        self.workspace_id = workspace_id
+    def __init__(self, session: AsyncSession):
         self._session = session
+        self.model = ParticipantModel
 
-    async def get_participants_by_meet_id(self, meet_id: int) -> list[ParticipantMeetDTO] | None:
-        query = select(Participant).where(Meet.id == meet_id)
-        result = await self._session.execute(query)
+    async def get_participants_by_meet_id(self, meet_id: MeetId) -> list[Participant] | None:
+        smtp = select(self.model).where(self.model.meet_id == meet_id)
+        result = await self._session.execute(smtp)
         data = result.mappings().all()
         if not data:
             return None
-        return [ParticipantMeetDTO(**d) for d in data]
+        return [Participant(**d) for d in data]
 
-    async def invite(self, meet_id: int, dto: InvitedMeetDTO) -> MeetResponseDTO | None:
-        query = select(Meet).where(Meet.id == meet_id)
-        result = await self._session.execute(query)
-        meet = result.mappings().one_or_none()
-        if not meet:
-            return None
-        return MeetResponseDTO(**meet)
-
-    async def add_meet(self, dto: MeetInputDTO) -> int:
+    async def invite(self, participant: Participant) -> ParticipantId | None:
         try:
-            query = insert(Meet).values(**dto.__dict__).returning(Meet.id)
-            result = await self._session.execute(query)
+            smtp = insert(self.model).values(**participant.__dict__).returning(self.model.id)
+            result = await self._session.execute(smtp)
             await self._session.commit()
-            return result.scalar_one()
+            return ParticipantId(result.scalar_one()) if result else None
+        except SQLAlchemyError as e:
+            await self._session.rollback()
+            raise e
+
+    async def update_participant(self, participant: Participant) -> ParticipantId | None:
+        try:
+            smtp = (
+                update(self.model)
+                .where(self.model.id == participant.id)
+                .values(**participant.__dict__)
+                .returning(self.model)
+            )
+            result = await self._session.execute(smtp)
+            await self._session.commit()
+            return ParticipantId(result.scalar_one().id) if result else None
         except SQLAlchemyError as e:
             await self._session.rollback()
             raise e

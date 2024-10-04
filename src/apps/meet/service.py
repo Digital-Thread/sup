@@ -1,6 +1,7 @@
 from .dtos import (
     InvitedMeetDTO,
     MeetInputDTO,
+    MeetListQueryDTO,
     MeetResponseDTO,
     ParticipantResponseDTO,
     ParticipantUpdateDTO,
@@ -34,14 +35,15 @@ class MeetService:
             raise MeetCreateException() from e
         return await self.meet_repository.create_meet(meet)
 
-    async def get_meets(self, query: MeetListQuery) -> list[MeetResponseDTO]:
-        meets = await self.meet_repository.get_meets(query)
+    async def get_meets(self, workspace_id: int, query: MeetListQueryDTO) -> list[MeetResponseDTO]:
+        meet_query = MeetListQuery(**query.__dict__)
+        meets = await self.meet_repository.get_meets(workspace_id, meet_query)
         if not meets:
             raise MeetNotFoundException()
         return [MeetResponseDTO(**m.__dict__) for m in meets]
 
-    async def get_meet_by_id(self, meet_id: MeetId) -> MeetResponseDTO:
-        meet = await self.meet_repository.get_meet_by_id(meet_id)
+    async def get_meet_by_id(self, workspace_id: int, meet_id: int) -> MeetResponseDTO:
+        meet = await self.meet_repository.get_meet_by_id(MeetId(meet_id))
         if not meet:
             raise MeetNotFoundException()
         return MeetResponseDTO(**meet.__dict__)
@@ -54,8 +56,10 @@ class MeetService:
 
         await self.participant_repository.invite(participant)
 
-    async def get_participants(self, meet_id: MeetId) -> list[ParticipantResponseDTO]:
-        participants = await self.participant_repository.get_participants_by_meet_id(meet_id)
+    async def get_participants(self, meet_id: int) -> list[ParticipantResponseDTO]:
+        participants = await self.participant_repository.get_participants_by_meet_id(
+            MeetId(meet_id)
+        )
         if not participants:
             raise ParticipantNotFoundException()
         return [ParticipantResponseDTO(**p.__dict__) for p in participants]
