@@ -1,20 +1,51 @@
-from datetime import datetime
+from datetime import datetime, timezone
+from re import match
+
+from .value_objects import AssignedId, CategoryId, MeetId, OwnerId, ParticipantId, WorkspaceId
 
 
 class Meet:
+    _NAME_MAX_LENGHT = 50
+
     def __init__(
         self,
+        workspace_id: WorkspaceId,
         name: str,
         meet_at: datetime,
-        category_id: int,
-        owner_id: int,
-        assigned_to: int,
+        category_id: CategoryId,
+        owner_id: OwnerId,
+        assigned_to: AssignedId | None = None,
+        participants: list[ParticipantId] | None = None,
     ):
+        self._id: MeetId | None = None
+        self.workspace_id = workspace_id
         self.name = name
         self.meet_at = meet_at
         self.category_id = category_id
         self.owner_id = owner_id
         self.assigned_to = assigned_to
+        self.participants = participants if participants else set()
+        self._created_at = datetime.now(timezone.utc)
+        self._updated_at = datetime.now(timezone.utc)
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @name.setter
+    def name(self, value: str):
+        self._validate_name(value)
+        self._name = value
+
+    def _validate_name(self, name: str) -> None:
+        pattern = r'^[a-zA-Zа-яА-ЯёЁ ]+$'
+        max_length = self._NAME_MAX_LENGHT
+        if not match(pattern, name):
+            raise ValueError(
+                'Name must consist of letters and spaces, and must not contain special symbols.'
+            )
+        if len(name) > max_length:
+            raise ValueError(f'Name must not be longer than {max_length} characters.')
 
     @property
     def meet_at(self) -> datetime:
@@ -27,65 +58,20 @@ class Meet:
         self._meet_at = value
 
     @property
-    def name(self) -> str:
-        return self._name
-
-    @name.setter
-    def name(self, value: str):
-        self._name = value
-
-    @property
-    def category_id(self) -> int:
-        return self._category_id
-
-    @category_id.setter
-    def category_id(self, value: int):
-        self._category_id = value
-
-    @property
-    def owner_id(self) -> int:
-        return self._owner_id
-
-    @owner_id.setter
-    def owner_id(self, value: int):
-        self._owner_id = value
-
-    @property
-    def assigned_to(self) -> int:
-        return self._assigned_to
-
-    @assigned_to.setter
-    def assigned_to(self, value: int):
-        self._assigned_to = value
-
-    @property
-    def id(self) -> int:
+    def id(self) -> MeetId | None:
         return self._id
 
     @id.setter
-    def id(self, value: int):
+    def id(self, value: MeetId):
         self._id = value
-
-    @property
-    def workspace_id(self) -> int:
-        return self._workspace_id
-
-    @workspace_id.setter
-    def workspace_id(self, value: int):
-        self._workspace_id = value
 
     @property
     def created_at(self) -> datetime:
         return self._created_at
 
-    @created_at.setter
-    def created_at(self, value: datetime):
-        self._created_at = value
-
     @property
     def updated_at(self) -> datetime:
         return self._updated_at
 
-    @updated_at.setter
-    def updated_at(self, value: datetime):
-        self._updated_at = value
+    def mark_as_updated(self) -> None:
+        self._updated_at = datetime.now(timezone.utc)

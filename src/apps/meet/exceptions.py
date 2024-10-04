@@ -1,10 +1,15 @@
-from apps import ApplicationException
+from src.apps import ApplicationException
 
 
 class BaseMeetException(ApplicationException):
     def __init__(self, message: str = 'Meet error'):
         self.message = message
         super().__init__(self.message)
+
+
+class MeetNameLengthException(BaseMeetException):
+    def __init__(self):
+        super().__init__(message='Meet name length error')
 
 
 class MeetNotFoundException(BaseMeetException):
