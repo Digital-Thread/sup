@@ -7,6 +7,11 @@ class BaseMeetException(ApplicationException):
         super().__init__(self.message)
 
 
+class AccessDeniedException(BaseMeetException):
+    def __init__(self):
+        super().__init__(message='Access denied')
+
+
 class MeetNameLengthException(BaseMeetException):
     def __init__(self):
         super().__init__(message='Meet name length error')

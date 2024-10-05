@@ -7,11 +7,9 @@ from uuid import UUID
 
 @dataclass
 class MeetInputDTO:
-    workspace_id: int
     name: str
     meet_at: datetime
     category_id: int
-    owner_id: UUID
     assigned_to: UUID
     participants: list[int]
 
@@ -33,6 +31,7 @@ class MeetUpdateDTO:
 @dataclass
 class MeetResponseDTO(MeetInputDTO):
     id: int
+    owner_id: UUID
 
 
 @dataclass

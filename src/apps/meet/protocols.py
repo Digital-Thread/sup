@@ -1,11 +1,8 @@
 from typing import Protocol
-
-
-class UserServiceProtocol(Protocol):
-    def get_user_by_id(self, user_id: int):
-        pass
+from uuid import UUID
 
 
 class WorkspaceServiceProtocol(Protocol):
-    def get_workspace_by_id(self, workspace_id: int):
-        pass
+    async def user_has_access(self, user_id: UUID, workspace_id: int) -> bool:
+        """Check if user has access to the workspace"""
+        ...

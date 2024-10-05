@@ -6,7 +6,14 @@ from typing import Literal, NamedTuple, TypedDict
 
 from .entities.meet import Meet
 from .entities.participant import Participant
-from .entities.value_objects import AssignedId, CategoryId, MeetId, ParticipantId
+from .entities.value_objects import (
+    AssignedId,
+    CategoryId,
+    MeetId,
+    OwnerId,
+    ParticipantId,
+    WorkspaceId,
+)
 
 
 class OrderByField(Enum):
@@ -42,31 +49,35 @@ class MeetListQuery:
 
 class IMeetRepository(ABC):
     @abstractmethod
-    async def create_meet(self, meet: Meet) -> MeetId:
+    async def create_meet(self, owner_id: OwnerId, workspace_id: WorkspaceId, meet: Meet) -> MeetId:
         raise NotImplementedError
 
     @abstractmethod
-    async def get_meets(self, workspace_id: int, query: MeetListQuery) -> list[Meet] | None:
+    async def get_meets(self, workspace_id: WorkspaceId, query: MeetListQuery) -> list[Meet] | None:
         raise NotImplementedError
 
     @abstractmethod
-    async def get_meet_by_id(self, meet_id: MeetId) -> Meet | None:
+    async def get_meet_by_id(self, workspace_id: WorkspaceId, meet_id: MeetId) -> Meet | None:
         raise NotImplementedError
 
     @abstractmethod
-    async def update_meet(self, meet: Meet) -> Meet:
+    async def update_meet(self, owner_id: OwnerId, workspace_id: WorkspaceId, meet: Meet) -> Meet:
         raise NotImplementedError
 
 
 class IParticipantRepository(ABC):
     @abstractmethod
-    async def get_participants_by_meet_id(self, meet_id: MeetId) -> list[Participant] | None:
+    async def get_participants_by_meet_id(
+        self, workspace_id: WorkspaceId, meet_id: MeetId
+    ) -> list[Participant] | None:
         raise NotImplementedError
 
     @abstractmethod
-    async def invite(self, participant: Participant) -> ParticipantId:
+    async def invite(self, workspace_id: WorkspaceId, participant: Participant) -> ParticipantId:
         raise NotImplementedError
 
     @abstractmethod
-    async def update_participant(self, participant: Participant) -> ParticipantId:
+    async def update_participant(
+        self, workspace_id: WorkspaceId, participant: Participant
+    ) -> ParticipantId:
         raise NotImplementedError
