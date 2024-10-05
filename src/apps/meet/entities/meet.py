@@ -1,7 +1,10 @@
 from datetime import datetime, timezone
 from re import match
 
-from .value_objects import AssignedId, CategoryId, MeetId, OwnerId, ParticipantId, WorkspaceId
+from src.apps.meet.dtos import MeetResponseDTO
+
+from .participant import Participant
+from .value_objects import AssignedId, CategoryId, MeetId, OwnerId, WorkspaceId
 
 
 class Meet:
@@ -14,8 +17,8 @@ class Meet:
         meet_at: datetime,
         category_id: CategoryId,
         owner_id: OwnerId,
-        assigned_to: AssignedId | None = None,
-        participants: list[ParticipantId] | None = None,
+        assigned_to: AssignedId,
+        participants: list[Participant],
     ):
         self._id: MeetId | None = None
         self.workspace_id = workspace_id
@@ -24,7 +27,7 @@ class Meet:
         self.category_id = category_id
         self.owner_id = owner_id
         self.assigned_to = assigned_to
-        self.participants = participants if participants else set()
+        self.participants = participants if participants else []
         self._created_at = datetime.now(timezone.utc)
         self._updated_at = datetime.now(timezone.utc)
 
@@ -58,7 +61,9 @@ class Meet:
         self._meet_at = value
 
     @property
-    def id(self) -> MeetId | None:
+    def id(self) -> MeetId:
+        if self._id is None:
+            raise ValueError('Meet id is None.')
         return self._id
 
     @id.setter
@@ -75,3 +80,15 @@ class Meet:
 
     def mark_as_updated(self) -> None:
         self._updated_at = datetime.now(timezone.utc)
+
+    def to_dto(self) -> MeetResponseDTO:
+        participants = [p.to_dto() for p in self.participants] if self.participants else []
+        return MeetResponseDTO(
+            id=self.id,
+            name=self.name,
+            meet_at=self.meet_at,
+            category_id=self.category_id,
+            owner_id=self.owner_id,
+            assigned_to=self.assigned_to,
+            participants=participants,
+        )

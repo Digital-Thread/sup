@@ -6,12 +6,26 @@ from uuid import UUID
 
 
 @dataclass
+class ParticipantInputDTO:
+    user_id: int
+    status: str
+
+
+@dataclass
+class ParticipantResponseDTO:
+    id: int
+    user_id: UUID
+    meet_id: int
+    status: str
+
+
+@dataclass
 class MeetInputDTO:
     name: str
     meet_at: datetime
     category_id: int
     assigned_to: UUID
-    participants: list[int]
+    participants: list[ParticipantInputDTO]
 
 
 class OptionalUpdateMeetFields(TypedDict, total=False):
@@ -29,9 +43,14 @@ class MeetUpdateDTO:
 
 
 @dataclass
-class MeetResponseDTO(MeetInputDTO):
+class MeetResponseDTO:
     id: int
     owner_id: UUID
+    name: str
+    meet_at: datetime
+    category_id: int
+    assigned_to: UUID
+    participants: list[ParticipantResponseDTO]
 
 
 @dataclass
@@ -44,14 +63,6 @@ class InvitedMeetDTO(MeetInputDTO):
 @dataclass
 class ParticipantUpdateDTO:
     id: int
-    status: str
-
-
-@dataclass
-class ParticipantResponseDTO:
-    id: int
-    user_id: UUID
-    meet_id: int
     status: str
 
 
@@ -82,5 +93,5 @@ class MeetFilterFields(TypedDict, total=False):
 class MeetListQueryDTO:
     filters: MeetFilterFields | None = None
     order_by: SortBy = SortBy(OrderByField.MEET_AT, SortOrder.DESC)
-    limit: Literal[5, 10] = 10
+    limit: Literal[4, 8, 16, 24] | None = 16
     offset: int = 0

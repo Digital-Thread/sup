@@ -14,10 +14,10 @@ class PaginatedParams:
     def __init__(
         self,
         page: Annotated[int, Query(default=1)],
-        per_page: Annotated[Literal[5, 10], Query(default=10)] = 10,
+        per_page: Annotated[Literal[4, 8, 16, 24] | None, Query(default=16)] = 16,
     ):
-        self.limit: Literal[5, 10] = per_page
-        self.offset = (page - 1) * per_page
+        self.limit: Literal[4, 8, 16, 24] | None = per_page
+        self.offset = (page - 1) * per_page if per_page else 0
 
 
 @router.post('/{workspace_id}/meets', response_model=int)

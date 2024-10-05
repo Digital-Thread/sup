@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
+from uuid import UUID
 
 from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -17,12 +18,12 @@ if TYPE_CHECKING:
 class Meet(Base, IntIdPkMixin, DatetimeFieldsMixin):
     name: Mapped[str]
     meet_at: Mapped[datetime]
-    workspace_id: Mapped[int]  # = mapped_column(ForeignKey('workspace.id'))
-    category_id: Mapped[int]  # = mapped_column(ForeignKey('category.id'))
-    owner_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
-    assigned_to: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    workspace_id: Mapped[int] = mapped_column(ForeignKey('workspace.id'))
+    category_id: Mapped[int] = mapped_column(ForeignKey('category.id'))
+    owner_id: Mapped[UUID] = mapped_column(ForeignKey('users.id'))
+    assigned_to: Mapped[UUID] = mapped_column(ForeignKey('users.id'))
 
-    participant: Mapped[list['Participant']] = relationship(back_populates='meet')
+    participants: Mapped[list['Participant']] = relationship(back_populates='meet')
 
     owner: Mapped['User'] = relationship(
         'User', foreign_keys=[owner_id], back_populates='owned_meetings'
@@ -35,7 +36,7 @@ class Meet(Base, IntIdPkMixin, DatetimeFieldsMixin):
 
 class Participant(Base, IntIdPkMixin, DatetimeFieldsMixin):
     meet_id: Mapped[int] = mapped_column(ForeignKey('meet.id'))
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    user_id: Mapped[UUID] = mapped_column(ForeignKey('users.id'))
     status: Mapped[str]
 
     user: Mapped['User'] = relationship('User', back_populates='participations')
