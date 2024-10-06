@@ -27,7 +27,7 @@ async def get_current_user_id() -> UUID:
 async def get_current_workspace_id() -> int:
     workspace_id = int(1)
     if not workspace_id:
-        raise Exception('User not found')
+        raise Exception('Workspace not found')
     return workspace_id
 
 
