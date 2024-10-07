@@ -1,7 +1,8 @@
 import datetime
+from typing import Any
 
-from src.apps.user.dtos import UserUpdateDTO, UserResponseDTO
-from src.apps.user.exceptions import UserNotFoundException, PermissionDeniedException
+from src.apps.user.dtos import UserResponseDTO, UserUpdateDTO
+from src.apps.user.exceptions import PermissionDeniedException, UserNotFoundException
 from src.apps.user.repositories import IUserRepository
 
 
@@ -9,7 +10,9 @@ class UpdateUserService:
     def __init__(self, user_repository: IUserRepository):
         self.user_repository = user_repository
 
-    async def update_user(self, email: str, current_user: UserUpdateDTO, new_data: dict) -> UserResponseDTO:
+    async def update_user(
+        self, email: str, current_user: UserUpdateDTO, new_data: dict[str, Any]
+    ) -> UserResponseDTO:
         user = await self.user_repository.find_by_email(email)
         if not user:
             raise UserNotFoundException(user.email)
@@ -24,6 +27,6 @@ class UpdateUserService:
                 continue
             if hasattr(user, key):
                 setattr(user, key, value)
-        user._updated_at = datetime.datetime.now
+        user._updated_at = datetime.datetime.now()
         await self.user_repository.update(user)
         return user

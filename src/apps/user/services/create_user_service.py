@@ -34,7 +34,7 @@ class CreateUserService:
         dsn = redis_config.construct_redis_dsn
         self.redis_client = redis.StrictRedis.from_url(dsn)
 
-    async def create_user(self, dto: UserCreateDTO) -> UserResponseDTO:
+    async def create_user(self, dto: UserCreateDTO) -> User:
         get_user_service = GetUserService(self.repository)
         existing_user = await get_user_service.get_user_by_email(dto.email)
         if existing_user:
@@ -47,7 +47,7 @@ class CreateUserService:
             f'activation_token:{user.email}', activation_token, ex=timedelta(days=7)
         )
         await self.send_mail_service.send_activation_email(user.email, activation_token)
-        return UserResponseDTO.model_validate(user)
+        return user
 
     async def activate_user(self, email: str) -> UserResponseDTO:
         user = await self.repository.find_by_email(email)

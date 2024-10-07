@@ -1,3 +1,3 @@
-from .dtos import UserCreateDTO, UserResponseDTO, UserUpdateDTO
+from .dtos import BaseUserDto, UserCreateDTO, UserResponseDTO, UserUpdateDTO
 
-__all__ = ['UserCreateDTO', 'UserResponseDTO', 'UserUpdateDTO']
+__all__ = ['BaseUserDto', 'UserCreateDTO', 'UserResponseDTO', 'UserUpdateDTO']

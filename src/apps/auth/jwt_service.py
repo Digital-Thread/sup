@@ -6,7 +6,11 @@ import redis.asyncio as redis
 from pydantic import EmailStr
 
 from src.apps.auth.dto import AccessTokenDTO, RefreshTokenDTO
-from src.apps.auth.exceptions import InvalidTokenError, TokenExpireError, TokenRefreshExpireError
+from src.apps.auth.exceptions import (
+    InvalidTokenError,
+    TokenExpireError,
+    TokenRefreshExpireError,
+)
 from src.config import JWTConfig, RedisConfig
 
 
@@ -49,7 +53,9 @@ class JWTService:
         access_token = await self.create_access_token(email)
         refresh_token = await self.create_refresh_token(email)
 
-        await self.redis_client.set(f'access_token:{email}', access_token, ex=self.access_token_lifetime)
+        await self.redis_client.set(
+            f'access_token:{email}', access_token, ex=self.access_token_lifetime
+        )
         await self.redis_client.set(
             f'refresh_token:{email}', refresh_token, ex=self.refresh_token_lifetime
         )

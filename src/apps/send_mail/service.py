@@ -1,5 +1,6 @@
-import aiosmtplib
 from email.mime.text import MIMEText
+
+import aiosmtplib
 
 from src.apps.send_mail.exceptions import SendMailActivationException
 from src.config import SMTPConfig
@@ -24,7 +25,9 @@ class SendMailService:
             msg['From'] = self.email
             msg['To'] = email
 
-            async with aiosmtplib.SMTP(hostname=self.host, port=self.port, use_tls=self.tls) as server:
+            async with aiosmtplib.SMTP(
+                hostname=self.host, port=self.port, use_tls=self.tls
+            ) as server:
                 await server.login(self.email, self.password)
                 await server.sendmail(self.email, email, msg.as_string())
 
@@ -32,14 +35,13 @@ class SendMailService:
             raise SendMailActivationException
 
 
-
-from environs import Env
 import asyncio
 
-if __name__ == "__main__":
+from environs import Env
+
+if __name__ == '__main__':
     env = Env()
     env.read_env()
-
 
     jwt_conf = SMTPConfig.from_env(env)
 

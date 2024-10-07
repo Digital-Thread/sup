@@ -18,6 +18,7 @@ class TokenActivationExpire(BaseUserError):
     def __init__(self, message: str = 'Время действия токена истекло'):
         super().__init__(message)
 
+
 class UserNotFoundException(BaseUserError):
     def __init__(self, email: str):
         super().__init__(f'Пользователь с email {email} не найден')

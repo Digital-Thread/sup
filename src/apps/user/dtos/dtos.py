@@ -1,4 +1,3 @@
-import uuid
 import datetime
 from typing import Optional
 
