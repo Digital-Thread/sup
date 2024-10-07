@@ -4,6 +4,8 @@ from enum import Enum
 from typing import Optional
 from uuid import UUID, uuid4
 
+from src.apps.workspace.domain.types_ids import InviteId, WorkspaceId
+
 
 class StatusInvite(Enum):
     ACTIVE = 'Активна'
@@ -15,8 +17,8 @@ class StatusInvite(Enum):
 class WorkspaceInvite:
     EXPIRATION_DAYS = 7
 
-    workspace_id: UUID
-    id: Optional[int] = field(default=None)
+    _workspace_id: WorkspaceId
+    id: Optional[InviteId] = field(default=None)
     code: UUID = field(default_factory=uuid4)
     _status: StatusInvite = field(default=StatusInvite.ACTIVE)
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
@@ -48,6 +50,10 @@ class WorkspaceInvite:
     def _validate_status_change(self, new_status: StatusInvite) -> None:
         if new_status == self._status:
             raise ValueError('Статус уже установлен')
+
+    @property
+    def workspace_id(self) -> WorkspaceId:
+        return self._workspace_id
 
     @property
     def status(self) -> StatusInvite:

@@ -2,31 +2,44 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from re import match
 from typing import Optional
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 from src.apps.workspace.domain.entities.validator_mixins import (
     DescriptionValidatorMixin,
+)
+from src.apps.workspace.domain.types_ids import (
+    CategoryId,
+    FeatureId,
+    InviteId,
+    MeetId,
+    MemberId,
+    OwnerId,
+    ProjectId,
+    RoleId,
+    TagId,
+    TaskId,
+    WorkspaceId,
 )
 
 
 @dataclass
 class Workspace(DescriptionValidatorMixin):
-    owner_id: UUID
+    owner_id: OwnerId
     _name: str
-    id: UUID = field(default_factory=uuid4)
+    _id: WorkspaceId = field(default_factory=uuid4)
     _description: Optional[str] = field(default=None)
     logo: Optional[str] = field(default=None)
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    invite_ids: set[int] = field(default_factory=set)
-    project_ids: set[int] = field(default_factory=set)
-    meet_ids: set[int] = field(default_factory=set)
-    tag_ids: set[int] = field(default_factory=set)
-    role_ids: set[int] = field(default_factory=set)
-    member_ids: set[UUID] = field(default_factory=set)
-    member_roles: dict[UUID, int] = field(default_factory=dict)
-    feature_tags: dict[int, set[int]] = field(default_factory=dict)
-    task_tags: dict[int, set[int]] = field(default_factory=dict)
-    meet_categories: dict[int, int] = field(default_factory=dict)
+    invite_ids: set[InviteId] = field(default_factory=set)
+    project_ids: set[ProjectId] = field(default_factory=set)
+    meet_ids: set[MeetId] = field(default_factory=set)
+    tag_ids: set[TagId] = field(default_factory=set)
+    role_ids: set[RoleId] = field(default_factory=set)
+    member_ids: set[MemberId] = field(default_factory=set)
+    member_roles: dict[MemberId, RoleId] = field(default_factory=dict)
+    feature_tags: dict[FeatureId, set[TagId]] = field(default_factory=dict)
+    task_tags: dict[TaskId, set[TagId]] = field(default_factory=dict)
+    meet_categories: dict[MeetId, CategoryId] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         self._is_valid_name(self._name, 'рабочего пространства')
@@ -39,6 +52,10 @@ class Workspace(DescriptionValidatorMixin):
         pattern = r'^[a-zA-Zа-яА-ЯёЁ\s]{1,50}$'
         if not bool(match(pattern, name)):
             raise ValueError(f'Неверный формат названия {attr_name}')
+
+    @property
+    def id(self) -> WorkspaceId:
+        return self._id
 
     @property
     def name(self) -> str:
