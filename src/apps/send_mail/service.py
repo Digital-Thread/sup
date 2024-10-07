@@ -1,4 +1,4 @@
-import smtplib
+import aiosmtplib
 from email.mime.text import MIMEText
 
 from src.apps.send_mail.exceptions import SendMailActivationException
@@ -11,8 +11,9 @@ class SendMailService:
         self.port = smtp_config.port
         self.password = smtp_config.password
         self.email = smtp_config.email
+        self.tls = smtp_config.TLS
 
-    def send_activation_email(self, email: str, token: str) -> None:
+    async def send_activation_email(self, email: str, token: str) -> None:
         try:
             activation_link = f'http://127.0.0.1:8000//activate/{token}'
             subject = 'Активация вашего аккаунта'
@@ -23,9 +24,26 @@ class SendMailService:
             msg['From'] = self.email
             msg['To'] = email
 
-            with smtplib.SMTP_SSL(self.host, self.port) as server:
-                server.login(self.email, self.password)
-                server.sendmail(self.email, email, msg.as_string())
+            async with aiosmtplib.SMTP(hostname=self.host, port=self.port, use_tls=self.tls) as server:
+                await server.login(self.email, self.password)
+                await server.sendmail(self.email, email, msg.as_string())
 
         except:
             raise SendMailActivationException
+
+
+
+from environs import Env
+import asyncio
+
+if __name__ == "__main__":
+    env = Env()
+    env.read_env()
+
+
+    jwt_conf = SMTPConfig.from_env(env)
+
+    jwt_service = SendMailService(jwt_conf)
+
+    # jwt_service.send_activation_email('onubee@gmail.com', '777')
+    asyncio.run(jwt_service.send_activation_email('onubee@gmail.com', '888'))

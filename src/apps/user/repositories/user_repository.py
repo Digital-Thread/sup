@@ -1,3 +1,4 @@
+import uuid
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
@@ -7,13 +8,21 @@ from src.apps.user.dtos import UserResponseDTO
 
 class IUserRepository(ABC):
     @abstractmethod
-    def save(self, user: User) -> None:
+    async def save(self, user: User) -> None:
         pass
 
     @abstractmethod
-    def find_by_email(self, email: str) -> Optional[UserResponseDTO]:
+    async def find_by_email(self, email: str) -> Optional[UserResponseDTO]:
         pass
 
     @abstractmethod
-    def find_all_users(self) -> List[UserResponseDTO]:
+    async def find_all_users(self) -> List[UserResponseDTO]:
+        pass
+
+    @abstractmethod
+    async def delete(self, email: str) -> None:
+        pass
+
+    @abstractmethod
+    async def update(self, user: User) -> None:
         pass
