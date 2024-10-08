@@ -2,13 +2,7 @@ from datetime import datetime, timezone
 from enum import IntEnum
 from re import match
 
-from apps.feature.domain.value_objects import (
-    FeatureId,
-    OwnerId,
-    ProjectId,
-    TagId,
-    UserId,
-)
+from apps.feature.domain.aliases import FeatureId, OwnerId, ProjectId, TagId, UserId
 
 
 class Priority(IntEnum):
