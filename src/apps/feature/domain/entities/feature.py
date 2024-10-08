@@ -124,3 +124,8 @@ class Feature:
 
     def mark_as_updated(self) -> None:
         self._updated_at = datetime.now(timezone.utc)
+
+    def update_fields(self, updates: OptionalFeatureUpdateFields) -> None:
+        for field, value in updates.items():
+            setattr(self, field, value)
+        self.mark_as_updated()
