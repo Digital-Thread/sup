@@ -3,7 +3,7 @@ from enum import IntEnum
 from re import match
 from typing import TypedDict
 
-from apps.feature.domain.aliases import OwnerId, ProjectId, TagId, UserId
+from apps.feature.domain.aliases import OwnerId, ProjectId, TagId, UserId, WorkspaceId
 
 
 class Priority(IntEnum):
@@ -56,6 +56,7 @@ class Feature:
     def __init__(
         self,
         name: str,
+        workspace_id: WorkspaceId,
         project_id: ProjectId,
         owner_id: OwnerId,
         assigned_to: UserId | None = None,
@@ -66,6 +67,7 @@ class Feature:
         members: set[UserId] | None = None,
     ):
         self.name = name
+        self._workspace_id = workspace_id
         self.project_id = project_id
         self._owner_id = owner_id
         self.assigned_to = assigned_to
@@ -109,6 +111,10 @@ class Feature:
         max_length = 10_000
         if description is not None and len(description) > max_length:
             raise ValueError(f'В описании может быть максимум {max_length} символов.')
+
+    @property
+    def workspace_id(self) -> WorkspaceId:
+        return self._workspace_id
 
     @property
     def owner_id(self) -> OwnerId:

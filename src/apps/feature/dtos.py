@@ -2,7 +2,14 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Self
 
-from apps.feature.domain.aliases import FeatureId, OwnerId, ProjectId, TagId, UserId
+from apps.feature.domain.aliases import (
+    FeatureId,
+    OwnerId,
+    ProjectId,
+    TagId,
+    UserId,
+    WorkspaceId,
+)
 from apps.feature.domain.entities.feature import (
     Feature,
     OptionalFeatureUpdateFields,
@@ -13,6 +20,7 @@ from apps.feature.domain.entities.feature import (
 
 @dataclass
 class FeatureInputDTO:
+    workspace_id: WorkspaceId
     name: str
     project_id: ProjectId
     owner_id: OwnerId
@@ -33,6 +41,7 @@ class FeatureUpdateDTO:
 @dataclass
 class FeatureOutputDTO:
     id: FeatureId
+    workspace_id: WorkspaceId
     name: str
     project_id: ProjectId
     owner_id: OwnerId
@@ -49,6 +58,7 @@ class FeatureOutputDTO:
     def from_entity(cls, feature_id: FeatureId, entity: Feature) -> Self:
         return cls(
             id=feature_id,
+            workspace_id=entity.workspace_id,
             name=entity.name,
             project_id=entity.project_id,
             owner_id=entity.owner_id,

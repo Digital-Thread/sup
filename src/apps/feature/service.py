@@ -1,4 +1,4 @@
-from apps.feature.domain.aliases import FeatureId
+from apps.feature.domain.aliases import FeatureId, WorkspaceId
 from apps.feature.domain.entities.feature import Feature
 from apps.feature.dtos import FeatureInputDTO, FeatureOutputDTO, FeatureUpdateDTO
 from apps.feature.exceptions import (
@@ -20,6 +20,7 @@ class FeatureService:
     async def create_feature(self, dto: FeatureInputDTO) -> None:
         try:
             feature = Feature(
+                workspace_id=dto.workspace_id,
                 name=dto.name,
                 project_id=dto.project_id,
                 owner_id=dto.owner_id,
@@ -60,7 +61,9 @@ class FeatureService:
             raise FeatureDoesNotExistError(feature_id)
         await self._repository.delete(feature_id=feature_id)
 
-    async def get_feature_list(self, query: FeatureListQuery) -> list[FeatureOutputDTO]:
-        features = await self._repository.get_list(query=query)
+    async def get_feature_list(
+        self, workspace_id: WorkspaceId, query: FeatureListQuery
+    ) -> list[FeatureOutputDTO]:
+        features = await self._repository.get_list(workspace_id=workspace_id, query=query)
         output = [FeatureOutputDTO.from_entity(*feature) for feature in features]
         return output

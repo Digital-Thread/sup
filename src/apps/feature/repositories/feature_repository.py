@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Literal, NamedTuple, TypedDict
 
-from apps.feature.domain.aliases import FeatureId, ProjectId, TagId, UserId
+from apps.feature.domain.aliases import FeatureId, ProjectId, TagId, UserId, WorkspaceId
 from apps.feature.domain.entities.feature import Feature
 
 
@@ -60,5 +60,7 @@ class IFeatureRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_list(self, query: FeatureListQuery) -> list[tuple[FeatureId, Feature]]:
+    async def get_list(
+        self, workspace_id: WorkspaceId, query: FeatureListQuery
+    ) -> list[tuple[FeatureId, Feature]]:
         pass
