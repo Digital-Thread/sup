@@ -1,33 +1,41 @@
+from apps import ApplicationException
 from apps.feature.domain.value_objects import FeatureId
 
 
-class FeatureError(Exception):
-    pass
+class FeatureError(ApplicationException):
+    DEFAULT_MESSAGE = 'Ошибка во время работы с фичёй.'
 
-
-class FeatureDoesNotExistError(FeatureError):
-    def __init__(self, feature_id: FeatureId, message: str = None):
-        self.feature_id = feature_id
-        self.message = message or f'Фича с ID {self.feature_id} не найдена.'
-        super().__init__(self.message)
+    def __init__(self,
+                 context: Exception = None,
+                 message: str = None) -> None:
+        self.context = context
+        self.message = message or self.DEFAULT_MESSAGE
+        self.args = (self.context, self.message)
 
     def __str__(self) -> str:
+        if self.context:
+            return f'{self.message} {self.context}'
+
         return self.message
 
 
 class FeatureCreateError(FeatureError):
-    def __init__(self, message: str = 'Ошибка при создании фичи'):
-        self.message = message
-        super().__init__(self.message)
-
-    def __str__(self) -> str:
-        return self.message
+    DEFAULT_MESSAGE = 'Ошибка во время создания фичи.'
 
 
 class FeatureUpdateError(FeatureError):
-    def __init__(self, message: str = 'Ошибка при обновлении фичи'):
-        self.message = message
-        super().__init__(self.message)
+    DEFAULT_MESSAGE = 'Ошибка при обновлении фичи.'
 
-    def __str__(self) -> str:
-        return self.message
+
+class FeatureDoesNotExistError(FeatureError):
+    DEFAULT_MESSAGE = 'Фича не найдена.'
+
+    def __init__(self,
+                 feature_id: FeatureId = None,
+                 context: Exception = None,
+                 message: str = None) -> None:
+        custom_message = f'Фича с ID {feature_id} не найдена.' if feature_id else message
+        super().__init__(context=context, message=custom_message or self.DEFAULT_MESSAGE)
+        self.feature_id = feature_id
+        self.args = (self.feature_id, self.context, self.message)
+
