@@ -44,7 +44,7 @@ class FeatureListQuery:
 class IFeatureRepository(ABC):
 
     @abstractmethod
-    async def create(self, feature: Feature) -> None:
+    async def save(self, feature: Feature) -> None:
         pass
 
     @abstractmethod
@@ -52,7 +52,7 @@ class IFeatureRepository(ABC):
         pass
 
     @abstractmethod
-    async def update(self, feature: Feature) -> None:
+    async def update(self, feature_id: FeatureId, feature: Feature) -> None:
         pass
 
     @abstractmethod
@@ -60,5 +60,5 @@ class IFeatureRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_list(self, query: FeatureListQuery) -> list[Feature]:
+    async def get_list(self, query: FeatureListQuery) -> list[tuple[FeatureId, Feature]]:
         pass
