@@ -46,15 +46,13 @@ class FeatureService:
         feature = await self._repository.get_by_id(feature_id=dto.id)
         if not feature:
             raise FeatureDoesNotExistError(dto.id)
-        try:
-            for field, value in dto.updated_fields.items():
-                setattr(feature, field, value)
 
+        try:
+            feature.update_fields(dto.updated_fields)
         except ValueError as e:
             raise FeatureUpdateError(context=e) from None
 
-        feature.mark_as_updated()
-        await self._repository.update(feature)
+        await self._repository.update(feature_id=dto.id, feature=feature)
 
     async def delete_feature(self, feature_id: FeatureId) -> None:
         feature = await self._repository.get_by_id(feature_id=feature_id)
