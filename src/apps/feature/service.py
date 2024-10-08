@@ -32,7 +32,7 @@ class FeatureService:
             )
         except ValueError as e:
             raise FeatureCreateError(context=e) from None
-        await self._repository.create(feature=feature)
+        await self._repository.save(feature=feature)
 
     async def get_feature_by_id(self, feature_id: FeatureId) -> FeatureOutputDTO:
         feature = await self._repository.get_by_id(feature_id=feature_id)
