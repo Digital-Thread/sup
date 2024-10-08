@@ -1,8 +1,9 @@
 from datetime import datetime, timezone
 from enum import IntEnum
 from re import match
+from typing import TypedDict
 
-from apps.feature.domain.aliases import FeatureId, OwnerId, ProjectId, TagId, UserId
+from apps.feature.domain.aliases import OwnerId, ProjectId, TagId, UserId
 
 
 class Priority(IntEnum):
@@ -39,6 +40,17 @@ class Status(IntEnum):
         }[self.value]
 
 
+class OptionalFeatureUpdateFields(TypedDict, total=False):
+    name: str
+    project_id: ProjectId
+    assigned_to: UserId | None
+    description: str | None
+    priority: Priority
+    status: Status
+    tags: set[TagId] | None
+    members: set[UserId] | None
+
+
 class Feature:
 
     def __init__(
@@ -62,7 +74,6 @@ class Feature:
         self.status = status
         self.tags = tags if tags else set()
         self.members = members if members else set()
-        self._id = None
         self._created_at = datetime.now(timezone.utc)
         self._updated_at = datetime.now(timezone.utc)
 
@@ -102,10 +113,6 @@ class Feature:
     @property
     def owner_id(self) -> OwnerId:
         return self._owner_id
-
-    @property
-    def id(self) -> FeatureId:
-        return self._id
 
     @property
     def created_at(self) -> datetime:
