@@ -37,8 +37,8 @@ class FilterField(TypedDict, total=False):
 class FeatureListQuery:
     filters: FilterField | None = None
     order_by: SortBy | None = SortBy(OrderByField.PRIORITY, SortOrder.DESC)
-    paginate_by: Literal[5, 10] | None = 10
-    page: int = 1
+    limit_by: Literal[5, 10] | None = 10
+    offset: int = 0
 
 
 class IFeatureRepository(ABC):
