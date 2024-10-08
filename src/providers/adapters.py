@@ -1,6 +1,6 @@
 from typing import AsyncIterable
 
-from dishka import Provider, Scope, provide, provide_all
+from dishka import Provider, Scope, provide
 from environs import Env
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
@@ -11,7 +11,10 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from src.apps.meet import IMeetRepository, IParticipantRepository, MeetService
+from src.apps.meet.protocols import WorkspaceService, WorkspaceServiceProtocol
 from src.config import Config, DbConfig
+from src.data_access.reposotiries.meet import MeetRepository
+from src.data_access.reposotiries.meet_participant import ParticipantRepository
 
 
 class SqlalchemyProvider(Provider):
@@ -52,4 +55,27 @@ class ConfigProvider(Provider):
 class RepositoriesProvider(Provider):
     scope = Scope.REQUEST
 
-    provide_meet = provide_all(IMeetRepository, IParticipantRepository, MeetService)
+    @provide(scope=scope)
+    def provide_meet_repository(self, session: AsyncSession) -> IMeetRepository:
+        return MeetRepository(session)
+
+    @provide(scope=scope)
+    def provide_participant_repository(self, session: AsyncSession) -> IParticipantRepository:
+        return ParticipantRepository(session)
+
+    @provide(scope=scope)
+    def provide_temp_workspace_service(self) -> WorkspaceServiceProtocol:
+        return WorkspaceService()
+
+    @provide(scope=scope)
+    def provide_meet_service(
+        self,
+        meet_repository: IMeetRepository,
+        participant_repository: IParticipantRepository,
+        workspace_service: WorkspaceServiceProtocol,
+    ) -> MeetService:
+        return MeetService(
+            meet_repository=meet_repository,
+            participant_repository=participant_repository,
+            workspace_service=workspace_service,
+        )

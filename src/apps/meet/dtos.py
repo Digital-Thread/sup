@@ -1,14 +1,24 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
 from typing import Literal, NamedTuple, TypedDict
 from uuid import UUID
 
 
 @dataclass
-class ParticipantInputDTO:
-    user_id: int
+class ParticipantCreateDTO:
+    user_id: UUID
     status: str
+
+
+@dataclass
+class ParticipantUpdateDTO:
+    id: int
+    status: str
+
+
+@dataclass
+class ParticipantDeleteDTO:
+    id: int
 
 
 @dataclass
@@ -20,26 +30,23 @@ class ParticipantResponseDTO:
 
 
 @dataclass
-class MeetInputDTO:
+class MeetCreateDTO:
     name: str
     meet_at: datetime
     category_id: int
     assigned_to: UUID
-    participants: list[ParticipantInputDTO]
-
-
-class OptionalUpdateMeetFields(TypedDict, total=False):
-    name: str
-    meet_at: datetime
-    category_id: int
-    assigned_to: int
-    participants: list[int]
+    participants: list[ParticipantCreateDTO]
 
 
 @dataclass
 class MeetUpdateDTO:
-    id: int
-    updated_fields: OptionalUpdateMeetFields
+    name: str | None = None
+    meet_at: datetime | None = None
+    category_id: int | None = None
+    assigned_to: UUID | None = None
+    participants_to_add: list[ParticipantCreateDTO] = field(default_factory=list)
+    participants_to_update: list[ParticipantUpdateDTO] = field(default_factory=list)
+    participants_to_delete: list[ParticipantDeleteDTO] = field(default_factory=list)
 
 
 @dataclass
@@ -53,38 +60,13 @@ class MeetResponseDTO:
     participants: list[ParticipantResponseDTO]
 
 
-@dataclass
-class InvitedMeetDTO(MeetInputDTO):
-    meet_id: int
-    user_id: UUID
-    status: str
-
-
-@dataclass
-class ParticipantUpdateDTO:
-    id: int
-    status: str
-
-
-class OrderByField(Enum):
-    NAME = 'name'
-    ASSIGNED_TO = 'assigned_to'
-    CREATED_AT = 'created_at'
-    MEET_AT = 'meet_at'
-
-
-class SortOrder(Enum):
-    ASC = 'ASC'
-    DESC = 'DESC'
-
-
 class SortBy(NamedTuple):
-    field: OrderByField
-    order: SortOrder
+    field: Literal['name', 'assigned_to', 'meet_at']
+    order: Literal['ASC', 'DESC']
 
 
 class MeetFilterFields(TypedDict, total=False):
-    category: int
+    category_id: int
     assigned_to: UUID
     meet_at: datetime
 
@@ -92,6 +74,6 @@ class MeetFilterFields(TypedDict, total=False):
 @dataclass
 class MeetListQueryDTO:
     filters: MeetFilterFields | None = None
-    order_by: SortBy = SortBy(OrderByField.MEET_AT, SortOrder.DESC)
+    order_by: SortBy = SortBy('meet_at', 'DESC')
     limit: Literal[4, 8, 16, 24] | None = 16
     offset: int = 0

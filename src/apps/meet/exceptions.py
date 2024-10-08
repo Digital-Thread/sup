@@ -40,3 +40,8 @@ class ParticipantCheckException(BaseMeetException):
 class ParticipantNotFoundException(BaseMeetException):
     def __init__(self):
         super().__init__(message='Participant not found')
+
+
+class ParticipantCreateException(BaseMeetException):
+    def __init__(self):
+        super().__init__(message='Participant create error')

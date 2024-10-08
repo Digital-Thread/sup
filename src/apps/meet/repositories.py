@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum
 from typing import Literal, NamedTuple, TypedDict
 
 from .entities.meet import Meet
@@ -15,21 +14,9 @@ from .entities.value_objects import (
 )
 
 
-class OrderByField(Enum):
-    NAME = 'name'
-    ASSIGNED_TO = 'assigned_to'
-    CREATED_AT = 'created_at'
-    MEET_AT = 'meet_at'
-
-
-class SortOrder(Enum):
-    ASC = 'ASC'
-    DESC = 'DESC'
-
-
 class SortBy(NamedTuple):
-    field: OrderByField
-    order: SortOrder
+    field: Literal['name', 'assigned_to', 'meet_at']
+    order: Literal['ASC', 'DESC']
 
 
 class MeetFilterFields(TypedDict, total=False):
@@ -41,7 +28,7 @@ class MeetFilterFields(TypedDict, total=False):
 @dataclass
 class MeetListQuery:
     filters: MeetFilterFields | None = None
-    order_by: SortBy = SortBy(OrderByField.MEET_AT, SortOrder.DESC)
+    order_by: SortBy = SortBy('meet_at', 'DESC')
     limit: Literal[4, 8, 16, 24] | None = 16
     offset: int = 0
 
@@ -63,10 +50,18 @@ class IMeetRepository(ABC):
     async def update_meet(self, meet: Meet) -> Meet:
         raise NotImplementedError
 
+    @abstractmethod
+    async def delete_meet(self, meet_id: MeetId) -> None:
+        raise NotImplementedError
+
 
 class IParticipantRepository(ABC):
     @abstractmethod
-    async def invite(self, participant: Participant) -> ParticipantId:
+    async def add_participant(self, participant: Participant) -> ParticipantId:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_participant_by_id(self, participant_id: ParticipantId) -> Participant | None:
         raise NotImplementedError
 
     @abstractmethod
@@ -74,9 +69,13 @@ class IParticipantRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def invite_bulk(self, participants: list[Participant]) -> list[ParticipantId]:
+    async def add_bulk(self, participants: list[Participant]) -> list[ParticipantId]:
         raise NotImplementedError
 
     @abstractmethod
     async def update_participant(self, participant: Participant) -> ParticipantId:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def delete_participant(self, participant_id: ParticipantId) -> None:
         raise NotImplementedError
