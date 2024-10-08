@@ -1,6 +1,6 @@
 from apps.feature.domain.aliases import FeatureId
 from apps.feature.domain.entities.feature import Feature
-from apps.feature.dtos import FeatureInputDTO, FeatureUpdateDTO
+from apps.feature.dtos import FeatureInputDTO, FeatureOutputDTO, FeatureUpdateDTO
 from apps.feature.exceptions import (
     FeatureCreateError,
     FeatureDoesNotExistError,
@@ -34,11 +34,13 @@ class FeatureService:
             raise FeatureCreateError(context=e) from None
         await self._repository.create(feature=feature)
 
-    async def get_feature_by_id(self, feature_id: FeatureId) -> Feature:
+    async def get_feature_by_id(self, feature_id: FeatureId) -> FeatureOutputDTO:
         feature = await self._repository.get_by_id(feature_id=feature_id)
         if not feature:
             raise FeatureDoesNotExistError(feature_id)
-        return feature
+        feature_dto = FeatureOutputDTO.from_entity(feature_id=feature_id, entity=feature)
+
+        return feature_dto
 
     async def update_feature(self, dto: FeatureUpdateDTO) -> None:
         feature = await self._repository.get_by_id(feature_id=dto.id)
@@ -60,5 +62,7 @@ class FeatureService:
             raise FeatureDoesNotExistError(feature_id)
         await self._repository.delete(feature_id=feature_id)
 
-    async def get_feature_list(self, query: FeatureListQuery) -> list[Feature]:
-        return await self._repository.get_list(query=query)
+    async def get_feature_list(self, query: FeatureListQuery) -> list[FeatureOutputDTO]:
+        features = await self._repository.get_list(query=query)
+        output = [FeatureOutputDTO.from_entity(*feature) for feature in features]
+        return output
