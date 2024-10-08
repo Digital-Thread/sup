@@ -1,5 +1,5 @@
+from apps.feature.domain.aliases import FeatureId
 from apps.feature.domain.entities.feature import Feature
-from apps.feature.domain.value_objects import FeatureId
 from apps.feature.dtos import FeatureInputDTO, FeatureUpdateDTO
 from apps.feature.exceptions import (
     FeatureCreateError,

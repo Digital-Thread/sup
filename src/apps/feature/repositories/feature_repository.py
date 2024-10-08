@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Literal, NamedTuple, TypedDict
 
+from apps.feature.domain.aliases import FeatureId, ProjectId, TagId, UserId
 from apps.feature.domain.entities.feature import Feature
-from apps.feature.domain.value_objects import FeatureId, ProjectId, TagId, UserId
 
 
 class OrderByField(Enum):

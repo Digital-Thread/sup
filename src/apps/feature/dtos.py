@@ -1,14 +1,8 @@
 from dataclasses import dataclass, field
 from typing import TypedDict
 
+from apps.feature.domain.aliases import FeatureId, OwnerId, ProjectId, TagId, UserId
 from apps.feature.domain.entities.feature import Priority, Status
-from apps.feature.domain.value_objects import (
-    FeatureId,
-    OwnerId,
-    ProjectId,
-    TagId,
-    UserId,
-)
 
 
 @dataclass
