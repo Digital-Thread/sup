@@ -31,7 +31,7 @@ class FeatureService:
                 members=dto.members,
             )
         except ValueError as e:
-            raise FeatureCreateError(f'Ошибка создания фичи: {e}')
+            raise FeatureCreateError(context=e) from None
         await self._repository.create(feature=feature)
 
     async def get_feature_by_id(self, feature_id: FeatureId) -> Feature:
@@ -47,10 +47,11 @@ class FeatureService:
         try:
             for field, value in dto.updated_fields.items():
                 setattr(feature, field, value)
-            feature.mark_as_updated()
 
         except ValueError as e:
-            raise FeatureUpdateError(f'Ошибка обновления фичи: {e}')
+            raise FeatureUpdateError(context=e) from None
+
+        feature.mark_as_updated()
         await self._repository.update(feature)
 
     async def delete_feature(self, feature_id: FeatureId) -> None:
