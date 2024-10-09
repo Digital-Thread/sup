@@ -1,3 +1,4 @@
+from src.apps.workspace.dtos.role_dtos import UpdateRoleAppDTO
 from src.apps.workspace.repositories.i_role_repository import IRoleRepository
 
 
@@ -5,7 +6,7 @@ class UpdateRoleUseCase:
     def __init__(self, role_repository: IRoleRepository):
         self.role_repository = role_repository
 
-    async def execute(self, role_id: int, update_data: dict[str, str]) -> None:
+    async def execute(self, role_id: int, update_data: UpdateRoleAppDTO) -> None:
         """
         Используем метод с полной загрузкой объекта из БД, т.к. есть поля с валидацией
         """
@@ -17,4 +18,4 @@ class UpdateRoleUseCase:
         if update_data.get('color'):
             role.color = update_data['color']
 
-        await self.role_repository.update(role, update_data)
+        await self.role_repository.update(role)

@@ -26,7 +26,7 @@ from src.apps.workspace.domain.types_ids import (
 class Workspace(DescriptionValidatorMixin):
     owner_id: OwnerId
     _name: str
-    _id: WorkspaceId = field(default_factory=uuid4)
+    _id: Optional[WorkspaceId] = field(default=None)
     _description: Optional[str] = field(default=None)
     logo: Optional[str] = field(default=None)
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))

@@ -1,6 +1,6 @@
-from typing import Any, Mapping
 from uuid import UUID
 
+from src.apps.workspace.dtos.workspace_dtos import UpdateWorkspaceAppDTO
 from src.apps.workspace.repositories.i_workspace_repository import IWorkspaceRepository
 
 
@@ -8,7 +8,7 @@ class UpdateWorkspaceUseCase:
     def __init__(self, workspace_repository: IWorkspaceRepository):
         self.workspace_repository = workspace_repository
 
-    async def execute(self, workspace_id: UUID, update_data: Mapping[str, Any]) -> None:
+    async def execute(self, workspace_id: UUID, update_data: UpdateWorkspaceAppDTO) -> None:
         if any(field in update_data for field in ['name', 'description']):
             await self._update_with_validation(workspace_id, update_data)
 
@@ -16,7 +16,7 @@ class UpdateWorkspaceUseCase:
             await self._update_without_validation(workspace_id, update_data)
 
     async def _update_with_validation(
-        self, workspace_id: UUID, update_data: Mapping[str, Any]
+        self, workspace_id: UUID, update_data: UpdateWorkspaceAppDTO
     ) -> None:
         """
         Используем метод с полной загрузкой объекта из БД, т.к. есть поля с валидацией
@@ -34,10 +34,10 @@ class UpdateWorkspaceUseCase:
             if key not in ['name', 'description']:
                 setattr(workspace, key, value)
 
-        await self.workspace_repository.update(workspace, update_data)
+        await self.workspace_repository.update(workspace)
 
     async def _update_without_validation(
-        self, workspace_id: UUID, update_data: Mapping[str, Any]
+        self, workspace_id: UUID, update_data: UpdateWorkspaceAppDTO
     ) -> None:
         """Метод для частичного обновления, без загрузки объекта из БД"""
         await self.workspace_repository.update_partial(workspace_id, update_data)
