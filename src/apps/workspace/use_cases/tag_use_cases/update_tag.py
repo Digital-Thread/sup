@@ -1,4 +1,7 @@
-from src.apps.workspace.dtos.tag_dtos import UpdateTagAppDTO
+from src.apps.workspace.domain.types_ids import RoleId, WorkspaceId
+from src.apps.workspace.dtos.tag_dtos import TagAppDTO, UpdateTagAppDTO
+from src.apps.workspace.exceptions.tag_exceptions import TagNotUpdated
+from src.apps.workspace.mappers.tag_mapper import TagMapper
 from src.apps.workspace.repositories.i_tag_repository import ITagRepository
 
 
@@ -6,16 +9,14 @@ class UpdateTagUseCase:
     def __init__(self, tag_repository: ITagRepository):
         self.tag_repository = tag_repository
 
-    async def execute(self, tag_id: int, update_data: UpdateTagAppDTO) -> None:
-        """
-        Используем метод с полной загрузкой объекта из БД, т.к. есть поля с валидацией
-        """
-        tag = await self.tag_repository.find_by_id(tag_id)
-
-        if update_data.get('name'):
-            tag.name = update_data['name']
-
-        if update_data.get('color'):
-            tag.color = update_data['color']
-
-        await self.tag_repository.update(tag)
+    async def execute(
+        self, workspace_id: WorkspaceId, role_id: RoleId, update_data: UpdateTagAppDTO
+    ) -> None:
+        tag = TagMapper.dto_to_entity(
+            update_data, {'workspace_id': workspace_id, 'role_id': role_id}
+        )
+        try:
+            await self.tag_repository.update(tag)
+        except TagNotUpdated:
+            pass
+            # TODO пробросить дальше

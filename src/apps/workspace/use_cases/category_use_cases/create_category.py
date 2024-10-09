@@ -11,10 +11,7 @@ class CreateCategoryUseCase:
 
     async def execute(self, category_data: CreateCategoryAppDTO) -> None:
         category = Category(
-            _name=category_data['name'],
-            workspace_ids=set(
-                WorkspaceId(workspace_id) for workspace_id in category_data['workspace_ids']
-            ),
+            _name=category_data['name'], _workspace_id=WorkspaceId(category_data['workspace_id'])
         )
 
         try:

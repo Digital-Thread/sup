@@ -1,8 +1,7 @@
+from dataclasses import dataclass
 from datetime import datetime
 from typing import TypedDict
 from uuid import UUID
-
-from src.apps.workspace.dtos.base_dto import BaseDTO
 
 
 class CreateWorkspaceInviteAppDTO(TypedDict):
@@ -13,7 +12,8 @@ class CreateWorkspaceInviteAppDTO(TypedDict):
     expired_at: datetime
 
 
-class WorkspaceInviteAppDTO(BaseDTO):
+@dataclass
+class WorkspaceInviteAppDTO:
     id: int
     workspace_id: UUID
     code: UUID

@@ -1,20 +1,19 @@
+from dataclasses import dataclass
 from typing import TypedDict
 from uuid import UUID
-
-from .base_dto import BaseDTO
 
 
 class CreateCategoryAppDTO(TypedDict):
     name: str
-    workspace_ids: set[UUID]
+    workspace_id: UUID
 
 
-class CategoryAppDTO(BaseDTO):
+@dataclass
+class CategoryAppDTO:
     id: int
     name: str
-    workspace_ids: set[UUID]
+    workspace_id: UUID
 
 
 class UpdateCategoryAppDTO(TypedDict, total=False):
     name: str
-    workspace_ids: set[UUID]

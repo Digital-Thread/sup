@@ -22,9 +22,5 @@ class IBaseRepository[T, ID](ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def update_partial(self, entity_id: ID, update_data: Mapping[str, Any]) -> None:
-        raise NotImplementedError
-
-    @abstractmethod
     async def delete(self, entity_id: ID) -> None:
         raise NotImplementedError

@@ -2,14 +2,11 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from re import match
 from typing import Optional
-from uuid import uuid4
 
 from src.apps.workspace.domain.entities.validator_mixins import (
     DescriptionValidatorMixin,
 )
 from src.apps.workspace.domain.types_ids import (
-    CategoryId,
-    FeatureId,
     InviteId,
     MeetId,
     MemberId,
@@ -17,7 +14,6 @@ from src.apps.workspace.domain.types_ids import (
     ProjectId,
     RoleId,
     TagId,
-    TaskId,
     WorkspaceId,
 )
 
@@ -30,16 +26,12 @@ class Workspace(DescriptionValidatorMixin):
     _description: Optional[str] = field(default=None)
     logo: Optional[str] = field(default=None)
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    invite_ids: set[InviteId] = field(default_factory=set)
-    project_ids: set[ProjectId] = field(default_factory=set)
-    meet_ids: set[MeetId] = field(default_factory=set)
-    tag_ids: set[TagId] = field(default_factory=set)
-    role_ids: set[RoleId] = field(default_factory=set)
-    member_ids: set[MemberId] = field(default_factory=set)
-    member_roles: dict[MemberId, RoleId] = field(default_factory=dict)
-    feature_tags: dict[FeatureId, set[TagId]] = field(default_factory=dict)
-    task_tags: dict[TaskId, set[TagId]] = field(default_factory=dict)
-    meet_categories: dict[MeetId, CategoryId] = field(default_factory=dict)
+    invite_ids: list[InviteId] = field(default_factory=list)
+    project_ids: list[ProjectId] = field(default_factory=list)
+    meet_ids: list[MeetId] = field(default_factory=list)
+    tag_ids: list[TagId] = field(default_factory=list)
+    role_ids: list[RoleId] = field(default_factory=list)
+    member_ids: list[MemberId] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         self._is_valid_name(self._name, 'рабочего пространства')

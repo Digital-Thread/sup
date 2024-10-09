@@ -1,7 +1,6 @@
+from dataclasses import dataclass
 from typing import TypedDict
 from uuid import UUID
-
-from .base_dto import BaseDTO
 
 
 class CreateTagAppDTO(TypedDict):
@@ -10,10 +9,12 @@ class CreateTagAppDTO(TypedDict):
     workspace_id: UUID
 
 
-class TagAppDTO(BaseDTO):
+@dataclass
+class TagAppDTO:
     id: int
     name: str
     color: str
+    workspace_id: UUID
 
 
 class UpdateTagAppDTO(TypedDict, total=False):
