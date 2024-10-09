@@ -1,16 +1,24 @@
-from src.apps.workspace.domain.entities.tag import Tag
-from src.apps.workspace.exceptions.tag_exceptions import TagNotFound
-from src.apps.workspace.repositories.i_tag_repository import ITagRepository
+from src.apps.workspace.domain.types_ids import InviteId
+from src.apps.workspace.dtos.workspace_invite_dtos import WorkspaceInviteAppDTO
+from src.apps.workspace.exceptions.workspace_invite_exceptions import (
+    WorkspaceInviteNotFound,
+)
+from src.apps.workspace.mappers.workspace_invite_mapper import WorkspaceInviteMapper
+from src.apps.workspace.repositories.i_workspace_invite_repository import (
+    IWorkspaceInviteRepository,
+)
 
 
-class GetTagByIdUseCase:
-    def __init__(self, tag_repository: ITagRepository):
-        self._tag_repository = tag_repository
+class GetWorkspaceInviteByIdUseCase:
+    def __init__(self, workspace_invite_repository: IWorkspaceInviteRepository):
+        self._workspaceInvite_repository = workspace_invite_repository
 
-    async def execute(self, tag_id: int) -> Tag:
+    async def execute(self, workspace_invite_id: InviteId) -> WorkspaceInviteAppDTO:
         try:
-            tag = await self._tag_repository.find_by_id(tag_id)
-        except TagNotFound:
-            raise ValueError(f'Тег с id={tag_id} не найдена')
-
-        return tag
+            workspace_invite = await self._workspaceInvite_repository.find_by_id(
+                workspace_invite_id
+            )
+        except WorkspaceInviteNotFound:
+            raise ValueError(f'Тег с id={workspace_invite_id} не найдена')
+        else:
+            return WorkspaceInviteMapper.entity_to_dto(workspace_invite, WorkspaceInviteAppDTO)

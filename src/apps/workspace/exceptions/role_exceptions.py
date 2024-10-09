@@ -2,11 +2,19 @@ from src.apps.base_exception import ApplicationException
 
 
 class RoleException(ApplicationException):
-    pass
+    """Ошибка работы с ролью"""
 
 
 class RoleNotFound(RoleException):
     """Роль не найдена"""
+
+
+class RoleNotUpdated(RoleException):
+    """Роль не обновлена"""
+
+
+class RoleNotDeleted(RoleException):
+    """Роль не удалена"""
 
 
 class WorkspaceRoleNotFound(RoleException):
@@ -15,3 +23,7 @@ class WorkspaceRoleNotFound(RoleException):
 
 class RoleAlreadyExists(RoleException):
     """Роль уже существует"""
+
+
+class RoleCreatedException(RoleException):
+    """Роль не создана"""

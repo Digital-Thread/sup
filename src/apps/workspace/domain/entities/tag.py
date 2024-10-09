@@ -14,11 +14,15 @@ class Tag(NameValidatorMixin, ColorValidatorMixin):
     _workspace_id: WorkspaceId
     _name: str
     _color: str
-    id: Optional[TagId] = field(default=None)
+    _id: Optional[TagId] = field(default=None)
 
     def __post_init__(self) -> None:
         self._is_valid_name(self._name, 'Тега')
         self._is_valid_color(self._color)
+
+    @property
+    def id(self) -> Optional[TagId]:
+        return self._id
 
     @property
     def workspace_id(self) -> WorkspaceId:

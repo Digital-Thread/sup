@@ -14,11 +14,15 @@ class Role(NameValidatorMixin, ColorValidatorMixin):
     _workspace_id: WorkspaceId
     _name: str
     _color: str
-    id: Optional[RoleId] = field(default=None)
+    _id: Optional[RoleId] = field(default=None)
 
     def __post_init__(self) -> None:
         self._is_valid_name(self._name, 'Роли')
         self._is_valid_color(self._color)
+
+    @property
+    def id(self) -> Optional[RoleId]:
+        return self._id
 
     @property
     def workspace_id(self) -> WorkspaceId:

@@ -2,11 +2,19 @@ from src.apps.base_exception import ApplicationException
 
 
 class CategoryException(ApplicationException):
-    pass
+    """Ошибка работы с категорией"""
 
 
 class CategoryNotFound(CategoryException):
     """Категория не найдена"""
+
+
+class CategoryNotUpdated(CategoryException):
+    """Категория не обновлена"""
+
+
+class CategoryNotDeleted(CategoryException):
+    """Категория не удалена"""
 
 
 class WorkspaceCategoryNotFound(CategoryException):
@@ -15,3 +23,7 @@ class WorkspaceCategoryNotFound(CategoryException):
 
 class CategoryAlreadyExists(CategoryException):
     """Категория уже существует"""
+
+
+class CategoryCreatedException(CategoryException):
+    """Категория не создана"""

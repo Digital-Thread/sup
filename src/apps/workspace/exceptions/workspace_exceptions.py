@@ -2,22 +2,28 @@ from src.apps.base_exception import ApplicationException
 
 
 class WorkspaceException(ApplicationException):
-    pass
+    """Ошибка работы с рабочим пространством"""
 
 
 class WorkspaceNotFound(WorkspaceException):
     """Рабочее пространство не найдено"""
 
-    pass
+
+class WorkspaceNotUpdated(WorkspaceException):
+    """Рабочее пространство не обновлено"""
+
+
+class WorkspaceNotDeleted(WorkspaceException):
+    """Рабочее пространство не удалено"""
 
 
 class OwnerWorkspaceNotFound(WorkspaceException):
     """Владелец рабочего пространства не найден"""
 
-    pass
-
 
 class WorkspaceAlreadyExists(WorkspaceException):
     """Рабочее пространство уже существует"""
 
-    pass
+
+class WorkspaceCreatedException(WorkspaceException):
+    """Рабочее пространство не создано"""

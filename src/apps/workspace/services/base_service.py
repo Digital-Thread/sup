@@ -1,14 +1,14 @@
 from collections.abc import Callable
-from typing import Any, Mapping
-from uuid import UUID
+from typing import Any
 
 
-class BaseService[T, ID, R]:
+class BaseService[T, DTO, ID, R]:
     """
     Базовый сервис для работы с сущностями.
 
     Параметры:
     T: Тип сущности, который будет обрабатываться этим сервисом.
+    DTO: data transfer object
     ID: Тип идентификатора сущности (int или UUID).
     R: Тип репозитория, который будет использоваться для доступа к данным.
     """
@@ -21,22 +21,20 @@ class BaseService[T, ID, R]:
         use_case_instance = use_case(self._repository)
         return await use_case_instance.execute(*args)
 
-    async def create(self, entity: T, use_case: Callable[[R], Any]) -> None:
-        await self._execute_use_case(use_case, entity)
+    async def create(self, entity_data: DTO, use_case: Callable[[R], Any]) -> None:
+        await self._execute_use_case(use_case, entity_data)
 
-    async def retrieve_by_id(self, entity_id: ID, use_case: Callable[[R], Any]) -> T:
+    async def retrieve_by_id(self, entity_id: ID, use_case: Callable[[R], Any]) -> DTO:
         return await self._execute_use_case(use_case, entity_id)
 
-    async def update(
-        self, entity_id: ID, update_data: Mapping[str, Any], use_case: Callable[[R], Any]
-    ) -> None:
+    async def update(self, entity_id: ID, update_data: DTO, use_case: Callable[[R], Any]) -> None:
         await self._execute_use_case(use_case, entity_id, update_data)
 
     async def delete(self, entity_id: ID, use_case: Callable[[R], Any]) -> None:
         await self._execute_use_case(use_case, entity_id)
 
     async def retrieve_by_workspace_id(
-        self, workspace_id: UUID, use_case: Callable[[R], Any]
-    ) -> list[T]:
+        self, workspace_id: ID, use_case: Callable[[R], Any]
+    ) -> list[DTO]:
         """Общий метод для получения сущностей по ID рабочего пространства."""
         return await self._execute_use_case(use_case, workspace_id)
