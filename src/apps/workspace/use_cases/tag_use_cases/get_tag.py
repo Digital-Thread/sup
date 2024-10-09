@@ -1,4 +1,3 @@
-from src.apps.workspace.domain.entities.tag import Tag
 from src.apps.workspace.domain.types_ids import TagId
 from src.apps.workspace.dtos.tag_dtos import TagAppDTO
 from src.apps.workspace.exceptions.tag_exceptions import TagNotFound
@@ -14,6 +13,6 @@ class GetTagByIdUseCase:
         try:
             tag = await self._tag_repository.find_by_id(tag_id)
         except TagNotFound:
-            raise ValueError(f'Тег с id={tag_id} не найдена')
+            raise ValueError(f'Тег с id={tag_id} не найден')
         else:
             return TagMapper.entity_to_dto(tag, TagAppDTO)
