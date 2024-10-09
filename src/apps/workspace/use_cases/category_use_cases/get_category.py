@@ -13,6 +13,6 @@ class GetCategoryByIdUseCase:
         try:
             category = await self._category_repository.find_by_id(category_id)
         except CategoryNotFound:
-            raise ValueError(f'Тег с id={category_id} не найдена')
+            raise ValueError(f'Категория с id={category_id} не найдена')
         else:
             return CategoryMapper.entity_to_dto(category, CategoryAppDTO)

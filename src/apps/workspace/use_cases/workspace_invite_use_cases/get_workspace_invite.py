@@ -19,6 +19,6 @@ class GetWorkspaceInviteByIdUseCase:
                 workspace_invite_id
             )
         except WorkspaceInviteNotFound:
-            raise ValueError(f'Тег с id={workspace_invite_id} не найдена')
+            raise ValueError(f'Ссылка приглашения с id={workspace_invite_id} не найдена')
         else:
             return WorkspaceInviteMapper.entity_to_dto(workspace_invite, WorkspaceInviteAppDTO)
