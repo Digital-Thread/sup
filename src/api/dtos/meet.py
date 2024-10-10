@@ -12,8 +12,13 @@ class ParticipantRequest(BaseModel):
     status: str
 
 
+class ParticipantRequestUpdate(BaseModel):
+    id: int
+    status: str
+
+
 class ParticipantRequestDelete(BaseModel):
-    user_id: UUID
+    id: int
 
 
 class MeetRequestCreate(BaseModel):
@@ -30,7 +35,7 @@ class MeetRequestUpdate(BaseModel):
     category_id: int
     assigned_to: UUID
     participants_to_add: list[ParticipantRequest]
-    participants_to_update: list[ParticipantRequest]
+    participants_to_update: list[ParticipantRequestUpdate]
     participants_to_delete: list[ParticipantRequestDelete]
 
 
