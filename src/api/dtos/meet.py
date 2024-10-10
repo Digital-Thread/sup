@@ -13,12 +13,11 @@ class SuccessResponse(BaseModel):
 
 class ParticipantRequest(BaseModel):
     user_id: UUID
-    status: str
+    status: Literal['present', 'absent', 'warned']
 
 
 class ParticipantRequestUpdate(BaseModel):
-    id: int
-    status: str
+    status: Literal['present', 'absent', 'warned']
 
 
 class ParticipantRequestDelete(BaseModel):
@@ -34,19 +33,19 @@ class MeetRequestCreate(BaseModel):
 
 
 class MeetRequestUpdate(BaseModel):
-    name: str
-    meet_at: datetime
-    category_id: int
-    assigned_to: UUID
-    participants_to_add: list[ParticipantRequest]
-    participants_to_update: list[ParticipantRequestUpdate]
-    participants_to_delete: list[ParticipantRequestDelete]
+    name: str | None = None
+    meet_at: datetime | None = None
+    category_id: int | None = None
+    assigned_to: UUID | None = None
+    participants_to_add: list[ParticipantRequest] = Field(default_factory=list)
+    participants_to_update: list[ParticipantRequestUpdate] = Field(default_factory=list)
+    participants_to_delete: list[ParticipantRequestDelete] = Field(default_factory=list)
 
 
 class ParticipantResponse(BaseModel):
     id: int
     user_id: UUID
-    status: str
+    status: Literal['present', 'absent', 'warned']
 
     @staticmethod
     def from_dto(dto: ParticipantResponseDTO) -> 'ParticipantResponse':

@@ -7,13 +7,13 @@ from uuid import UUID
 @dataclass
 class ParticipantCreateDTO:
     user_id: UUID
-    status: str
+    status: Literal['present', 'absent', 'warned']
 
 
 @dataclass
 class ParticipantUpdateDTO:
     id: int
-    status: str
+    status: Literal['present', 'absent', 'warned']
 
 
 @dataclass
@@ -26,7 +26,7 @@ class ParticipantResponseDTO:
     id: int
     user_id: UUID
     meet_id: int
-    status: str
+    status: Literal['present', 'absent', 'warned']
 
 
 @dataclass

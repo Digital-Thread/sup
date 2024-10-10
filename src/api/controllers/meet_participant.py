@@ -4,7 +4,7 @@ from uuid import UUID
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends, status
 
-from src.api.dtos.meet import ParticipantRequest
+from src.api.dtos.meet import ParticipantRequestUpdate
 from src.apps.meet.dtos import ParticipantUpdateDTO
 from src.apps.meet.service import MeetService
 
@@ -31,7 +31,7 @@ async def update_participant(
     workspace_id: Annotated[int, Depends(get_current_workspace_id)],
     meet_id: int,
     participant_id: int,
-    participant_request: ParticipantRequest,
+    participant_request: ParticipantRequestUpdate,
     meet_service: FromDishka[MeetService],
 ) -> None:
     dto = ParticipantUpdateDTO(id=participant_id, status=participant_request.status)

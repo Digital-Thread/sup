@@ -28,7 +28,6 @@ from .exceptions import (
     BaseMeetException,
     MeetCreateException,
     MeetNotFoundException,
-    ParticipantCheckException,
     ParticipantCreateException,
     ParticipantNotFoundException,
 )
@@ -207,17 +206,13 @@ class MeetService:
     async def update_participant(
         self, user_id: UUID, workspace_id: int, dto: ParticipantUpdateDTO
     ) -> int:
-        participant_data = {
-            'id': ParticipantId(dto.id),
-            'status': Status(dto.status),
-        }
-        participant = self._create_entity(Participant, participant_data, ParticipantCheckException)
+        participant = await self._get_participant_or_raise(dto.id)
+        if dto.status is not None:
+            participant.status = Status(dto.status)
         participant_id = await self.participant_repository.update_participant(participant)
         return int(participant_id)
 
-    def _create_entity[
-        T
-    ](
+    def _create_entity[T](
         self, entity_class: Type[T], data: dict[str, Any], exception_class: Type[BaseMeetException]
     ) -> T:
         try:
@@ -230,6 +225,14 @@ class MeetService:
         if not meet:
             raise MeetNotFoundException()
         return meet
+
+    async def _get_participant_or_raise(self, participant_id: int) -> Participant:
+        participant = await self.participant_repository.get_participant_by_id(
+            ParticipantId(participant_id)
+        )
+        if not participant:
+            raise ParticipantNotFoundException()
+        return participant
 
     async def _update_meet_fields(self, meet: Meet, dto: MeetUpdateDTO) -> None:
         if dto.name is not None:
