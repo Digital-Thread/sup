@@ -2,6 +2,7 @@ from typing import AsyncIterable
 
 from dishka import Provider, Scope, provide
 from environs import Env
+from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -9,7 +10,13 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from src.config import Config, DbConfig
+from src.apps.auth import JWTService
+from src.apps.send_mail.service import SendMailService
+from src.apps.user.protocols import JWTServiceProtocol, SendMailServiceProtocol
+from src.apps.user.repositories import IUserRepository
+from src.apps.user.services import CreateUserService
+from src.config import Config, DbConfig, JWTConfig, RedisConfig, SMTPConfig
+from src.data_access.reposotiries.user_repository import UserRepository
 
 
 class SqlalchemyProvider(Provider):
@@ -37,8 +44,54 @@ class ConfigProvider(Provider):
 
         return Config(
             db=DbConfig.from_env(env),
+            smtp=SMTPConfig.from_env(env),
+            redis=RedisConfig.from_env(env),
+            jwt=JWTConfig.from_env(env),
         )
+
+    @provide(scope=Scope.APP)
+    def provide_smtp_config(self, config: Config) -> SMTPConfig:
+        return config.smtp
+
+    @provide(scope=Scope.APP)
+    def provide_redis_config(self, config: Config) -> RedisConfig:
+        return config.redis
+
+    @provide(scope=Scope.APP)
+    def provide_jwt_config(self, config: Config) -> JWTConfig:
+        return config.jwt
 
 
 class RepositoriesProvider(Provider):
     scope = Scope.REQUEST
+
+    @provide(scope=scope, provides=SendMailServiceProtocol)
+    def provide_send_mail_service(self, smtp_config: SMTPConfig) -> SendMailService:
+        return SendMailService(smtp_config)
+
+    @provide(scope=scope, provides=JWTServiceProtocol)
+    def provide_jwt_service(self, jwt_config: JWTConfig, redis_config: RedisConfig) -> JWTService:
+        return JWTService(jwt_config, redis_config)
+
+    @provide(scope=scope, provides=IUserRepository)
+    def provide_user_repository(self, session: AsyncSession) -> UserRepository:
+        return UserRepository(session)
+
+    @provide(scope=scope)
+    def provide_pwd_context(self) -> CryptContext:
+        return CryptContext(schemes=['bcrypt'], deprecated='auto')
+
+    @provide(scope=scope)
+    def provide_create_user_service(
+        self,
+        pwd_context: CryptContext,
+        send_mail_service: SendMailServiceProtocol,
+        repository: IUserRepository,
+        redis_config: RedisConfig,
+    ) -> CreateUserService:
+        return CreateUserService(
+            pwd_context=pwd_context,
+            send_mail_service=send_mail_service,
+            repository=repository,
+            redis_config=redis_config,
+        )

@@ -27,3 +27,8 @@ class UserNotFoundException(BaseUserError):
 class PermissionDeniedException(BaseUserError):
     def __init__(self, message: str = 'Вы можете редактировать только свою учетную запись'):
         super().__init__(message)
+
+
+class UserPasswordException(BaseUserError):
+    def __init__(self, message: str = 'Пароль не может быть длиннее 50 символов'):
+        super().__init__(message)

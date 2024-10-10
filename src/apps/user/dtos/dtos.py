@@ -17,7 +17,7 @@ class BaseUserDto(BaseModel):
 
 
 class UserCreateDTO(BaseUserDto):
-    pass
+    password: str
 
 
 class UserResponseDTO(BaseUserDto):

@@ -207,3 +207,6 @@ class Config:
     """
 
     db: DbConfig
+    smtp: SMTPConfig
+    redis: RedisConfig
+    jwt: JWTConfig

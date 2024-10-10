@@ -33,19 +33,3 @@ class SendMailService:
 
         except:
             raise SendMailActivationException
-
-
-import asyncio
-
-from environs import Env
-
-if __name__ == '__main__':
-    env = Env()
-    env.read_env()
-
-    jwt_conf = SMTPConfig.from_env(env)
-
-    jwt_service = SendMailService(jwt_conf)
-
-    # jwt_service.send_activation_email('onubee@gmail.com', '777')
-    asyncio.run(jwt_service.send_activation_email('onubee@gmail.com', '888'))

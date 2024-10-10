@@ -9,7 +9,7 @@ class User(Base, DatetimeFieldsMixin, UUIDPkMixin):
     first_name: Mapped[str] = mapped_column(String(20), nullable=False)
     last_name: Mapped[str] = mapped_column(String(20), nullable=False)
     email: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
-    password: Mapped[str] = mapped_column(String(50), nullable=False)
+    password: Mapped[str] = mapped_column(String(200), nullable=False)
     username_tg: Mapped[str] = mapped_column(String(50), nullable=False)
     nick_tg: Mapped[str] = mapped_column(String(50), nullable=False)
     nick_gmeet: Mapped[str] = mapped_column(String(50), nullable=False)

@@ -11,6 +11,7 @@ from src.apps.user.exceptions import (
     TokenActivationExpire,
     UserAlreadyExistsError,
     UserNotFoundError,
+    UserPasswordException,
 )
 from src.apps.user.repositories import IUserRepository
 from src.apps.user.services import GetUserService
@@ -40,6 +41,8 @@ class CreateUserService:
         if existing_user:
             raise UserAlreadyExistsError(dto.email)
         user = User(**dto.model_dump())
+        if len(user.password) > 51:
+            raise UserPasswordException
         user.password = self.get_password_hash(dto.password)
         await self.repository.save(user)
         activation_token = self.generate_activation_token(user.email)
