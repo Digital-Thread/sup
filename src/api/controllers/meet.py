@@ -3,7 +3,6 @@ from uuid import UUID
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Depends, status
-from fastapi.responses import JSONResponse
 
 from src.api.dtos.meet import (
     MeetFilterFieldsRequest,
@@ -13,6 +12,7 @@ from src.api.dtos.meet import (
     MeetSortFieldsRequest,
     PaginatedParams,
     PaginatedResponse,
+    SuccessResponse,
 )
 from src.apps.meet.dtos import (
     MeetCreateDTO,
@@ -42,13 +42,13 @@ async def get_current_workspace_id() -> int:
     return workspace_id
 
 
-@router.post('/{workspace_id}/meets')
+@router.post('', status_code=status.HTTP_201_CREATED, response_model=SuccessResponse)
 async def create_meet(
     owner_id: Annotated[UUID, Depends(get_current_user_id)],
     workspace_id: Annotated[int, Depends(get_current_workspace_id)],
     dto: MeetRequestCreate,
     meet_service: FromDishka[MeetService],
-) -> JSONResponse:
+) -> SuccessResponse:
     meet = MeetCreateDTO(
         name=dto.name,
         meet_at=dto.meet_at,
@@ -57,10 +57,10 @@ async def create_meet(
         participants=[ParticipantCreateDTO(**p.model_dump()) for p in dto.participants],
     )
     await meet_service.create_meet(owner_id, workspace_id, meet)
-    return JSONResponse(status_code=status.HTTP_201_CREATED, content={'success': True})
+    return SuccessResponse(message='Meet created')
 
 
-@router.get('/{workspace_id}/meets', response_model=PaginatedResponse[MeetResponse])
+@router.get('', response_model=PaginatedResponse[MeetResponse])
 async def get_meets(
     user_id: Annotated[UUID, Depends(get_current_user_id)],
     workspace_id: Annotated[int, Depends(get_current_workspace_id)],
@@ -76,22 +76,23 @@ async def get_meets(
         order_by=SortBy(sort_by.field, sort_by.order),
     )
     meets = await meet_service.get_meets(user_id, workspace_id, query)
-    meets_dto = [MeetResponse.from_dto(meet) for meet in meets]
-    return PaginatedResponse(count=len(meets), items=meets_dto)
+    meets_response = [MeetResponse.from_dto(meet) for meet in meets]
+    return PaginatedResponse(count=len(meets), items=meets_response)
 
 
-@router.get('/{workspace_id}/meets/{meet_id}', response_model=MeetResponse)
+@router.get('/{meet_id}', response_model=MeetResponse)
 async def get_meet_by_id(
     user_id: Annotated[UUID, Depends(get_current_user_id)],
     workspace_id: Annotated[int, Depends(get_current_workspace_id)],
     meet_id: int,
     meet_service: FromDishka[MeetService],
-) -> JSONResponse:
+) -> MeetResponse:
     meet = await meet_service.get_meet_by_id(user_id, workspace_id, meet_id)
-    return JSONResponse(status_code=status.HTTP_200_OK, content=MeetResponse.from_dto(meet))
+    meet_response = MeetResponse.from_dto(meet)
+    return meet_response
 
 
-@router.patch('/{workspace_id}/meets/{meet_id}')
+@router.patch('/{meet_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def update_meet(
     user_id: Annotated[UUID, Depends(get_current_user_id)],
     workspace_id: Annotated[int, Depends(get_current_workspace_id)],
@@ -117,7 +118,7 @@ async def update_meet(
     await meet_service.update_meet(user_id, workspace_id, meet_id, dto)
 
 
-@router.delete('/{workspace_id}/meets/{meet_id}')
+@router.delete('/{meet_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_meet(
     user_id: Annotated[UUID, Depends(get_current_user_id)],
     workspace_id: Annotated[int, Depends(get_current_workspace_id)],

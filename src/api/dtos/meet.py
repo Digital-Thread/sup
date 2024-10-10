@@ -7,6 +7,10 @@ from pydantic import BaseModel, BeforeValidator, Field
 from src.apps.meet.dtos import MeetFilterFields, MeetResponseDTO, ParticipantResponseDTO
 
 
+class SuccessResponse(BaseModel):
+    message: str
+
+
 class ParticipantRequest(BaseModel):
     user_id: UUID
     status: str
