@@ -13,10 +13,7 @@ from src.apps.meet.entities.value_objects import (
     UserId,
     WorkspaceId,
 )
-from src.apps.meet.repositories import (
-    IMeetRepository,
-    MeetListQuery,
-)
+from src.apps.meet.repositories import IMeetRepository, MeetListQuery
 from src.data_access.models import Meet as MeetModel
 from src.data_access.models.meet import Participant as ParticipantModel
 

@@ -47,7 +47,7 @@ class IMeetRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def update_meet(self, meet: Meet) -> Meet:
+    async def update_meet(self, meet: Meet) -> MeetId | None:
         raise NotImplementedError
 
     @abstractmethod
@@ -65,7 +65,9 @@ class IParticipantRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_participants_by_meet_id(self, meet_id: MeetId) -> list[Participant]:
+    async def get_participants_by_meet_id(
+        self, workspace_id: WorkspaceId, meet_id: MeetId
+    ) -> list[Participant]:
         raise NotImplementedError
 
     @abstractmethod

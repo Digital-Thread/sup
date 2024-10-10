@@ -9,8 +9,5 @@ class WorkspaceServiceProtocol(Protocol):
 
 
 class WorkspaceService:
-    def __init__(self):
-        pass
-
     async def user_has_access(self, user_id: UUID, workspace_id: int) -> bool:
         return True

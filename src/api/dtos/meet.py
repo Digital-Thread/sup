@@ -4,7 +4,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, BeforeValidator, Field
 
-from src.apps.meet.dtos import MeetResponseDTO, ParticipantResponseDTO
+from src.apps.meet.dtos import MeetFilterFields, MeetResponseDTO, ParticipantResponseDTO
 
 
 class ParticipantRequest(BaseModel):
@@ -12,12 +12,26 @@ class ParticipantRequest(BaseModel):
     status: str
 
 
-class MeetRequest(BaseModel):
+class ParticipantRequestDelete(BaseModel):
+    user_id: UUID
+
+
+class MeetRequestCreate(BaseModel):
     name: str
     meet_at: datetime
     category_id: int
     assigned_to: UUID
     participants: list[ParticipantRequest]
+
+
+class MeetRequestUpdate(BaseModel):
+    name: str
+    meet_at: datetime
+    category_id: int
+    assigned_to: UUID
+    participants_to_add: list[ParticipantRequest]
+    participants_to_update: list[ParticipantRequest]
+    participants_to_delete: list[ParticipantRequestDelete]
 
 
 class ParticipantResponse(BaseModel):
@@ -26,7 +40,7 @@ class ParticipantResponse(BaseModel):
     status: str
 
     @staticmethod
-    def from_dto(dto: ParticipantResponseDTO):
+    def from_dto(dto: ParticipantResponseDTO) -> 'ParticipantResponse':
         return ParticipantResponse(id=dto.id, user_id=dto.user_id, status=dto.status)
 
 
@@ -40,7 +54,7 @@ class MeetResponse(BaseModel):
     participants: list[ParticipantResponse]
 
     @staticmethod
-    def from_dto(dto: MeetResponseDTO):
+    def from_dto(dto: MeetResponseDTO) -> 'MeetResponse':
         return MeetResponse(
             id=dto.id,
             name=dto.name,
@@ -61,11 +75,11 @@ class PaginatedParams(BaseModel):
     per_page: Annotated[Literal[4, 8, 16, 24] | None, BeforeValidator(int)] = 16
 
     @property
-    def limit(self):
+    def limit(self) -> Literal[4, 8, 16, 24] | None:
         return self.per_page
 
     @property
-    def offset(self):
+    def offset(self) -> int:
         if self.per_page is None:
             return 0
         return (self.page - 1) * self.per_page
@@ -75,6 +89,17 @@ class MeetFilterFieldsRequest(BaseModel):
     category_id: int | None = None
     assigned_to: UUID | None = None
     meet_at: datetime | None = None
+
+    def to_dto(self) -> MeetFilterFields:
+        result: MeetFilterFields = {}
+
+        if self.category_id is not None:
+            result['category_id'] = self.category_id
+        if self.assigned_to is not None:
+            result['assigned_to'] = self.assigned_to
+        if self.meet_at is not None:
+            result['meet_at'] = self.meet_at
+        return result
 
 
 class MeetSortFieldsRequest(BaseModel):

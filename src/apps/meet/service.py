@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import Type
+from typing import Any, Awaitable, Callable, Concatenate, ParamSpec, Type, TypeVar
 from uuid import UUID
 
 from .dtos import (
@@ -35,10 +35,17 @@ from .exceptions import (
 from .protocols import WorkspaceServiceProtocol
 from .repositories import IMeetRepository, IParticipantRepository, MeetListQuery
 
+P = ParamSpec('P')
+R = TypeVar('R')
 
-def check_access(method):
+
+def check_access(
+    method: Callable[Concatenate[Any, UUID, int, P], Awaitable[R]],
+) -> Callable[Concatenate[Any, UUID, int, P], Awaitable[R]]:
     @wraps(method)
-    async def wrapper(self, user_id: UUID, workspace_id: int, *args, **kwargs):
+    async def wrapper(
+        self: Any, user_id: UUID, workspace_id: int, *args: P.args, **kwargs: P.kwargs
+    ) -> R:
         has_access = await self.workspace_service.user_has_access(user_id, workspace_id)
         if not has_access:
             raise AccessDeniedException()
@@ -188,7 +195,7 @@ class MeetService:
         self, user_id: UUID, workspace_id: int, meet_id: int
     ) -> list[ParticipantResponseDTO]:
         participants = await self.participant_repository.get_participants_by_meet_id(
-            MeetId(meet_id)
+            WorkspaceId(workspace_id), MeetId(meet_id)
         )
 
         if not participants:
@@ -208,8 +215,10 @@ class MeetService:
         participant_id = await self.participant_repository.update_participant(participant)
         return int(participant_id)
 
-    def _create_entity[T](
-        self, entity_class: Type[T], data: dict, exception_class: Type[BaseMeetException]
+    def _create_entity[
+        T
+    ](
+        self, entity_class: Type[T], data: dict[str, Any], exception_class: Type[BaseMeetException]
     ) -> T:
         try:
             return entity_class(**data)

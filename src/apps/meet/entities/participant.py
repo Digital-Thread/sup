@@ -34,7 +34,7 @@ class Participant:
         return self._id
 
     @id.setter
-    def id(self, value: ParticipantId):
+    def id(self, value: ParticipantId) -> None:
         self._id = value
 
     @property
@@ -44,7 +44,7 @@ class Participant:
         return self._meet_id
 
     @meet_id.setter
-    def meet_id(self, value: MeetId):
+    def meet_id(self, value: MeetId) -> None:
         self._meet_id = value
 
     def to_dto(self) -> ParticipantResponseDTO:

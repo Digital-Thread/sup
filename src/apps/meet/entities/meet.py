@@ -36,7 +36,7 @@ class Meet:
         return self._name
 
     @name.setter
-    def name(self, value: str):
+    def name(self, value: str) -> None:
         self._validate_name(value)
         self._name = value
 
@@ -55,7 +55,7 @@ class Meet:
         return self._meet_at
 
     @meet_at.setter
-    def meet_at(self, value: datetime):
+    def meet_at(self, value: datetime) -> None:
         if value is not None:
             value = value.replace(tzinfo=None)
         self._meet_at = value
@@ -67,7 +67,7 @@ class Meet:
         return self._id
 
     @id.setter
-    def id(self, value: MeetId):
+    def id(self, value: MeetId) -> None:
         self._id = value
 
     @property

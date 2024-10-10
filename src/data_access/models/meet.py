@@ -38,7 +38,7 @@ class Meet(Base, IntIdPkMixin, DatetimeFieldsMixin):
         'Workspace', foreign_keys=[workspace_id], back_populates='meets', lazy='raise_on_sql'
     )
 
-    # TODO: Decide abount cascade delete or not
+    # TODO: Decide about cascade delete or not
     category: Mapped['Category'] = relationship('Category', back_populates='meets', lazy='joined')
 
 

@@ -8,9 +8,7 @@ from src.apps.meet.entities.value_objects import (
     UserId,
     WorkspaceId,
 )
-from src.apps.meet.repositories import (
-    IParticipantRepository,
-)
+from src.apps.meet.repositories import IParticipantRepository
 from src.data_access.models.meet import Participant as ParticipantModel
 
 

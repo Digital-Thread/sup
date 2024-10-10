@@ -7,7 +7,8 @@ from fastapi.responses import JSONResponse
 
 from src.api.dtos.meet import (
     MeetFilterFieldsRequest,
-    MeetRequest,
+    MeetRequestCreate,
+    MeetRequestUpdate,
     MeetResponse,
     MeetSortFieldsRequest,
     PaginatedParams,
@@ -15,9 +16,11 @@ from src.api.dtos.meet import (
 )
 from src.apps.meet.dtos import (
     MeetCreateDTO,
-    MeetFilterFields,
     MeetListQueryDTO,
+    MeetUpdateDTO,
     ParticipantCreateDTO,
+    ParticipantDeleteDTO,
+    ParticipantUpdateDTO,
     SortBy,
 )
 from src.apps.meet.service import MeetService
@@ -43,9 +46,9 @@ async def get_current_workspace_id() -> int:
 async def create_meet(
     owner_id: Annotated[UUID, Depends(get_current_user_id)],
     workspace_id: Annotated[int, Depends(get_current_workspace_id)],
-    dto: MeetRequest,
+    dto: MeetRequestCreate,
     meet_service: FromDishka[MeetService],
-):
+) -> JSONResponse:
     meet = MeetCreateDTO(
         name=dto.name,
         meet_at=dto.meet_at,
@@ -69,12 +72,12 @@ async def get_meets(
     query = MeetListQueryDTO(
         offset=paginated_params.offset if paginated_params else 0,
         limit=paginated_params.limit if paginated_params else None,
-        filters=MeetFilterFields(**filters.model_dump(exclude_none=True)),
+        filters=filters.to_dto(),
         order_by=SortBy(sort_by.field, sort_by.order),
     )
     meets = await meet_service.get_meets(user_id, workspace_id, query)
-    meets = [MeetResponse.from_dto(meet) for meet in meets]
-    return PaginatedResponse(count=len(meets), items=meets)
+    meets_dto = [MeetResponse.from_dto(meet) for meet in meets]
+    return PaginatedResponse(count=len(meets), items=meets_dto)
 
 
 @router.get('/{workspace_id}/meets/{meet_id}', response_model=MeetResponse)
@@ -83,5 +86,42 @@ async def get_meet_by_id(
     workspace_id: Annotated[int, Depends(get_current_workspace_id)],
     meet_id: int,
     meet_service: FromDishka[MeetService],
-):
-    return await meet_service.get_meet_by_id(user_id, workspace_id, meet_id)
+) -> JSONResponse:
+    meet = await meet_service.get_meet_by_id(user_id, workspace_id, meet_id)
+    return JSONResponse(status_code=status.HTTP_200_OK, content=MeetResponse.from_dto(meet))
+
+
+@router.patch('/{workspace_id}/meets/{meet_id}')
+async def update_meet(
+    user_id: Annotated[UUID, Depends(get_current_user_id)],
+    workspace_id: Annotated[int, Depends(get_current_workspace_id)],
+    meet_id: int,
+    meet_request: MeetRequestUpdate,
+    meet_service: FromDishka[MeetService],
+) -> None:
+    dto = MeetUpdateDTO(
+        name=meet_request.name,
+        meet_at=meet_request.meet_at,
+        category_id=meet_request.category_id,
+        assigned_to=meet_request.assigned_to,
+        participants_to_add=[
+            ParticipantCreateDTO(**p.model_dump()) for p in meet_request.participants_to_add
+        ],
+        participants_to_update=[
+            ParticipantUpdateDTO(**p.model_dump()) for p in meet_request.participants_to_update
+        ],
+        participants_to_delete=[
+            ParticipantDeleteDTO(**p.model_dump()) for p in meet_request.participants_to_delete
+        ],
+    )
+    await meet_service.update_meet(user_id, workspace_id, meet_id, dto)
+
+
+@router.delete('/{workspace_id}/meets/{meet_id}')
+async def delete_meet(
+    user_id: Annotated[UUID, Depends(get_current_user_id)],
+    workspace_id: Annotated[int, Depends(get_current_workspace_id)],
+    meet_id: int,
+    meet_service: FromDishka[MeetService],
+) -> None:
+    await meet_service.delete_meet(user_id, workspace_id, meet_id)

@@ -8,40 +8,40 @@ class BaseMeetException(ApplicationException):
 
 
 class AccessDeniedException(BaseMeetException):
-    def __init__(self):
-        super().__init__(message='Access denied')
+    def __init__(self, message: str = 'Access denied'):
+        super().__init__(message)
 
 
 class MeetNameLengthException(BaseMeetException):
-    def __init__(self):
-        super().__init__(message='Meet name length error')
+    def __init__(self, message: str = 'Meet name length error'):
+        super().__init__(message)
 
 
 class MeetNotFoundException(BaseMeetException):
-    def __init__(self):
-        super().__init__(message='Meet not found')
+    def __init__(self, message: str = 'Meet not found'):
+        super().__init__(message)
 
 
 class MeetCreateException(BaseMeetException):
-    def __init__(self):
-        super().__init__(message='Meet create error')
+    def __init__(self, message: str = 'Meet create error'):
+        super().__init__(message)
 
 
 class MeetInviteException(BaseMeetException):
-    def __init__(self):
-        super().__init__(message='Meet invite error')
+    def __init__(self, message: str = 'Meet invite error'):
+        super().__init__(message)
 
 
 class ParticipantCheckException(BaseMeetException):
-    def __init__(self):
-        super().__init__(message='Participant check error')
+    def __init__(self, message: str = 'Participant check error'):
+        super().__init__(message)
 
 
 class ParticipantNotFoundException(BaseMeetException):
-    def __init__(self):
-        super().__init__(message='Participant not found')
+    def __init__(self, message: str = 'Participant not found'):
+        super().__init__(message)
 
 
 class ParticipantCreateException(BaseMeetException):
-    def __init__(self):
-        super().__init__(message='Participant create error')
+    def __init__(self, message: str = 'Participant create error'):
+        super().__init__(message)
