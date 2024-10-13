@@ -14,7 +14,11 @@ from src.apps.auth import JWTService
 from src.apps.send_mail.service import SendMailService
 from src.apps.user.protocols import JWTServiceProtocol, SendMailServiceProtocol
 from src.apps.user.repositories import IUserRepository
-from src.apps.user.services import CreateUserService
+from src.apps.user.services import (
+    AuthenticateUserService,
+    CreateUserService,
+    GetUserService,
+)
 from src.config import Config, DbConfig, JWTConfig, RedisConfig, SMTPConfig
 from src.data_access.reposotiries.user_repository import UserRepository
 
@@ -70,7 +74,13 @@ class RepositoriesProvider(Provider):
         return SendMailService(smtp_config)
 
     @provide(scope=scope, provides=JWTServiceProtocol)
-    def provide_jwt_service(self, jwt_config: JWTConfig, redis_config: RedisConfig) -> JWTService:
+    def provide_jwt_protocol_service(
+        self, jwt_config: JWTConfig, redis_config: RedisConfig
+    ) -> JWTService:
+        return JWTService(jwt_config, redis_config)
+
+    @provide(scope=scope)
+    def provide_jwt__service(self, jwt_config: JWTConfig, redis_config: RedisConfig) -> JWTService:
         return JWTService(jwt_config, redis_config)
 
     @provide(scope=scope, provides=IUserRepository)
@@ -88,10 +98,29 @@ class RepositoriesProvider(Provider):
         send_mail_service: SendMailServiceProtocol,
         repository: IUserRepository,
         redis_config: RedisConfig,
+        token_service: JWTServiceProtocol,
     ) -> CreateUserService:
         return CreateUserService(
             pwd_context=pwd_context,
             send_mail_service=send_mail_service,
             repository=repository,
             redis_config=redis_config,
+            token_service=token_service,
+        )
+
+    @provide(scope=scope)
+    def provide_get_user_service(
+        self, repository: IUserRepository, token_service: JWTServiceProtocol
+    ) -> GetUserService:
+        return GetUserService(repository=repository, token_service=token_service)
+
+    @provide(scope=scope)
+    def provide_auth_service(
+        self,
+        repository: IUserRepository,
+        pwd_context: CryptContext,
+        token_service: JWTServiceProtocol,
+    ) -> AuthenticateUserService:
+        return AuthenticateUserService(
+            repository=repository, pwd_context=pwd_context, token_service=token_service
         )

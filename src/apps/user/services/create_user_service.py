@@ -1,24 +1,21 @@
 import uuid
 from datetime import timedelta
-from typing import TYPE_CHECKING
 
-import redis.asyncio as redis
+import redis.asyncio as redis  # type: ignore
 from passlib.context import CryptContext
 
 from src.apps.user.domain.entities import User
 from src.apps.user.dtos import UserCreateDTO, UserResponseDTO
 from src.apps.user.exceptions import (
+    LengthUserPasswordException,
     TokenActivationExpire,
     UserAlreadyExistsError,
     UserNotFoundError,
-    UserPasswordException,
 )
+from src.apps.user.protocols import JWTServiceProtocol, SendMailServiceProtocol
 from src.apps.user.repositories import IUserRepository
 from src.apps.user.services import GetUserService
 from src.config import RedisConfig
-
-if TYPE_CHECKING:
-    from src.apps.user.protocols import SendMailServiceProtocol
 
 
 class CreateUserService:
@@ -28,21 +25,23 @@ class CreateUserService:
         send_mail_service: SendMailServiceProtocol,
         repository: IUserRepository,
         redis_config: RedisConfig,
+        token_service: JWTServiceProtocol,
     ):
         self.repository = repository
         self.pwd_context = pwd_context or CryptContext(schemes=['bcrypt'], deprecated='auto')
         self.send_mail_service = send_mail_service
         dsn = redis_config.construct_redis_dsn
         self.redis_client = redis.StrictRedis.from_url(dsn)
+        self.token_service = token_service
 
     async def create_user(self, dto: UserCreateDTO) -> User:
-        get_user_service = GetUserService(self.repository)
+        get_user_service = GetUserService(self.repository, self.token_service)
         existing_user = await get_user_service.get_user_by_email(dto.email)
         if existing_user:
             raise UserAlreadyExistsError(dto.email)
         user = User(**dto.model_dump())
         if len(user.password) > 51:
-            raise UserPasswordException
+            raise LengthUserPasswordException
         user.password = self.get_password_hash(dto.password)
         await self.repository.save(user)
         activation_token = self.generate_activation_token(user.email)

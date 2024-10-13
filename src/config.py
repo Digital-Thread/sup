@@ -161,7 +161,6 @@ class SMTPConfig:
 class JWTConfig:
     secret_key: str
     algorithm: str
-    access_token_expire_minutes: int
     access_token_lifetime: timedelta = timedelta(minutes=15)
     refresh_token_lifetime: timedelta = timedelta(days=7)
 
@@ -169,11 +168,10 @@ class JWTConfig:
     def from_env(env: Env) -> 'JWTConfig':
         secret_key = env.str('SECRET_KEY')
         algorithm = env.str('ALGORITHM')
-        access_token_expire_minutes = env.int('ACCESS_TOKEN_EXPIRE_MINUTES')
+
         return JWTConfig(
             secret_key=secret_key,
             algorithm=algorithm,
-            access_token_expire_minutes=access_token_expire_minutes,
         )
 
 

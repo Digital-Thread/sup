@@ -29,3 +29,8 @@ class UserResponseDTO(BaseUserDto):
 
 class UserUpdateDTO(BaseUserDto):
     is_active: Optional[bool] = False
+
+
+class AuthDTO(BaseModel):
+    email: str
+    password: str

@@ -29,6 +29,16 @@ class PermissionDeniedException(BaseUserError):
         super().__init__(message)
 
 
-class UserPasswordException(BaseUserError):
+class LengthUserPasswordException(BaseUserError):
     def __init__(self, message: str = 'Пароль не может быть длиннее 50 символов'):
+        super().__init__(message)
+
+
+class UserPasswordException(BaseUserError):
+    def __init__(self, message: str = 'Неверный пароль'):
+        super().__init__(message)
+
+
+class TokenExpiredError(Exception):
+    def __init__(self, message: str = 'Зайдите в систему'):
         super().__init__(message)
