@@ -35,3 +35,6 @@ class SendMailServiceProtocol(Protocol):
 
     async def send_activation_email(self, email: str, token: str) -> None:
         pass
+
+    async def send_invite_email(self, email: str, token: str) -> None:
+        pass

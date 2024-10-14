@@ -23,7 +23,7 @@ class GetUserService:
         return query
 
     async def get_user_info(
-            self, access_token: str, refresh_token: str, user_agent: str
+        self, access_token: str, refresh_token: str, user_agent: str
     ) -> tuple[UserResponseDTO, str, int, str, int]:
 
         user = None

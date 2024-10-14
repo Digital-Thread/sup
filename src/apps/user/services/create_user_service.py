@@ -44,7 +44,7 @@ class CreateUserService:
             raise LengthUserPasswordException
         user.password = self.get_password_hash(dto.password)
         await self.repository.save(user)
-        activation_token = self.generate_activation_token(user.email)
+        activation_token = self.generate_uuid_token()
         await self.redis_client.set(
             f'activation_token:{user.email}', activation_token, ex=timedelta(days=7)
         )
@@ -75,5 +75,10 @@ class CreateUserService:
         return self.pwd_context.hash(password)
 
     @staticmethod
-    def generate_activation_token(email: str) -> str:
+    def generate_uuid_token() -> str:
         return str(uuid.uuid4())
+
+    async def send_invite_link(self, email: str) -> None:
+        invite_token = self.generate_uuid_token()
+        await self.redis_client.set(f'invite_token:{email}', invite_token, ex=timedelta(days=7))
+        return await self.send_mail_service.send_invite_email(email, invite_token)

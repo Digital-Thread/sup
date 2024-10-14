@@ -22,6 +22,15 @@ class AuthorizeUserService:
         self.repository = repository
         self.token_service = token_service
 
+    @staticmethod
+    async def get_access_admin(user: User) -> bool:
+        if user is None:
+            raise UserNotFoundError()
+        if user.is_superuser:
+            return True
+        else:
+            raise UserPermissionError()
+
     async def get_authorize_user_by_email(self, user: User, email: str) -> UserResponseDTO:
         get_user_service = GetUserService(self.repository, self.token_service)
         if user is None:

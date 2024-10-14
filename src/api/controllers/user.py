@@ -16,9 +16,9 @@ from src.apps.user.services.authorize_user_service import AuthorizeUserService
 router = APIRouter(route_class=DishkaRoute)
 
 
-@router.post('/create/user/{user_id}', response_model=UserResponseDTO)
+@router.post('/register', response_model=UserResponseDTO)
 async def create_user(
-        create_user_dto: UserCreateDTO, create_user_service: FromDishka[CreateUserService]
+    create_user_dto: UserCreateDTO, create_user_service: FromDishka[CreateUserService]
 ) -> UserResponseDTO:
     user = await create_user_service.create_user(create_user_dto)
     return user
@@ -26,9 +26,9 @@ async def create_user(
 
 @router.post('/login')
 async def login_user(
-        request: Request,
-        auth_dto: AuthDTO,
-        auth_service: FromDishka[AuthenticateUserService],
+    request: Request,
+    auth_dto: AuthDTO,
+    auth_service: FromDishka[AuthenticateUserService],
 ) -> dict[str, str]:
     user = await auth_service.authenticate_user(email=auth_dto.email, password=auth_dto.password)
     user_agent = request.headers.get('User-Agent')
@@ -45,9 +45,9 @@ async def login_user(
 
 @router.post('/logout')
 async def logout_user(
-        request: Request,
-        response: Response,
-        token_service: FromDishka[JWTService],
+    request: Request,
+    response: Response,
+    token_service: FromDishka[JWTService],
 ) -> dict[str, str]:
     user_agent = request.headers.get('User-Agent')
     access_token = request.cookies.get('sup_access_token')
@@ -64,10 +64,10 @@ async def logout_user(
 
 @router.get('/user/', response_model=UserResponseDTO)
 async def get_user(
-        request: Request,
-        get_user_service: FromDishka[GetUserService],
-        authorize_service: FromDishka[AuthorizeUserService],
-        email: str = Query(...),
+    request: Request,
+    get_user_service: FromDishka[GetUserService],
+    authorize_service: FromDishka[AuthorizeUserService],
+    email: str = Query(...),
 ) -> Optional[UserResponseDTO]:
     user_agent = request.headers.get('User-Agent')
     access_token = request.cookies.get('sup_access_token')
@@ -87,9 +87,9 @@ async def get_user(
 
 @router.get('/users/', response_model=Optional[List[UserResponseDTO]])
 async def get_users(
-        request: Request,
-        get_user_service: FromDishka[GetUserService],
-        authorize_service: FromDishka[AuthorizeUserService],
+    request: Request,
+    get_user_service: FromDishka[GetUserService],
+    authorize_service: FromDishka[AuthorizeUserService],
 ) -> Optional[List[UserResponseDTO]]:
     user_agent = request.headers.get('User-Agent')
     access_token = request.cookies.get('sup_access_token')
@@ -107,8 +107,8 @@ async def get_users(
 
 @router.get('/aboutme', response_model=UserResponseDTO)
 async def about_me(
-        request: Request,
-        user_service: FromDishka[GetUserService],
+    request: Request,
+    user_service: FromDishka[GetUserService],
 ) -> Optional[UserResponseDTO]:
     user_agent = request.headers.get('User-Agent')
     access_token = request.cookies.get('sup_access_token')
@@ -122,3 +122,30 @@ async def about_me(
         request.state.max_age_access = max_age_access
         request.state.max_age_refresh = max_age_refresh
     return user
+
+
+@router.get('/invite_link/', response_model=UserResponseDTO)
+async def invite_link(
+    request: Request,
+    get_user_service: FromDishka[GetUserService],
+    authorize_service: FromDishka[AuthorizeUserService],
+    create_user_service: FromDishka[CreateUserService],
+    email: str = Query(...),
+) -> dict[str, str]:
+    user_agent = request.headers.get('User-Agent')
+    access_token = request.cookies.get('sup_access_token')
+    refresh_token = request.cookies.get('sup_refresh_token')
+    user, new_access_token, max_age_access, new_refresh_token, max_age_refresh = (
+        await get_user_service.get_user_info(access_token, refresh_token, user_agent)
+    )
+
+    if new_access_token and new_refresh_token:
+        request.state.new_access_token = new_access_token
+        request.state.new_refresh_token = new_refresh_token
+        request.state.max_age_access = max_age_access
+        request.state.max_age_refresh = max_age_refresh
+
+    await authorize_service.get_access_admin(user=user)
+    await create_user_service.send_invite_link(email=email)
+
+    return {'detail': f'Инвайт отправлен на почту {email}'}
