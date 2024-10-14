@@ -15,7 +15,10 @@ class JWTServiceProtocol(Protocol):
     ) -> bool:
         pass
 
-    async def decode_token(self, token: str) -> Optional[Dict[str, Any]]:
+    async def decode_access_token(self, token: str) -> Optional[str]:
+        pass
+
+    async def decode_refresh_token(self, token: str) -> str | None:
         pass
 
     async def create_refresh_token(self, email: EmailStr) -> str:

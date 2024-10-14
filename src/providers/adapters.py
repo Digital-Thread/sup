@@ -16,6 +16,7 @@ from src.apps.user.protocols import JWTServiceProtocol, SendMailServiceProtocol
 from src.apps.user.repositories import IUserRepository
 from src.apps.user.services import (
     AuthenticateUserService,
+    AuthorizeUserService,
     CreateUserService,
     GetUserService,
 )
@@ -115,7 +116,7 @@ class RepositoriesProvider(Provider):
         return GetUserService(repository=repository, token_service=token_service)
 
     @provide(scope=scope)
-    def provide_auth_service(
+    def provide_authenticate_service(
         self,
         repository: IUserRepository,
         pwd_context: CryptContext,
@@ -124,3 +125,11 @@ class RepositoriesProvider(Provider):
         return AuthenticateUserService(
             repository=repository, pwd_context=pwd_context, token_service=token_service
         )
+
+    @provide(scope=scope)
+    def provide_authorize_service(
+        self,
+        repository: IUserRepository,
+        token_service: JWTServiceProtocol,
+    ) -> AuthorizeUserService:
+        return AuthorizeUserService(repository=repository, token_service=token_service)

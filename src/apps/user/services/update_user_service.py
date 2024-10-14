@@ -2,7 +2,10 @@ import datetime
 from typing import Any
 
 from src.apps.user.dtos import UserResponseDTO, UserUpdateDTO
-from src.apps.user.exceptions import PermissionDeniedException, UserNotFoundException
+from src.apps.user.exceptions import (
+    PermissionDeniedException,
+    UserNotFoundByEmailException,
+)
 from src.apps.user.repositories import IUserRepository
 
 
@@ -15,7 +18,7 @@ class UpdateUserService:
     ) -> UserResponseDTO:
         user = await self.user_repository.find_by_email(email)
         if not user:
-            raise UserNotFoundException(user.email)
+            raise UserNotFoundByEmailException(user.email)
         if not current_user.is_superuser and user.email != current_user.email:
             raise PermissionDeniedException()
         restricted_fields = ['is_superuser', '_created_at', '_id']

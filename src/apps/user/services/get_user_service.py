@@ -1,7 +1,7 @@
-from typing import List, Optional
+from typing import List
 
-from src.apps.auth.exceptions import TokenExpireError
 from src.apps.user.dtos import UserResponseDTO
+from src.apps.user.exceptions import TokenExpiredError, UserNotFoundError
 from src.apps.user.protocols import JWTServiceProtocol
 from src.apps.user.repositories import IUserRepository
 
@@ -13,14 +13,17 @@ class GetUserService:
 
     async def get_user_by_email(self, email: str) -> UserResponseDTO:
         user = await self.repository.find_by_email(email)
-        return user
+        if user:
+            return user
+        else:
+            raise UserNotFoundError()
 
     async def get_all_users(self) -> List[UserResponseDTO]:
         query = await self.repository.find_all_users()
         return query
 
     async def get_user_info(
-        self, access_token: str, refresh_token: str, user_agent: str
+            self, access_token: str, refresh_token: str, user_agent: str
     ) -> tuple[UserResponseDTO, str, int, str, int]:
 
         user = None
@@ -30,27 +33,22 @@ class GetUserService:
         max_age_refresh = None
 
         if access_token:
-            try:
-                decoded_payload = await self.token_service.decode_token(access_token)
-                email = decoded_payload['email']
-                is_valid = await self.token_service.access_token_protected_resource(
-                    email=email, access_token_client=access_token, user_agent=user_agent
+            email = await self.token_service.decode_access_token(access_token)
+            is_valid = await self.token_service.access_token_protected_resource(
+                email=email, access_token_client=access_token, user_agent=user_agent
+            )
+            if is_valid:
+                user = await self.get_user_by_email(email)
+                return (
+                    user,
+                    new_access_token,
+                    max_age_access,
+                    new_refresh_token,
+                    max_age_refresh,
                 )
-                if is_valid:
-                    user = await self.get_user_by_email(email)
-                    return (
-                        user,
-                        new_access_token,
-                        max_age_access,
-                        new_refresh_token,
-                        max_age_refresh,
-                    )
-            except TokenExpireError:
-                pass
 
         if refresh_token:
-            decoded_payload = await self.token_service.decode_token(refresh_token)
-            email = decoded_payload['email']
+            email = await self.token_service.decode_refresh_token(refresh_token)
             is_valid = await self.token_service.refresh_token_protected_resource(
                 email=email, refresh_token_client=refresh_token, user_agent=user_agent
             )
@@ -59,15 +57,13 @@ class GetUserService:
                     await self.token_service.creating_tokens(email=email, user_agent=user_agent)
                 )
                 user = await self.get_user_by_email(email)
-                if user:
-                    return (
-                        user,
-                        new_access_token,
-                        max_age_access,
-                        new_refresh_token,
-                        max_age_refresh,
-                    )
-                else:
-                    raise TokenExpireError()
-
+                return (
+                    user,
+                    new_access_token,
+                    max_age_access,
+                    new_refresh_token,
+                    max_age_refresh,
+                )
+        if user is None:
+            raise TokenExpiredError()
         return user, new_access_token, max_age_access, new_refresh_token, max_age_refresh

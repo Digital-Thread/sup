@@ -19,7 +19,7 @@ class TokenActivationExpire(BaseUserError):
         super().__init__(message)
 
 
-class UserNotFoundException(BaseUserError):
+class UserNotFoundByEmailException(BaseUserError):
     def __init__(self, email: str):
         super().__init__(f'Пользователь с email {email} не найден')
 
@@ -36,9 +36,20 @@ class LengthUserPasswordException(BaseUserError):
 
 class UserPasswordException(BaseUserError):
     def __init__(self, message: str = 'Неверный пароль'):
+        self.message = message
         super().__init__(message)
 
 
 class TokenExpiredError(Exception):
     def __init__(self, message: str = 'Зайдите в систему'):
+        super().__init__(message)
+
+
+class UserNotAdminError(BaseUserError):
+    def __init__(self, message: str = 'Вы можете смотреть информацию только о себе'):
+        super().__init__(message)
+
+
+class UserPermissionError(BaseUserError):
+    def __init__(self, message: str = 'У вас нет прав для доступа к этому ресурсу'):
         super().__init__(message)

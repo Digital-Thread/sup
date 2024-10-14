@@ -66,6 +66,7 @@ fix = true
 
 [tool.isort]
 profile = "black"
+skip = ["src/apps/user/services/__init__.py"]
 
 [tool.deptry]
 ignore = ["DEP002"]

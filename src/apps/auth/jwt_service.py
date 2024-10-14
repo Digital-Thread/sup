@@ -6,7 +6,7 @@ import jwt
 import redis.asyncio as redis  # type: ignore
 from pydantic import EmailStr
 
-from src.apps.auth.dto import AccessTokenDTO, RefreshTokenDTO
+from src.apps.auth.dto import AccessTokenDTO, RefreshTokenDTO, TokenDTO
 from src.apps.auth.exceptions import (
     InvalidTokenError,
     TokenExpireError,
@@ -29,23 +29,34 @@ class JWTService:
     async def create_access_token(self, email: EmailStr) -> tuple[AccessTokenDTO, int]:
         expiration_access = datetime.now(timezone.utc) + self.access_token_lifetime
         max_age_access = int(expiration_access.timestamp()) - int(time.time())
-        token = jwt.encode(
+        access_token = jwt.encode(
             {'email': email, 'exp': expiration_access}, self.secret_key, algorithm=self.algorithm
         )
-        return token, max_age_access
+        return access_token, max_age_access
 
     async def create_refresh_token(self, email: EmailStr) -> tuple[RefreshTokenDTO, int]:
         expiration_refresh = datetime.now(timezone.utc) + self.refresh_token_lifetime
         max_age_refresh = int(expiration_refresh.timestamp()) - int(time.time())
-        token = jwt.encode(
+        refresh_token = jwt.encode(
             {'email': email, 'exp': expiration_refresh}, self.secret_key, algorithm=self.algorithm
         )
-        return token, max_age_refresh
+        return refresh_token, max_age_refresh
 
-    async def decode_token(self, token: AccessTokenDTO) -> Optional[Dict[str, Any]]:
+    async def decode_access_token(self, token: AccessTokenDTO) -> Optional[str]:
         try:
             payload = jwt.decode(token, self.secret_key, algorithms=self.algorithm)
-            return payload
+            email = payload['email']
+            return email
+        except jwt.ExpiredSignatureError:
+            return None
+        except jwt.InvalidTokenError:
+            return None
+
+    async def decode_refresh_token(self, token: RefreshTokenDTO) -> str | None:
+        try:
+            payload = jwt.decode(token, self.secret_key, algorithms=self.algorithm)
+            email = payload['email']
+            return email
         except jwt.ExpiredSignatureError:
             raise TokenExpireError()
         except jwt.InvalidTokenError:
@@ -77,7 +88,7 @@ class JWTService:
         if access_token is not None:
             access_token = access_token.decode('utf-8')
         if access_token == access_token_client:
-            decoded = await self.decode_token(access_token)
+            decoded = await self.decode_access_token(access_token)
             if decoded:
                 return True
         return False
@@ -89,7 +100,5 @@ class JWTService:
         if refresh_token is not None:
             refresh_token = refresh_token.decode('utf-8')
         if refresh_token == refresh_token_client:
-            decoded = await self.decode_token(refresh_token)
-            if decoded and decoded['email'] == email:
-                return True
+            return True
         raise TokenRefreshExpireError()

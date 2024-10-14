@@ -4,7 +4,7 @@ class JWTException(Exception):
 
 
 class InvalidTokenError(JWTException):
-    def __init__(self, message: str = 'Невалидный формат токена'):
+    def __init__(self, message: str = 'Невалидный формат рефреш токена'):
         super().__init__(message)
 
 
