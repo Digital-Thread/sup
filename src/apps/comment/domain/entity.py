@@ -3,11 +3,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Self
 
-from src.apps.comment import (
-    CommentAssociatedWithBothError,
-    CommentNotAssociatedError,
-    CommentOutDto,
-)
+from src.apps.comment import CommentAssociatedWithBothError, CommentNotAssociatedError
 
 from .event import CommentCreatedEvent, CommentDeletedEvent, CommentUpdatedEvent, Event
 from .value_objects import (
@@ -103,15 +99,4 @@ class CommentEntity(AggregateRoot):
             CommentDeletedEvent(
                 comment_id=self.comment_id, task_id=self.task_id, feature_id=self.feature_id
             )
-        )
-
-    def to_dto(self: Self) -> 'CommentOutDto':
-        return CommentOutDto(
-            comment_id=self.comment_id.value,
-            task_id=getattr(self.task_id, 'value', None),
-            feature_id=getattr(self.feature_id, 'value', None),
-            content=self.content.value,
-            author_id=self.author_id.value,
-            created_at=self.created_at.value,
-            updated_at=self.updated_at.value,
         )
