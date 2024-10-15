@@ -1,35 +1,30 @@
 import dataclasses
 from datetime import datetime
+from uuid import UUID
 
 
 @dataclasses.dataclass
 class BaseCommentDto:
-    author_id: int
+    author_id: UUID
     content: str
     task_id: int | None
     feature_id: int | None
 
 
 @dataclasses.dataclass
-class AddCommentToTaskDto:
-    author_id: int
-    task_id: int
-    content: str
-    feature_id: None = None
+class AddCommentToTaskDto(BaseCommentDto):
+    pass
 
 
 @dataclasses.dataclass
-class AddCommentToFeatureDto:
-    author_id: int
-    feature_id: int
-    content: str
-    task_id: None = None
+class AddCommentToFeatureDto(BaseCommentDto):
+    pass
 
 
 @dataclasses.dataclass
-class UpdateCommentDto:
-    comment_id: int
-    new_content: str
+class UpdateCommentDto(BaseCommentDto):
+    comment_id: int | None = None
+    new_content: str | None = None
 
 
 @dataclasses.dataclass

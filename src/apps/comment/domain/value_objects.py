@@ -12,6 +12,7 @@ __all__ = (
 )
 
 from datetime import datetime
+from uuid import UUID
 
 from src.apps.comment import (
     InvalidAuthorIdError,
@@ -51,10 +52,10 @@ class CommentId(ValueObject[int]):
 
 
 @dataclass(frozen=True)
-class AuthorId(ValueObject[int]):
+class AuthorId(ValueObject[UUID]):
 
     def _validate(self) -> None:
-        if not isinstance(self.value, int) or self.value <= 0:
+        if not isinstance(self.value, UUID):
             raise InvalidAuthorIdError()
 
 
