@@ -1,65 +1,59 @@
+from dataclasses import dataclass
+
 from src.apps import ApplicationException
 
 
+@dataclass
 class BaseCommentException(ApplicationException):
     """Base Domain Error"""
 
-    @property
-    def message(self) -> str:
-        return 'A domain error occurred'
+    message: str = 'A domain error occurred'
 
 
+@dataclass
 class CommentNotAssociatedError(BaseCommentException):
     """Выбрасывается, когда комментарий не ассоциирован ни с задачей, ни с фичей"""
 
-    @property
-    def message(self) -> str:
-        return 'Comment must be associated with either a Task or a Feature.'
+    message: str = 'Comment must be associated with either a Task or a Feature.'
 
 
+@dataclass
 class CommentAssociatedWithBothError(BaseCommentException):
     """Выбрасывается, когда комментарий ассоциирован и с задачей, и с фичей одновременно"""
 
-    @property
-    def message(self) -> str:
-        return 'Comment cannot be associated with both a Task and a Feature.'
+    message: str = 'Comment cannot be associated with both a Task and a Feature.'
 
 
+@dataclass
 class InvalidCommentIdError(BaseCommentException):
     """Выбрасывается, когда идентификатор комментария некорректный"""
 
-    @property
-    def message(self) -> str:
-        return 'CommentId must be a positive integer.'
+    message: str = 'CommentId must be a positive integer.'
 
 
+@dataclass
 class InvalidAuthorIdError(BaseCommentException):
     """Выбрасывается, когда идентификатор автора некорректный"""
 
-    @property
-    def message(self) -> str:
-        return 'AuthorId must be a positive integer.'
+    message: str = 'AuthorId must be a uuid object.'
 
 
+@dataclass
 class InvalidTaskIdError(BaseCommentException):
     """Выбрасывается, когда идентификатор задачи некорректный"""
 
-    @property
-    def message(self) -> str:
-        return 'TaskId must be a positive integer.'
+    message: str = 'TaskId must be a positive integer.'
 
 
+@dataclass
 class InvalidFeatureIdError(BaseCommentException):
     """Выбрасывается, когда идентификатор фичи некорректный"""
 
-    @property
-    def message(self) -> str:
-        return 'FeatureId must be a positive integer.'
+    message: str = 'FeatureId must be a positive integer.'
 
 
+@dataclass
 class InvalidContentError(BaseCommentException):
     """Выбрасывается, когда контент комментария некорректный"""
 
-    @property
-    def message(self) -> str:
-        return 'Content must be a non-empty string.'
+    message: str = 'Content must be a non-empty string.'
