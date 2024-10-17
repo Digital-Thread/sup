@@ -65,7 +65,7 @@ class UserRepository(IUserRepository):
                 nick_gmeet=user.nick_gmeet,
                 nick_gitlab=user.nick_gitlab,
                 nick_github=user.nick_github,
-                updated_at=datetime.datetime.now(datetime.timezone.utc),
+                updated_at=datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None),
             )
         )
         await self._session.execute(query)

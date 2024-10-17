@@ -2,7 +2,7 @@ from passlib.context import CryptContext
 from pydantic import EmailStr
 
 from src.apps.user.dtos import UserResponseDTO
-from src.apps.user.exceptions import UserPasswordException
+from src.apps.user.exceptions import NotActivationExpire, UserPasswordException
 from src.apps.user.protocols import JWTServiceProtocol
 from src.apps.user.repositories import IUserRepository
 from src.apps.user.services import GetUserService
@@ -25,6 +25,8 @@ class AuthenticateUserService:
         user = await get_user_service.get_user_by_email(email=email)
         if not user or not self.verify_password(password, user.password):
             raise UserPasswordException()
+        if not user.is_active:
+            raise NotActivationExpire()
         return user
 
     def verify_password(self, plain_password: str, user_password: str) -> bool:

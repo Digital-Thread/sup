@@ -1,3 +1,5 @@
+import random
+import string
 import uuid
 from datetime import timedelta
 
@@ -6,15 +8,16 @@ from passlib.context import CryptContext
 
 from src.apps.user.domain.entities import User
 from src.apps.user.dtos import UserCreateDTO, UserResponseDTO
+from src.apps.user.dtos.dtos import AdminCreateUserDTO
 from src.apps.user.exceptions import (
     LengthUserPasswordException,
     TokenActivationExpire,
     UserAlreadyExistsError,
     UserNotFoundError,
+    UserPermissionError,
 )
 from src.apps.user.protocols import JWTServiceProtocol, SendMailServiceProtocol
 from src.apps.user.repositories import IUserRepository
-from src.apps.user.services import GetUserService
 from src.config import RedisConfig
 
 
@@ -34,41 +37,88 @@ class CreateUserService:
         self.redis_client = redis.StrictRedis.from_url(dsn)
         self.token_service = token_service
 
-    async def create_user(self, dto: UserCreateDTO) -> User:
-        get_user_service = GetUserService(self.repository, self.token_service)
-        existing_user = await get_user_service.get_user_by_email(dto.email)
+    async def create_user(self, dto: UserCreateDTO, token: str) -> User:
+        existing_user = await self.repository.find_by_email(dto.email)
         if existing_user:
             raise UserAlreadyExistsError(dto.email)
-        user = User(**dto.model_dump())
+        invite_token = await self.redis_client.get(f'invite_token:{dto.email}')
+        if invite_token is None:
+            raise TokenActivationExpire()
+        if invite_token is not None:
+            invite_token = invite_token.decode('utf-8')
+        if invite_token == token:
+            if dto.password == '':
+                dto.password = self.generate_password()
+                password_sent = True
+            else:
+                password_sent = False
+            user = User(**dto.model_dump())
+            if len(user.password) > 51:
+                raise LengthUserPasswordException
+            password = user.password
+            user.password = self.get_password_hash(dto.password)
+            await self.repository.save(user)
+            await self.redis_client.delete(f'invite_token:{dto.email}')
+            activation_token = self.generate_uuid_token()
+            await self.redis_client.set(
+                f'activation_token:{activation_token}', user.email, ex=timedelta(days=7)
+            )
+            if password_sent:
+                await self.send_mail_service.send_login_and_activate_email(
+                    email=user.email, password=password, token=activation_token
+                )
+            else:
+                await self.send_mail_service.send_activation_email(
+                    email=user.email, token=activation_token
+                )
+            return user
+        else:
+            raise UserPermissionError()
+
+    async def create_user_by_admin(self, dto: AdminCreateUserDTO) -> tuple[str, str]:
+        existing_user = await self.repository.find_by_email(dto.email)
+        if existing_user:
+            raise UserAlreadyExistsError(dto.email)
+        if dto.password == '':
+            dto.password = self.generate_password()
+        user_data = dto.model_dump(exclude={'send_mail'})
+        user = User(**user_data)
         if len(user.password) > 51:
             raise LengthUserPasswordException
+        password = user.password
         user.password = self.get_password_hash(dto.password)
         await self.repository.save(user)
-        activation_token = self.generate_uuid_token()
-        await self.redis_client.set(
-            f'activation_token:{user.email}', activation_token, ex=timedelta(days=7)
-        )
-        await self.send_mail_service.send_activation_email(user.email, activation_token)
-        return user
+        if not user.is_active and dto.send_mail:
+            activation_token = self.generate_uuid_token()
+            await self.redis_client.set(
+                f'activation_token:{activation_token}', user.email, ex=timedelta(days=7)
+            )
+            await self.send_mail_service.send_login_and_activate_email(
+                email=user.email, password=password, token=activation_token
+            )
+        if user.is_active and dto.send_mail:
+            await self.send_mail_service.send_login_email(
+                email=user.email,
+                password=password,
+            )
+
+        return user.email, password
 
     async def activate_user(self, email: str) -> UserResponseDTO:
         user = await self.repository.find_by_email(email)
         if user is None:
             raise UserNotFoundError()
         user.is_active = True
-        await self.repository.save(user)
+        await self.repository.update(user)
         return user
 
-    async def activate_user_by_token(self, email: str, token: str) -> UserResponseDTO:
-        stored_token = await self.redis_client.get(f'activation_token:{email}')
-        if stored_token is None or stored_token.decode() != token:
+    async def activate_user_by_token(self, token: str) -> UserResponseDTO:
+        email_bytes = await self.redis_client.get(f'activation_token:{token}')
+        if email_bytes is None:
             raise TokenActivationExpire()
-        user = await self.repository.find_by_email(email)
-        if user is None:
-            raise UserNotFoundError()
-        user.is_active = True
-        await self.repository.save(user)
-        await self.redis_client.delete(f'activation_token:{email}')
+        email = email_bytes.decode()
+        user =  await self.activate_user(email=email)
+        await self.redis_client.delete(f'activation_token:{token}')
         return user
 
     def get_password_hash(self, password: str) -> str:
@@ -79,6 +129,15 @@ class CreateUserService:
         return str(uuid.uuid4())
 
     async def send_invite_link(self, email: str) -> None:
+        user = await self.repository.find_by_email(email)
+        if user:
+            raise UserAlreadyExistsError(email)
         invite_token = self.generate_uuid_token()
         await self.redis_client.set(f'invite_token:{email}', invite_token, ex=timedelta(days=7))
         return await self.send_mail_service.send_invite_email(email, invite_token)
+
+    @staticmethod
+    def generate_password(length: int = 12) -> str:
+        characters = string.ascii_letters + string.digits + "!#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+        password = ''.join(random.choice(characters) for i in range(length))
+        return password

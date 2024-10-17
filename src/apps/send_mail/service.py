@@ -34,6 +34,27 @@ class SendMailService:
         except:
             raise SendMailActivationException
 
+    async def send_login_and_activate_email(self, email: str, password: str, token: str) -> None:
+        try:
+            activation_link = f'http://127.0.0.1:8000//activate/{token}'
+            subject = 'Активация вашего аккаунта'
+            message = f'Email: {email}\n Пароль: {password} \nДля входа вашего аккаунта перейдите по ссылке: {activation_link}'
+
+            await self.connect_smtp(message, subject, email)
+        except:
+            raise SendMailActivationException
+
+    async def send_login_email(self, email: str, password: str) -> None:
+        try:
+            activation_link = f'http://127.0.0.1:8000/login'
+            subject = 'Вход в аккаунт'
+            message = f'Email: {email}\nПароль: {password}\nДля входа вашего аккаунта перейдите по ссылке: {activation_link}'
+
+            await self.connect_smtp(message, subject, email)
+
+        except:
+            raise SendMailActivationException
+
     async def send_invite_email(self, email: str, token: str) -> None:
         try:
             invite_link = f'http://127.0.0.1:8000//register/{token}'

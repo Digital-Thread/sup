@@ -8,7 +8,9 @@ from src.apps.auth.exceptions import (
     TokenRefreshExpireError,
 )
 from src.apps.user.exceptions import (
+    InviteTokenExpiredError,
     LengthUserPasswordException,
+    NotActivationExpire,
     PermissionDeniedException,
     TokenActivationExpire,
     TokenExpiredError,
@@ -37,6 +39,8 @@ exception_status_codes = {
     TokenRefreshExpireError: status.HTTP_401_UNAUTHORIZED,
     UserPermissionError: status.HTTP_403_FORBIDDEN,
     UserNotAdminError: status.HTTP_403_FORBIDDEN,
+    InviteTokenExpiredError: status.HTTP_401_UNAUTHORIZED,
+    NotActivationExpire: status.HTTP_401_UNAUTHORIZED,
 }
 
 

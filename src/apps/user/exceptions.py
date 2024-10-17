@@ -11,7 +11,7 @@ class UserNotFoundError(BaseUserError):
 class UserAlreadyExistsError(Exception):
 
     def __init__(self, email: str):
-        super().__init__(f'Пользователь с email {email} уже существует.')
+        super().__init__(f'Пользователь с email: {email} уже существует.')
 
 
 class TokenActivationExpire(BaseUserError):
@@ -21,7 +21,7 @@ class TokenActivationExpire(BaseUserError):
 
 class UserNotFoundByEmailException(BaseUserError):
     def __init__(self, email: str):
-        super().__init__(f'Пользователь с email {email} не найден')
+        super().__init__(f'Пользователь с email:{email} не найден')
 
 
 class PermissionDeniedException(BaseUserError):
@@ -52,4 +52,14 @@ class UserNotAdminError(BaseUserError):
 
 class UserPermissionError(BaseUserError):
     def __init__(self, message: str = 'У вас нет прав для доступа к этому ресурсу'):
+        super().__init__(message)
+
+
+class InviteTokenExpiredError(Exception):
+    def __init__(self, email: str):
+        super().__init__(f'Для пользователя {email} нет инвайт ссылки на регистрацию')
+
+
+class NotActivationExpire(BaseUserError):
+    def __init__(self, message: str = 'Ваш аккаунт не активирован'):
         super().__init__(message)
