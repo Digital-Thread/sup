@@ -10,7 +10,14 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
+from src.apps.comment.domain import (
+    CommentEntity,
+    CommentId,
+    Content,
+    ICommentRepository,
+)
 from src.config import Config, DbConfig
+from src.data_access.reposotiries import CommentRepository
 
 
 class SqlalchemyProvider(Provider):
@@ -32,7 +39,6 @@ class SqlalchemyProvider(Provider):
                 await session.commit()
             except SQLAlchemyError:
                 await session.rollback()
-                raise
             finally:
                 await session.close()
 
@@ -50,3 +56,6 @@ class ConfigProvider(Provider):
 
 class RepositoriesProvider(Provider):
     scope = Scope.REQUEST
+    comment_repo = provide(
+        CommentRepository, provides=ICommentRepository[Content, CommentId, CommentEntity]
+    )
