@@ -74,10 +74,10 @@ class Feature:
         self.description = description
         self.priority = priority
         self.status = status
-        self.tags = tags if tags else set()
-        self.members = members if members else set()
-        self._created_at = datetime.now(timezone.utc)
-        self._updated_at = datetime.now(timezone.utc)
+        self.tags = tags
+        self.members = members
+        self.created_at = datetime.now(timezone.utc)
+        self.updated_at = datetime.now(timezone.utc)
 
     @property
     def name(self) -> str:
@@ -120,18 +120,7 @@ class Feature:
     def owner_id(self) -> OwnerId:
         return self._owner_id
 
-    @property
-    def created_at(self) -> datetime:
-        return self._created_at
-
-    @property
-    def updated_at(self) -> datetime:
-        return self._updated_at
-
-    def mark_as_updated(self) -> None:
-        self._updated_at = datetime.now(timezone.utc)
-
     def update_fields(self, updates: OptionalFeatureUpdateFields) -> None:
         for field, value in updates.items():
             setattr(self, field, value)
-        self.mark_as_updated()
+        self.updated_at = datetime.now(timezone.utc)
