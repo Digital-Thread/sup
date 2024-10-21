@@ -25,6 +25,11 @@ class CommentAssociatedWithBothError(BaseCommentException):
 
 
 @dataclass
+class CommentNotFoundError(BaseCommentException):
+    message: str = 'Comment cannot be found.'
+
+
+@dataclass
 class InvalidCommentIdError(BaseCommentException):
     """Выбрасывается, когда идентификатор комментария некорректный"""
 

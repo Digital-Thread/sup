@@ -5,10 +5,10 @@ from .entity import AggregateRoot
 from .event import Event
 
 
-class ICommentRepository[CommentId, Entity: AggregateRoot](Protocol):
+class ICommentRepository[Content, CommentId, Entity: AggregateRoot](Protocol):
 
     @abc.abstractmethod
-    def save(self, entity: Entity) -> Entity | None:
+    async def save(self, entity: Entity) -> Entity | None:
         """
         Сохранить комментарий в базе данных
         :param entity: Сущность комментария для сохранения
@@ -17,7 +17,7 @@ class ICommentRepository[CommentId, Entity: AggregateRoot](Protocol):
         pass
 
     @abc.abstractmethod
-    def fetch_by_id(self, comment_id: CommentId) -> Entity | None:
+    async def fetch_by_id(self, comment_id: CommentId) -> Entity | None:
         """
         Получить комментарий по его ID
         :param comment_id: Идентификатор комментария
@@ -26,7 +26,7 @@ class ICommentRepository[CommentId, Entity: AggregateRoot](Protocol):
         pass
 
     @abc.abstractmethod
-    def fetch_all(self) -> list[Entity]:
+    async def fetch_all(self, page: int, page_size: int) -> list[Entity]:
         """
         Получить список всех комментариев
         :return: Список сущностей комментариев
@@ -34,17 +34,17 @@ class ICommentRepository[CommentId, Entity: AggregateRoot](Protocol):
         pass
 
     @abc.abstractmethod
-    def update_comment(self, comment_id: CommentId, entity: Entity) -> Entity:
+    async def update_comment(self, comment_id: CommentId, new_content: Content) -> Entity:
         """
         Обновить данные комментария по его ID
         :param comment_id: Идентификатор комментария
-        :param entity: Сущность комментария с новыми данными
+        :param new_content: Новый комментарий
         :return: Обновленная сущность комментария
         """
         pass
 
     @abc.abstractmethod
-    def delete_comment(self, comment_id: CommentId) -> None:
+    async def delete_comment(self, comment_id: CommentId) -> None:
         """
         Удалить комментарий по его ID
         :param comment_id: Идентификатор комментария
@@ -56,11 +56,11 @@ class ICommentRepository[CommentId, Entity: AggregateRoot](Protocol):
 class Interactor[Request, Response](Protocol):
 
     @abc.abstractmethod
-    def execute(self, request: Request) -> Response:
+    async def execute(self, request: Request) -> Response:
         raise NotImplementedError
 
 
 class IEventHandler(Protocol):
     @abc.abstractmethod
-    def handle(self, events: list[Event]) -> None:
+    async def handle(self, events: list[Event]) -> None:
         pass

@@ -45,7 +45,7 @@ class AggregateRoot(Entity, ABC):
 @dataclass
 class CommentEntity(AggregateRoot):
     comment_id: CommentId | None
-    author_id: AuthorId
+    user_id: AuthorId
     task_id: TaskId | None
     feature_id: FeatureId | None
     content: Content
@@ -57,7 +57,7 @@ class CommentEntity(AggregateRoot):
         cls,
         task_id: TaskId | None,
         feature_id: FeatureId | None,
-        author_id: AuthorId,
+        user_id: AuthorId,
         content: Content,
     ) -> 'Self':
         if not task_id and not feature_id:
@@ -69,7 +69,7 @@ class CommentEntity(AggregateRoot):
             task_id=task_id,
             feature_id=feature_id,
             content=content,
-            author_id=author_id,
+            user_id=user_id,
             created_at=CreatedAt(datetime.now()),
             updated_at=UpdatedAt(datetime.now()),
         )
@@ -83,7 +83,7 @@ class CommentEntity(AggregateRoot):
                     comment_id=self.comment_id,
                     task_id=self.task_id,
                     feature_id=self.feature_id,
-                    author_id=self.author_id,
+                    user_id=self.user_id,
                     content=self.content,
                     created_at=self.created_at,
                 )

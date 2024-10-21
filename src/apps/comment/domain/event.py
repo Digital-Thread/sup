@@ -14,7 +14,7 @@ class CommentCreatedEvent(Event):
     comment_id: CommentId | None
     task_id: TaskId | None
     feature_id: FeatureId | None
-    author_id: AuthorId
+    user_id: AuthorId
     content: Content
     created_at: CreatedAt
 

@@ -12,7 +12,7 @@ class CommentMapper:
             task_id=entity.task_id.value if entity.task_id is not None else None,
             feature_id=entity.feature_id.value if entity.feature_id is not None else None,
             content=entity.content.value,
-            author_id=entity.author_id.value,
+            user_id=entity.user_id.value,
             created_at=entity.created_at.value,
             updated_at=entity.updated_at.value,
         )
@@ -20,7 +20,7 @@ class CommentMapper:
     @staticmethod
     def dto_to_entity(dto: BaseCommentDto) -> CommentEntity:
         return CommentEntity.create_for_entity(
-            author_id=AuthorId(dto.author_id),
+            user_id=AuthorId(dto.user_id),
             task_id=TaskId(dto.task_id) if dto.task_id is not None else None,
             feature_id=FeatureId(dto.feature_id) if dto.feature_id is not None else None,
             content=Content(dto.content),

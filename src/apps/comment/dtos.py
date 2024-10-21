@@ -5,24 +5,24 @@ from uuid import UUID
 
 @dataclasses.dataclass
 class BaseCommentDto:
-    author_id: UUID
+    user_id: UUID
     content: str
     task_id: int | None
     feature_id: int | None
 
 
 @dataclasses.dataclass
-class AddCommentToTaskDto(BaseCommentDto):
+class AddCommentDto(BaseCommentDto):
     pass
 
 
 @dataclasses.dataclass
-class AddCommentToFeatureDto(BaseCommentDto):
-    pass
+class FetchCommentDto:
+    comment_id: int
 
 
 @dataclasses.dataclass
-class UpdateCommentDto(BaseCommentDto):
+class UpdateCommentDto:
     comment_id: int | None = None
     new_content: str | None = None
 
@@ -37,3 +37,9 @@ class CommentOutDto(BaseCommentDto):
     comment_id: int
     created_at: datetime
     updated_at: datetime
+
+
+@dataclasses.dataclass
+class CommentPaginationDto:
+    page: int
+    page_size: int
