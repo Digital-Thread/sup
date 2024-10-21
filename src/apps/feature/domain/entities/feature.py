@@ -47,8 +47,8 @@ class OptionalFeatureUpdateFields(TypedDict, total=False):
     description: str | None
     priority: Priority
     status: Status
-    tags: set[TagId] | None
-    members: set[UserId] | None
+    tags: list[TagId] | None
+    members: list[UserId] | None
 
 
 class Feature:
@@ -63,8 +63,8 @@ class Feature:
         description: str | None = None,
         priority: Priority = Priority.NO_PRIORITY,
         status: Status = Status.NEW,
-        tags: set[TagId] | None = None,
-        members: set[UserId] | None = None,
+        tags: list[TagId] | None = None,
+        members: list[UserId] | None = None,
     ):
         self.name = name
         self._workspace_id = workspace_id
