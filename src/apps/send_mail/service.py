@@ -25,7 +25,7 @@ class SendMailService:
 
     async def send_activation_email(self, email: str, token: str) -> None:
         try:
-            activation_link = f'http://127.0.0.1:8000//activate/{token}'
+            activation_link = f'http://0.0.0.0:8080/api/v1/user/activate/{token}'
             subject = 'Активация вашего аккаунта'
             message = f'Для активации вашего аккаунта перейдите по ссылке: {activation_link}'
 
@@ -36,7 +36,7 @@ class SendMailService:
 
     async def send_login_and_activate_email(self, email: str, password: str, token: str) -> None:
         try:
-            activation_link = f'http://127.0.0.1:8000//activate/{token}'
+            activation_link = f'http://0.0.0.0:8080/api/v1/user/activate/{token}'
             subject = 'Активация вашего аккаунта'
             message = f'Email: {email}\n Пароль: {password} \nДля входа вашего аккаунта перейдите по ссылке: {activation_link}'
 
@@ -46,7 +46,7 @@ class SendMailService:
 
     async def send_login_email(self, email: str, password: str) -> None:
         try:
-            activation_link = f'http://127.0.0.1:8000/login'
+            activation_link = f'http://0.0.0.0:8080/api/v1/user/login'
             subject = 'Вход в аккаунт'
             message = f'Email: {email}\nПароль: {password}\nДля входа вашего аккаунта перейдите по ссылке: {activation_link}'
 
@@ -57,7 +57,7 @@ class SendMailService:
 
     async def send_invite_email(self, email: str, token: str) -> None:
         try:
-            invite_link = f'http://127.0.0.1:8000//register/{token}'
+            invite_link = f'http://0.0.0.0:8080/api/v1/user/registration/{token}'
             subject = 'Приглашение на регистрацию'
             message = f'Для регистрации вашего аккаунта перейдите по ссылке: {invite_link}'
 

@@ -19,7 +19,10 @@ from src.apps.user.services import (
     AuthorizeUserService,
     CreateUserService,
     GetUserService,
+    UpdateUserService,
 )
+from src.apps.user.services.password_reset_user_service import PasswordResetUserService
+from src.apps.user.services.remove_user_service import RemoveUserService
 from src.config import Config, DbConfig, JWTConfig, RedisConfig, SMTPConfig
 from src.data_access.reposotiries.user_repository import UserRepository
 
@@ -116,20 +119,48 @@ class RepositoriesProvider(Provider):
         return GetUserService(repository=repository, token_service=token_service)
 
     @provide(scope=scope)
-    def provide_authenticate_service(
+    def provide_authenticate_user_service(
         self,
         repository: IUserRepository,
         pwd_context: CryptContext,
-        token_service: JWTServiceProtocol,
+        get_user_service: GetUserService,
     ) -> AuthenticateUserService:
         return AuthenticateUserService(
-            repository=repository, pwd_context=pwd_context, token_service=token_service
+            repository=repository, pwd_context=pwd_context, get_user_service=get_user_service
         )
 
     @provide(scope=scope)
-    def provide_authorize_service(
+    def provide_authorize_user_service(
         self,
         repository: IUserRepository,
         token_service: JWTServiceProtocol,
     ) -> AuthorizeUserService:
         return AuthorizeUserService(repository=repository, token_service=token_service)
+
+    @provide(scope=scope)
+    def provide_update_user_service(
+        self,
+        repository: IUserRepository,
+        token_service: JWTServiceProtocol,
+    ) -> UpdateUserService:
+        return UpdateUserService(repository=repository, token_service=token_service)
+
+    @provide(scope=scope)
+    def provide_remove_user_service(
+        self,
+        repository: IUserRepository,
+    ) -> RemoveUserService:
+        return RemoveUserService(repository=repository)
+
+    @provide(scope=scope)
+    def provide_reset_password_user_service(
+        self,
+        repository: IUserRepository,
+        authenticate_service: AuthenticateUserService,
+        create_service: CreateUserService,
+    ) -> PasswordResetUserService:
+        return PasswordResetUserService(
+            repository=repository,
+            authenticate_service=authenticate_service,
+            create_service=create_service,
+        )

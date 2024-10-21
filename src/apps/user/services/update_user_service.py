@@ -1,35 +1,24 @@
-import datetime
-from typing import Any
-
+from src.apps.user.domain.entities import User
 from src.apps.user.dtos import UserResponseDTO, UserUpdateDTO
-from src.apps.user.exceptions import (
-    PermissionDeniedException,
-    UserNotFoundByEmailException,
-)
+from src.apps.user.exceptions import UserAlreadyExistsError
+from src.apps.user.protocols import JWTServiceProtocol
 from src.apps.user.repositories import IUserRepository
 
 
 class UpdateUserService:
-    def __init__(self, user_repository: IUserRepository):
-        self.user_repository = user_repository
+    def __init__(self, repository: IUserRepository, token_service: JWTServiceProtocol):
+        self.repository = repository
+        self.token_service = token_service
 
-    async def update_user(
-        self, email: str, current_user: UserUpdateDTO, new_data: dict[str, Any]
-    ) -> UserResponseDTO:
-        user = await self.user_repository.find_by_email(email)
-        if not user:
-            raise UserNotFoundByEmailException(user.email)
-        if not current_user.is_superuser and user.email != current_user.email:
-            raise PermissionDeniedException()
-        restricted_fields = ['is_superuser', '_created_at', '_id']
-        admin_only_fields = ['is_active']
-        for key, value in new_data.items():
-            if key in restricted_fields:
-                continue
-            if key in admin_only_fields and not current_user.is_superuser:
-                continue
-            if hasattr(user, key):
+    async def update_user(self, user: User, user_data: UserUpdateDTO, user_agent: str) -> User:
+        if user_data.email:
+            existing_user = await self.repository.find_by_email(user_data.email)
+            if existing_user:
+                raise UserAlreadyExistsError(user_data.email)
+            await self.token_service.removing_tokens(email=user_data.email, user_agent=user_agent)
+            await self.token_service.creating_tokens(email=user_data.email, user_agent=user_agent)
+        for key, value in user_data.__dict__.items():
+            if value:
                 setattr(user, key, value)
-        user._updated_at = datetime.datetime.now()
-        await self.user_repository.update(user)
+        await self.repository.update(user)
         return user

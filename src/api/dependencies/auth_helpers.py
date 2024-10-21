@@ -1,13 +1,13 @@
 from fastapi import Request
 
-from src.apps.user.dtos import UserResponseDTO
+from src.apps.user.domain.entities import User
 from src.apps.user.services import GetUserService
 
 
 async def authenticate_and_create_tokens(
     request: Request,
     get_user_service: GetUserService,
-) -> UserResponseDTO:
+) -> User:
     user_agent = request.headers.get('User-Agent')
     access_token = request.cookies.get('sup_access_token')
     refresh_token = request.cookies.get('sup_refresh_token')

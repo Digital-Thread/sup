@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 from typing import List, Optional
 
 from src.apps.user.domain.entities import User
-from src.apps.user.dtos import UserResponseDTO
 
 
 class IUserRepository(ABC):
@@ -11,11 +10,11 @@ class IUserRepository(ABC):
         pass
 
     @abstractmethod
-    async def find_by_email(self, email: str) -> Optional[UserResponseDTO]:
+    async def find_by_email(self, email: str) -> Optional[User]:
         pass
 
     @abstractmethod
-    async def find_all_users(self) -> List[UserResponseDTO]:
+    async def find_all_users(self) -> List[User]:
         pass
 
     @abstractmethod

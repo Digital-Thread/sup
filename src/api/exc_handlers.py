@@ -8,9 +8,15 @@ from src.apps.auth.exceptions import (
     TokenRefreshExpireError,
 )
 from src.apps.user.exceptions import (
+    InvalidEmailFormatError,
+    InvalidNameError,
     InviteTokenExpiredError,
     LengthUserPasswordException,
+    MissingDigitError,
+    MissingSpecialCharacterError,
+    MissingUppercaseLetterError,
     NotActivationExpire,
+    OneOfTheExpire,
     PermissionDeniedException,
     TokenActivationExpire,
     TokenExpiredError,
@@ -20,6 +26,8 @@ from src.apps.user.exceptions import (
     UserNotFoundError,
     UserPasswordException,
     UserPermissionError,
+    ValidateEmptyLengthError,
+    ValidateLengthError,
 )
 
 __all__ = ('init_exception_handlers',)
@@ -41,6 +49,14 @@ exception_status_codes = {
     UserNotAdminError: status.HTTP_403_FORBIDDEN,
     InviteTokenExpiredError: status.HTTP_401_UNAUTHORIZED,
     NotActivationExpire: status.HTTP_401_UNAUTHORIZED,
+    ValidateLengthError: status.HTTP_400_BAD_REQUEST,
+    ValidateEmptyLengthError: status.HTTP_400_BAD_REQUEST,
+    InvalidNameError: status.HTTP_400_BAD_REQUEST,
+    InvalidEmailFormatError: status.HTTP_400_BAD_REQUEST,
+    MissingUppercaseLetterError: status.HTTP_400_BAD_REQUEST,
+    MissingDigitError: status.HTTP_400_BAD_REQUEST,
+    MissingSpecialCharacterError: status.HTTP_400_BAD_REQUEST,
+    OneOfTheExpire: status.HTTP_400_BAD_REQUEST,
 }
 
 

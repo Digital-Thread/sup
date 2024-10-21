@@ -1,13 +1,16 @@
-from pydantic import BaseModel
+from dataclasses import dataclass
 
 
-class AccessTokenDTO(BaseModel):
+@dataclass
+class AccessTokenDTO:
     access_token: str
 
 
-class RefreshTokenDTO(BaseModel):
+@dataclass
+class RefreshTokenDTO:
     refresh_token: str
 
 
-class TokenDTO(BaseModel):
+@dataclass
+class TokenDTO:
     token: str

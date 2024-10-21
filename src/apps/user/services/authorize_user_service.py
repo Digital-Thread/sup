@@ -31,20 +31,22 @@ class AuthorizeUserService:
         else:
             raise UserPermissionError()
 
-    async def get_authorize_user_by_email(self, user: User, email: str) -> UserResponseDTO:
+    async def get_authorize_user_by_email(self, user: User, email: str) -> User:
         get_user_service = GetUserService(self.repository, self.token_service)
         if user is None:
             raise UserNotFoundError()
         if not user.is_superuser and user.email != email:
             raise UserNotAdminError()
         if user.is_superuser and user.is_active:
-            return await get_user_service.get_user_by_email(email)
+            user = await get_user_service.get_user_by_email(email)
+            return user
         if not user.is_superuser and user.email == email:
-            return await get_user_service.get_user_by_email(email)
+            user = await get_user_service.get_user_by_email(email)
+            return user
         else:
             raise UserPermissionError()
 
-    async def get_authorize_users(self, user: User) -> List[UserResponseDTO]:
+    async def get_authorize_users(self, user: User) -> List[User]:
         get_user_service = GetUserService(self.repository, self.token_service)
         if user.is_superuser and user.is_active:
             return await get_user_service.get_all_users()

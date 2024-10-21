@@ -3,6 +3,17 @@ import re
 import uuid
 from dataclasses import dataclass, field
 
+from src.apps.user.exceptions import (
+    InvalidEmailFormatError,
+    InvalidNameError,
+    MissingDigitError,
+    MissingSpecialCharacterError,
+    MissingUppercaseLetterError,
+    OneOfTheExpire,
+    ValidateEmptyLengthError,
+    ValidateLengthError,
+)
+
 
 @dataclass
 class User:
@@ -36,6 +47,7 @@ class User:
 
     def __post_init__(self) -> None:
         self._validate_all_fields()
+        self._validate_password(password=self.password)
 
     def _validate_all_fields(self) -> None:
         for field_name in [
@@ -53,7 +65,7 @@ class User:
         self._validate_email(self.email)
 
         if not (self.nick_gitlab or self.nick_github):
-            raise ValueError('Необходимо указать хотя бы один ник: nick_gitlab или nick_github.')
+            raise OneOfTheExpire()
 
         if self.nick_gitlab:
             self._validate_length(self.nick_gitlab, 'nick_gitlab')
@@ -62,22 +74,40 @@ class User:
 
     def _validate_length(self, value: str, field_name: str) -> None:
         if value is None or value.strip() == '':
-            raise ValueError(f'{field_name} не может быть пустым.')
+            raise ValidateEmptyLengthError(field_name)
         max_length = self.__dataclass_fields__[field_name].metadata['max_length']
         if len(value) > max_length:
-            raise ValueError(f'Длина {field_name} не должна превышать {max_length} символов.')
+            raise ValidateLengthError(field_name, max_length)
 
     @staticmethod
-    def _validate_name(name: str) -> None:
+    def _validate_name(name: str) -> str:
         pattern = r'^[a-zA-Zа-яА-ЯёЁ]+$'
         if not re.match(pattern, name):
-            raise ValueError(
-                'В названии допускается использование только букв '
-                'латинского и кириллического алфавитов.'
-            )
+            raise InvalidNameError()
+        return name.capitalize() if isinstance(name, str) else name
 
     @staticmethod
     def _validate_email(email: str) -> None:
         pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
         if not re.match(pattern, email):
-            raise ValueError('Некорректный формат электронной почты.')
+            raise InvalidEmailFormatError()
+
+    @staticmethod
+    def _validate_password(password: str) -> str:
+        return validate_new_password_func(password)
+
+    @staticmethod
+    def validate_new_password(password: str) -> str:
+        return validate_new_password_func(password)
+
+
+def validate_new_password_func(password: str) -> str:
+    if password is None:
+        return password
+    if not re.search(r'[A-Z]', password):
+        raise MissingUppercaseLetterError()
+    if not re.search(r'\d', password):
+        raise MissingDigitError()
+    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        raise MissingSpecialCharacterError()
+    return password

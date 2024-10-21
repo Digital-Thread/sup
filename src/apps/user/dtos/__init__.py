@@ -1,17 +1,21 @@
 from .dtos import (
     AdminCreateUserDTO,
+    AdminPasswordUpdateDTO,
     AuthDTO,
-    BaseUserDto,
+    BaseUserDTO,
     UserCreateDTO,
+    UserPasswordUpdateDTO,
     UserResponseDTO,
     UserUpdateDTO,
 )
 
 __all__ = [
-    'BaseUserDto',
+    'BaseUserDTO',
     'UserCreateDTO',
     'UserResponseDTO',
     'UserUpdateDTO',
     'AuthDTO',
     'AdminCreateUserDTO',
+    'UserPasswordUpdateDTO',
+    'AdminPasswordUpdateDTO',
 ]

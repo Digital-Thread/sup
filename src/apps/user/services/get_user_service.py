@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Optional
 
-from src.apps.user.dtos import UserResponseDTO
+from src.apps.user.domain.entities import User
 from src.apps.user.exceptions import TokenExpiredError, UserNotFoundError
 from src.apps.user.protocols import JWTServiceProtocol
 from src.apps.user.repositories import IUserRepository
@@ -11,22 +11,22 @@ class GetUserService:
         self.repository = repository
         self.token_service = token_service
 
-    async def get_user_by_email(self, email: str) -> UserResponseDTO:
+    async def get_user_by_email(self, email: str) -> User:
         user = await self.repository.find_by_email(email)
         if user:
             return user
         else:
             raise UserNotFoundError()
 
-    async def get_all_users(self) -> List[UserResponseDTO]:
-        query = await self.repository.find_all_users()
-        return query
+    async def get_all_users(self) -> List[User]:
+        users = await self.repository.find_all_users()
+        return users
 
     async def get_user_info(
         self, access_token: str, refresh_token: str, user_agent: str
-    ) -> tuple[UserResponseDTO, str, int, str, int]:
+    ) -> tuple[User, Optional[str], Optional[int], Optional[str], Optional[int]]:
 
-        user = None
+        user: Optional[User] = None
         new_access_token = None
         max_age_access = None
         new_refresh_token = None
@@ -66,4 +66,10 @@ class GetUserService:
                 )
         if user is None:
             raise TokenExpiredError()
-        return user, new_access_token, max_age_access, new_refresh_token, max_age_refresh
+        return (
+            user,
+            new_access_token,
+            max_age_access,
+            new_refresh_token,
+            max_age_refresh,
+        )

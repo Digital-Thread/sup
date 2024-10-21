@@ -1,6 +1,7 @@
 import random
 import string
 import uuid
+from dataclasses import asdict
 from datetime import timedelta
 
 import redis.asyncio as redis  # type: ignore
@@ -13,6 +14,7 @@ from src.apps.user.exceptions import (
     LengthUserPasswordException,
     TokenActivationExpire,
     UserAlreadyExistsError,
+    UserNotFoundByEmailException,
     UserNotFoundError,
     UserPermissionError,
 )
@@ -47,14 +49,16 @@ class CreateUserService:
         if invite_token is not None:
             invite_token = invite_token.decode('utf-8')
         if invite_token == token:
-            if dto.password == '':
+            if dto.password is None:
                 dto.password = self.generate_password()
                 password_sent = True
             else:
                 password_sent = False
-            user = User(**dto.model_dump())
+            user_data = {k: v for k, v in asdict(dto).items() if k != 'password'}
+            user_data['password'] = dto.password
+            user = User(**user_data)
             if len(user.password) > 51:
-                raise LengthUserPasswordException
+                raise LengthUserPasswordException()
             password = user.password
             user.password = self.get_password_hash(dto.password)
             await self.repository.save(user)
@@ -79,9 +83,9 @@ class CreateUserService:
         existing_user = await self.repository.find_by_email(dto.email)
         if existing_user:
             raise UserAlreadyExistsError(dto.email)
-        if dto.password == '':
+        if dto.password is None:
             dto.password = self.generate_password()
-        user_data = dto.model_dump(exclude={'send_mail'})
+        user_data = {k: v for k, v in asdict(dto).items() if k != 'send_mail'}
         user = User(**user_data)
         if len(user.password) > 51:
             raise LengthUserPasswordException
@@ -104,20 +108,26 @@ class CreateUserService:
 
         return user.email, password
 
-    async def activate_user(self, email: str) -> UserResponseDTO:
-        user = await self.repository.find_by_email(email)
-        if user is None:
+    async def activate_user_by_admin(self, user: User) -> User:
+        current_user = await self.repository.find_by_email(user.email)
+        if current_user is None:
             raise UserNotFoundError()
+        return await self.activate_user(user=current_user)
+
+    async def activate_user(self, user: User) -> User:
         user.is_active = True
         await self.repository.update(user)
         return user
 
-    async def activate_user_by_token(self, token: str) -> UserResponseDTO:
+    async def activate_user_by_token(self, token: str) -> User:
         email_bytes = await self.redis_client.get(f'activation_token:{token}')
+        print(email_bytes)
         if email_bytes is None:
             raise TokenActivationExpire()
         email = email_bytes.decode()
-        user =  await self.activate_user(email=email)
+        print(email)
+        current_user = await self.repository.find_by_email(email)
+        user = await self.activate_user(user=current_user)
         await self.redis_client.delete(f'activation_token:{token}')
         return user
 

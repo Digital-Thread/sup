@@ -21,7 +21,7 @@ class TokenActivationExpire(BaseUserError):
 
 class UserNotFoundByEmailException(BaseUserError):
     def __init__(self, email: str):
-        super().__init__(f'Пользователь с email:{email} не найден')
+        super().__init__(f'Пользователь с email: {email} не найден')
 
 
 class PermissionDeniedException(BaseUserError):
@@ -62,4 +62,50 @@ class InviteTokenExpiredError(Exception):
 
 class NotActivationExpire(BaseUserError):
     def __init__(self, message: str = 'Ваш аккаунт не активирован'):
+        super().__init__(message)
+
+
+class ValidateLengthError(Exception):
+    def __init__(self, field_name: str, max_length: int):
+        super().__init__(f'Длина {field_name} не должна превышать {max_length} символов.')
+
+
+class ValidateEmptyLengthError(Exception):
+    def __init__(self, field_name: str):
+        super().__init__(f'{field_name} не может быть пустым.')
+
+
+class OneOfTheExpire(BaseUserError):
+    def __init__(
+        self, message: str = 'Необходимо указать хотя бы один ник: nick_gitlab или nick_github.'
+    ):
+        super().__init__(message)
+
+
+class InvalidNameError(BaseUserError):
+    def __init__(
+        self,
+        message: str = 'В названии допускается использование только букв '
+        'латинского и кириллического алфавитов.',
+    ):
+        super().__init__(message)
+
+
+class InvalidEmailFormatError(BaseUserError):
+    def __init__(self, message: str = 'Некорректный формат электронной почты.'):
+        super().__init__(message)
+
+
+class MissingUppercaseLetterError(BaseUserError):
+    def __init__(self, message: str = 'Пароль должен содержать хотя бы одну заглавную букву.'):
+        super().__init__(message)
+
+
+class MissingDigitError(BaseUserError):
+    def __init__(self, message: str = 'Пароль должен содержать хотя бы одну цифру.'):
+        super().__init__(message)
+
+
+class MissingSpecialCharacterError(BaseUserError):
+    def __init__(self, message: str = 'Пароль должен содержать хотя бы один специальный символ.'):
         super().__init__(message)
