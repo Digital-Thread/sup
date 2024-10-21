@@ -1,5 +1,5 @@
 # Allow imports relative to the "src" and "test" directories.
-src = ["src", ""]
+src = [""]
 
 # Exclude a variety of commonly ignored directories.
 exclude = [
