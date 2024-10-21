@@ -66,6 +66,7 @@ def create_app() -> FastAPI:
         version='0.1.0',
         swagger_ui_parameters={'syntaxHighlight.theme': 'obsidian'},
         lifespan=lifespan,
+        docs_url='/',
     )
     init_services(app)
     init_di(app)
