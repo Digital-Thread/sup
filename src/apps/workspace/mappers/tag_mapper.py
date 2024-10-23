@@ -7,22 +7,23 @@ from src.apps.workspace.mappers.base_mapper import BaseMapper
 
 
 class TagMapper(BaseMapper[Tag, TagAppDTO]):
+    ATTRIBUTE_MAP = {'name': '_name', 'color': '_color'}
+
     @staticmethod
-    def dto_to_entity(dto: TagAppDTO | UpdateTagAppDTO, immutable_data: dict[str, Any]) -> Tag:
+    def dto_to_entity(dto: TagAppDTO) -> Tag:
 
-        if isinstance(dto, TagAppDTO):
-            tag = Tag(
-                _workspace_id=WorkspaceId(dto.workspace_id),
-                _name=dto.name,
-                _color=dto.color,
-                _id=TagId(dto.id),
-            )
-        else:
-            tag = Tag(
-                _workspace_id=WorkspaceId(immutable_data.get('workspace_id')),
-                _name=dto.get('name'),
-                _color=dto.get('color'),
-                _id=TagId(immutable_data.get('id')),
-            )
+        return Tag(
+            _workspace_id=WorkspaceId(dto.workspace_id),
+            _name=dto.name,
+            _color=dto.color,
+            _id=TagId(dto.id),
+        )
 
-        return tag
+    @staticmethod
+    def update_data(existing_tag: Tag, dto: UpdateTagAppDTO) -> Tag:
+
+        for key, value in dto.items():
+            attr_name = TagMapper.ATTRIBUTE_MAP.get(key, key)
+            setattr(existing_tag, attr_name, value)
+
+        return existing_tag

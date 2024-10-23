@@ -29,19 +29,7 @@ class WorkspaceAppDTO:
     meet_categories: dict[int, int] = field(default_factory=dict)
 
 
-@dataclass
 class UpdateWorkspaceAppDTO(TypedDict, total=False):
-    id: UUID
     name: str
     description: str
     logo: str
-    invite_ids: list[int]
-    project_ids: list[int]
-    meet_ids: list[int]
-    tag_ids: list[int]
-    role_ids: list[int]
-    member_ids: list[UUID]
-    member_roles: dict[UUID, int]
-    feature_tags: dict[int, set[int]]
-    task_tags: dict[int, set[int]]
-    meet_categories: dict[int, int]
