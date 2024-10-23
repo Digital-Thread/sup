@@ -23,13 +23,16 @@ class FeatureRepository(IFeatureRepository):
         self.model = FeatureModel
         self.mapper = FeatureMapper()
 
-    async def _get_m2m_objects(self,
-                               list_ids: list,
-                               model: TagModel | UserModel) -> Sequence[Row | RowMapping | Any]:
-        query = select(model).where(model.id.in_(list_ids))
-        result = await self._session.execute(query)
-        m2m_objects = result.scalars().all()
-        return m2m_objects
+    async def _get_m2m_objects(
+            self, list_ids: list[TagId | UserId] | None, model: TagModel | UserModel
+    ) -> list[TagModel | UserModel] | None:
+        if list_ids:
+            query = select(model).where(model.id.in_(list_ids))
+            result = await self._session.execute(query)
+            m2m_objects = result.scalars().all()
+            return list(m2m_objects)
+        else:
+            return None
 
     async def save(self, feature: Feature) -> None:
         feature_model = self.mapper.map_entity_to_model(feature)
