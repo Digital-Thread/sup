@@ -2,6 +2,7 @@ from typing import AsyncIterable
 
 from dishka import Provider, Scope, provide
 from environs import Env
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -26,7 +27,13 @@ class SqlalchemyProvider(Provider):
         self, sessionmaker: async_sessionmaker[AsyncSession]
     ) -> AsyncIterable[AsyncSession]:
         async with sessionmaker() as session:
-            yield session
+            try:
+                yield session
+                await session.commit()
+            except SQLAlchemyError:
+                await session.rollback()
+            finally:
+                await session.close()
 
 
 class ConfigProvider(Provider):
