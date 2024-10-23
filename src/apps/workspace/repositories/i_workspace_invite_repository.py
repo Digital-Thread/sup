@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from uuid import UUID
 
 from src.apps.workspace.domain.entities.workspace_invite import WorkspaceInvite
 from src.apps.workspace.domain.types_ids import InviteId, WorkspaceId

@@ -1,5 +1,4 @@
 from logging import warning
-from typing import Optional
 
 from sqlalchemy import delete, select, update
 from sqlalchemy.exc import IntegrityError
@@ -31,8 +30,8 @@ class CategoryRepository(ICategoryRepository):
             warning(error)
             raise CategoryCreatedException
 
-    async def find_by_id(self, category_id: CategoryId) -> Optional[Category]:
-        query: Optional[CategoryModel] = await self._session.get(CategoryModel, category_id)
+    async def find_by_id(self, category_id: CategoryId) -> Category | None:
+        query: CategoryModel | None = await self._session.get(CategoryModel, category_id)
         category = CategoryConverter.model_to_entity(query) if query else None
         return category
 

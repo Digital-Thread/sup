@@ -1,5 +1,4 @@
 from logging import warning
-from typing import Optional
 
 from sqlalchemy import delete, select, update
 from sqlalchemy.exc import IntegrityError
@@ -31,8 +30,8 @@ class TagRepository(ITagRepository):
             warning(error)
             raise TagCreatedException('Ошибка создания тега')
 
-    async def find_by_id(self, tag_id: TagId) -> Optional[Tag]:
-        query: Optional[TagModel] = await self._session.get(TagModel, tag_id)
+    async def find_by_id(self, tag_id: TagId) -> Tag | None:
+        query: TagModel | None = await self._session.get(TagModel, tag_id)
         tag = TagConverter.model_to_entity(query) if query else None
         return tag
 

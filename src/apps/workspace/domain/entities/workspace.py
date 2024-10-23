@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from re import match
-from typing import Optional
 
 from src.apps.workspace.domain.entities.validator_mixins import (
     DescriptionValidatorMixin,
@@ -22,9 +21,9 @@ from src.apps.workspace.domain.types_ids import (
 class Workspace(DescriptionValidatorMixin):
     owner_id: OwnerId
     _name: str
-    _id: Optional[WorkspaceId] = field(default=None)
-    _description: Optional[str] = field(default=None)
-    logo: Optional[str] = field(default=None)
+    _id: WorkspaceId | None = field(default=None)
+    _description: str | None = field(default=None)
+    logo: str | None = field(default=None)
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     invite_ids: list[InviteId] = field(default_factory=list)
     project_ids: list[ProjectId] = field(default_factory=list)
@@ -46,7 +45,7 @@ class Workspace(DescriptionValidatorMixin):
             raise ValueError(f'Неверный формат названия {attr_name}')
 
     @property
-    def id(self) -> WorkspaceId:
+    def id(self) -> WorkspaceId | None:
         return self._id
 
     @property

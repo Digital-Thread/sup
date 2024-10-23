@@ -1,6 +1,4 @@
 from dataclasses import dataclass, field
-from typing import Optional
-from uuid import UUID
 
 from src.apps.workspace.domain.entities.validator_mixins import (
     ColorValidatorMixin,
@@ -14,14 +12,14 @@ class Role(NameValidatorMixin, ColorValidatorMixin):
     _workspace_id: WorkspaceId
     _name: str
     _color: str
-    _id: Optional[RoleId] = field(default=None)
+    _id: RoleId | None = field(default=None)
 
     def __post_init__(self) -> None:
         self._is_valid_name(self._name, 'Роли')
         self._is_valid_color(self._color)
 
     @property
-    def id(self) -> Optional[RoleId]:
+    def id(self) -> RoleId | None:
         return self._id
 
     @property

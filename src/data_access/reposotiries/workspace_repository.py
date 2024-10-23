@@ -1,5 +1,4 @@
 from logging import warning
-from typing import Optional
 
 from sqlalchemy import delete, exists, select, update
 from sqlalchemy.exc import IntegrityError
@@ -39,8 +38,8 @@ class WorkspaceRepository(IWorkspaceRepository):
             warning(error)
             raise WorkspaceCreatedException('Ошибка создания рабочего пространства')
 
-    async def find_by_id(self, workspace_id: WorkspaceId) -> Optional[Workspace]:
-        query: Optional[WorkspaceModel] = await self._session.get(WorkspaceModel, workspace_id)
+    async def find_by_id(self, workspace_id: WorkspaceId) -> Workspace | None:
+        query: WorkspaceModel | None = await self._session.get(WorkspaceModel, workspace_id)
         workspace = WorkspaceConverter.model_to_entity(query) if query else None
         return workspace
 
@@ -103,7 +102,7 @@ class WorkspaceRepository(IWorkspaceRepository):
         )
 
         if user_role_exists.scalar():
-            update_role = await self._session.execute(
+            await self._session.execute(
                 update(UserWorkspaceRoleModel)
                 .filter_by(user_id=user_id, workspace_id=user_id)
                 .values(role_id=role_id)
@@ -118,7 +117,7 @@ class WorkspaceRepository(IWorkspaceRepository):
 
     async def find_user_role_in_workspace(
         self, user_id: OwnerId, workspace_id: WorkspaceId
-    ) -> Optional[Role]:
+    ) -> Role | None:
         query = (
             select(UserWorkspaceRoleModel)
             .options(joinedload(UserWorkspaceRoleModel.role))

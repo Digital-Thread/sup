@@ -1,6 +1,4 @@
 from logging import warning
-from typing import Optional
-from uuid import UUID
 
 from sqlalchemy import delete, select, update
 from sqlalchemy.exc import IntegrityError
@@ -32,8 +30,8 @@ class RoleRepository(IRoleRepository):
             warning(error)
             raise RoleCreatedException
 
-    async def find_by_id(self, role_id: RoleId) -> Optional[Role]:
-        query: Optional[RoleModel] = await self._session.get(RoleModel, role_id)
+    async def find_by_id(self, role_id: RoleId) -> Role | None:
+        query: RoleModel | None = await self._session.get(RoleModel, role_id)
         role = RoleConverter.model_to_entity(query) if query else None
         return role
 

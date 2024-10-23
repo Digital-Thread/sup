@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from uuid import UUID
 
 from src.apps.workspace.domain.entities.tag import Tag
 from src.apps.workspace.domain.types_ids import TagId, WorkspaceId
