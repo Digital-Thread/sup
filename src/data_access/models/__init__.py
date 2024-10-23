@@ -1,9 +1,9 @@
 from .base import Base
 from .feature import FeatureModel
-from .user import User
+from .user import UserModel
 
 __all__ = (
     'Base',
-    'User',
+    'UserModel',
     'FeatureModel',
 )
