@@ -36,12 +36,8 @@ class FeatureRepository(IFeatureRepository):
 
     async def save(self, feature: Feature) -> None:
         feature_model = self.mapper.map_entity_to_model(feature)
-
-        tags = await self._get_m2m_objects(feature.tags, TagModel)
-        feature_model.tags = tags
-
-        members = await self._get_m2m_objects(feature.members, UserModel)
-        feature_model.members = members
+        feature_model.tags = await self._get_m2m_objects(feature.tags, TagModel)
+        feature_model.members = await self._get_m2m_objects(feature.members, UserModel)
 
         try:
             self._session.add(feature_model)
@@ -75,12 +71,8 @@ class FeatureRepository(IFeatureRepository):
             feature_model.description = feature.description
             feature_model.priority = feature.priority
             feature_model.status = feature.status
-
-            tags = await self._get_m2m_objects(feature.tags, TagModel)
-            feature_model.tags = tags
-
-            members = await self._get_m2m_objects(feature.members, UserModel)
-            feature_model.members = members
+            feature_model.tags = await self._get_m2m_objects(feature.tags, TagModel)
+            feature_model.members = await self._get_m2m_objects(feature.members, UserModel)
 
             try:
                 feature_model.project_id = feature.project_id
