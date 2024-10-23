@@ -1,5 +1,5 @@
-from src.apps.workspace.domain.types_ids import RoleId, WorkspaceId
-from src.apps.workspace.dtos.role_dtos import RoleAppDTO, UpdateRoleAppDTO
+from src.apps.workspace.domain.types_ids import RoleId
+from src.apps.workspace.dtos.role_dtos import UpdateRoleAppDTO
 from src.apps.workspace.exceptions.role_exceptions import RoleNotFound, RoleNotUpdated
 from src.apps.workspace.mappers.role_mapper import RoleMapper
 from src.apps.workspace.repositories.i_role_repository import IRoleRepository

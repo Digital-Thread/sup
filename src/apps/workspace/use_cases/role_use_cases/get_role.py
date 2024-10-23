@@ -1,4 +1,3 @@
-from src.apps.workspace.domain.entities.role import Role
 from src.apps.workspace.domain.types_ids import RoleId
 from src.apps.workspace.dtos.role_dtos import RoleAppDTO
 from src.apps.workspace.exceptions.role_exceptions import RoleNotFound

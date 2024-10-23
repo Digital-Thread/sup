@@ -4,7 +4,9 @@ from typing import Optional
 from sqlalchemy import delete, exists, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
+from src.apps.workspace.domain.entities.role import Role
 from src.apps.workspace.domain.entities.workspace import Workspace
 from src.apps.workspace.domain.types_ids import OwnerId, RoleId, WorkspaceId
 from src.apps.workspace.exceptions.role_exceptions import RoleNotFound
@@ -14,6 +16,7 @@ from src.apps.workspace.exceptions.workspace_exceptions import (
     WorkspaceNotUpdated,
 )
 from src.apps.workspace.repositories.i_workspace_repository import IWorkspaceRepository
+from src.data_access.converters.role_converter import RoleConverter
 from src.data_access.converters.workspace_converter import WorkspaceConverter
 from src.data_access.models.stubs import UserModel
 from src.data_access.models.workspace_models.role import RoleModel
@@ -112,3 +115,18 @@ class WorkspaceRepository(IWorkspaceRepository):
             self._session.add(new_user_role)
 
         await self._session.commit()
+
+    async def find_user_role_in_workspace(
+        self, user_id: OwnerId, workspace_id: WorkspaceId
+    ) -> Optional[Role]:
+        query = (
+            select(UserWorkspaceRoleModel)
+            .options(joinedload(UserWorkspaceRoleModel.role))
+            .filter_by(user_id=user_id, workspace_id=workspace_id)
+        )
+        result = await self._session.execute(query)
+        user_workspace_role = result.scalars().first()
+        role = (
+            RoleConverter.model_to_entity(user_workspace_role.role) if user_workspace_role else None
+        )
+        return role

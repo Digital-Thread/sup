@@ -1,6 +1,3 @@
-from uuid import UUID
-
-from src.apps.workspace.domain.entities.tag import Tag
 from src.apps.workspace.domain.types_ids import WorkspaceId
 from src.apps.workspace.dtos.tag_dtos import TagAppDTO
 from src.apps.workspace.exceptions.tag_exceptions import WorkspaceTagNotFound
