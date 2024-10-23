@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Optional
 from uuid import UUID, uuid4
 
 from src.apps.workspace.domain.types_ids import InviteId, WorkspaceId
@@ -18,7 +17,7 @@ class WorkspaceInvite:
     EXPIRATION_DAYS = 7
 
     _workspace_id: WorkspaceId
-    id: Optional[InviteId] = field(default=None)
+    id: InviteId | None = field(default=None)
     code: UUID = field(default_factory=uuid4)
     _status: StatusInvite = field(default=StatusInvite.ACTIVE)
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))

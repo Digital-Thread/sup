@@ -1,5 +1,4 @@
 from abc import abstractmethod
-from uuid import UUID
 
 from src.apps.workspace.domain.entities.category import Category
 from src.apps.workspace.domain.types_ids import CategoryId, WorkspaceId

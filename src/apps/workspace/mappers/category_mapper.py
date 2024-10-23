@@ -1,5 +1,3 @@
-from typing import Any
-
 from src.apps.workspace.domain.entities.category import Category
 from src.apps.workspace.domain.types_ids import CategoryId, WorkspaceId
 from src.apps.workspace.dtos.category_dtos import CategoryAppDTO, UpdateCategoryAppDTO

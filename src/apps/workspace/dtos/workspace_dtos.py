@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Optional, TypedDict
+from typing import TypedDict
 from uuid import UUID
 
 
@@ -15,8 +15,8 @@ class WorkspaceAppDTO:
     owner_id: UUID
     name: str
     created_at: datetime
-    description: Optional[str] = field(default=None)
-    logo: Optional[str] = field(default=None)
+    description: str | None = field(default=None)
+    logo: str | None = field(default=None)
     invite_ids: list[int] = field(default_factory=list)
     project_ids: list[int] = field(default_factory=list)
     meet_ids: list[int] = field(default_factory=list)

@@ -1,6 +1,4 @@
 from dataclasses import dataclass, field
-from typing import Optional
-from uuid import UUID
 
 from src.apps.workspace.domain.entities.validator_mixins import (
     ColorValidatorMixin,
@@ -14,14 +12,14 @@ class Tag(NameValidatorMixin, ColorValidatorMixin):
     _workspace_id: WorkspaceId
     _name: str
     _color: str
-    _id: Optional[TagId] = field(default=None)
+    _id: TagId | None = field(default=None)
 
     def __post_init__(self) -> None:
         self._is_valid_name(self._name, 'Тега')
         self._is_valid_color(self._color)
 
     @property
-    def id(self) -> Optional[TagId]:
+    def id(self) -> TagId | None:
         return self._id
 
     @property

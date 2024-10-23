@@ -38,8 +38,8 @@ class WorkspaceInviteRepository(IWorkspaceInviteRepository):
             warning(error)
             raise WorkspaceInviteCreatedException('Ошибка создания ссылки приглашения')
 
-    async def find_by_id(self, workspace_invite_id: InviteId) -> Optional[WorkspaceInvite]:
-        query: Optional[WorkspaceInviteModel] = await self._session.get(WorkspaceInviteModel, workspace_invite_id)
+    async def find_by_id(self, workspace_invite_id: InviteId) -> WorkspaceInvite | None:
+        query: WorkspaceInviteModel | None = await self._session.get(WorkspaceInviteModel, workspace_invite_id)
         workspace_invite = WorkspaceInviteConverter.model_to_entity(query) if query else None
         return workspace_invite
 

@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Any, Mapping, Optional
 
 
 class IBaseRepository[T, ID](ABC):
@@ -14,7 +13,7 @@ class IBaseRepository[T, ID](ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def find_by_id(self, entity_id: ID) -> Optional[T]:
+    async def find_by_id(self, entity_id: ID) -> T | None:
         raise NotImplementedError
 
     @abstractmethod
