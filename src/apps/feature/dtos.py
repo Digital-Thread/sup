@@ -28,8 +28,8 @@ class FeatureInputDTO:
     description: str | None = None
     priority: Priority = Priority.NO_PRIORITY
     status: Status = Status.NEW
-    tags: set[TagId] | None = None
-    members: set[UserId] | None = None
+    tags: list[TagId] | None = None
+    members: list[UserId] | None = None
 
 
 @dataclass
@@ -51,8 +51,8 @@ class FeatureOutputDTO:
     description: str | None = None
     priority: Priority = Priority.NO_PRIORITY
     status: Status = Status.NEW
-    tags: set[TagId] | None = None
-    members: set[UserId] | None = None
+    tags: list[TagId] | None = None
+    members: list[UserId] | None = None
 
     @classmethod
     def from_entity(cls, feature_id: FeatureId, entity: Feature) -> Self:
@@ -68,6 +68,6 @@ class FeatureOutputDTO:
             description=entity.description,
             priority=entity.priority,
             status=entity.status,
-            tags=set(entity.tags) if entity.tags else None,
-            members=set(entity.members) if entity.members else None,
+            tags=entity.tags,
+            members=entity.members,
         )
