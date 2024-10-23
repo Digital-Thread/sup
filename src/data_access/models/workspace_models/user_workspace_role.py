@@ -16,15 +16,15 @@ if TYPE_CHECKING:
 class UserWorkspaceRoleModel(Base, IntIdPkMixin):
     __tablename__ = 'user_workspace_roles'
 
-    user_id: Mapped[UUID] = mapped_column(ForeignKey('users.id'))
+    user_id: Mapped[UUID] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'))
     workspace_id: Mapped[UUID] = mapped_column(
-        PostgreSQLUUID(as_uuid=True), ForeignKey('workspaces.id')
+        PostgreSQLUUID(as_uuid=True), ForeignKey('workspaces.id', ondelete='CASCADE')
     )
-    role_id: Mapped[int] = mapped_column(ForeignKey('roles.id'))
+    role_id: Mapped[int] = mapped_column(ForeignKey('roles.id', ondelete='CASCADE'))
 
     user: Mapped['UserModel'] = relationship(
-        'UserModel', back_populates='workspaces_roles', cascade='all, delete-orphan'
+        'UserModel', back_populates='workspaces_roles'
     )
     role: Mapped['RoleModel'] = relationship(
-        'RoleModel', back_populates='users', cascade='all, delete-orphan'
+        'RoleModel', back_populates='users'
     )

@@ -4,7 +4,7 @@ from uuid import UUID
 
 from sqlalchemy import TIMESTAMP, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID
-from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.data_access.models.base import Base
 from src.data_access.models.mixins import UUIDPkMixin
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 class WorkspaceModel(Base, UUIDPkMixin):
     __tablename__ = 'workspaces'
 
-    owner_id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), ForeignKey('users.id'))
+    owner_id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), ForeignKey('users.id', ondelete='CASCADE'))
     name: Mapped[str] = mapped_column(unique=True, nullable=False)
     description: Mapped[Optional[str]]
     logo: Mapped[Optional[str]]
@@ -35,14 +35,14 @@ class WorkspaceModel(Base, UUIDPkMixin):
         'UserModel', secondary='workspace_members', back_populates='workspaces'
     )
     projects: Mapped[list['ProjectModel']] = relationship(
-        'ProjectModel', back_populates='workspace'
+        'ProjectModel', back_populates='workspace', cascade='all, delete-orphan'
     )
-    meets: Mapped[list['MeetModel']] = relationship('MeetModel', back_populates='workspace')
-    roles: Mapped[list['RoleModel']] = relationship('RoleModel', back_populates='workspace')
-    tags: Mapped[list['TagModel']] = relationship('TagModel', back_populates='workspace')
+    meets: Mapped[list['MeetModel']] = relationship('MeetModel', back_populates='workspace', cascade='all, delete-orphan')
+    roles: Mapped[list['RoleModel']] = relationship('RoleModel', back_populates='workspace', cascade='all, delete-orphan')
+    tags: Mapped[list['TagModel']] = relationship('TagModel', back_populates='workspace', cascade='all, delete-orphan')
     categories: Mapped[list['CategoryModel']] = relationship(
-        'CategoryModel', back_populates='workspace'
+        'CategoryModel', back_populates='workspace', cascade='all, delete-orphan'
     )
     invites: Mapped[list['WorkspaceInviteModel']] = relationship(
-        'WorkspaceInviteModel', back_populates='workspace'
+        'WorkspaceInviteModel', back_populates='workspace', cascade='all, delete-orphan'
     )
