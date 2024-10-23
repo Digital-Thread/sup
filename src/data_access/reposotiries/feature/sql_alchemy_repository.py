@@ -5,14 +5,11 @@ from apps.feature import (
     FeatureId,
     FeatureListQuery,
     IFeatureRepository,
-    OwnerId,
-    ProjectId,
-    UserId,
     WorkspaceId,
 )
 from asyncpg import ForeignKeyViolationError
 from data_access.models import FeatureModel, TagModel, UserModel  # пока нет по указанному пути
-from data_access.reposotiries.feature.exceptions import DataBaseError
+from data_access.reposotiries.feature import DataBaseError, FeatureMapper
 from sqlalchemy import Row, RowMapping, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,45 +21,7 @@ class FeatureRepository(IFeatureRepository):
     def __init__(self, session: AsyncSession):
         self._session = session
         self.model = FeatureModel
-
-    async def _map_entity_to_model(self, feature_entity: Feature) -> FeatureModel:
-        feature_model = self.model(
-            workspace_id=feature_entity.workspace_id,
-            name=feature_entity.name,
-            project_id=feature_entity.project_id,
-            owner_id=feature_entity.owner_id,
-            created_at=feature_entity.created_at,
-            updated_at=feature_entity.updated_at,
-            assigned_to=feature_entity.assigned_to,
-            description=feature_entity.description,
-            priority=feature_entity.priority,
-            status=feature_entity.status,
-        )
-        tags = await self._get_m2m_objects(feature_entity.tags, TagModel)
-        feature_model.tags = tags
-
-        members = await self._get_m2m_objects(feature_entity.members, UserModel)
-        feature_model.members = members
-
-        return feature_model
-
-    @staticmethod
-    def _map_model_to_entity(feature_model: FeatureModel) -> Feature:
-        feature = Feature(
-            workspace_id=WorkspaceId(feature_model.workspace_id),
-            name=feature_model.name,
-            project_id=ProjectId(feature_model.project_id),
-            owner_id=OwnerId(feature_model.owner_id),
-            assigned_to=UserId(feature_model.assigned_to_id) if feature_model.assigned_to_id else None,
-            description=feature_model.description,
-            priority=feature_model.priority,
-            status=feature_model.status,
-            tags=[tag.id for tag in feature_model.tags] if feature_model.tags else None,
-            members=[user.id for user in feature_model.members] if feature_model.members else None
-        )
-        feature.created_at = feature_model.created_at
-        feature.updated_at = feature_model.updated_at
-        return feature
+        self.mapper = FeatureMapper()
 
     async def _get_m2m_objects(self,
                                list_ids: list,
@@ -73,7 +32,14 @@ class FeatureRepository(IFeatureRepository):
         return m2m_objects
 
     async def save(self, feature: Feature) -> None:
-        feature_model = self._map_entity_to_model(feature)
+        feature_model = self.mapper.map_entity_to_model(feature)
+
+        tags = await self._get_m2m_objects(feature.tags, TagModel)
+        feature_model.tags = tags
+
+        members = await self._get_m2m_objects(feature.members, UserModel)
+        feature_model.members = members
+
         try:
             self._session.add(feature_model)
             await self._session.flush()
@@ -93,7 +59,7 @@ class FeatureRepository(IFeatureRepository):
         result = await self._session.execute(stmt)
         feature_model = result.scalar_one_or_none()
         if feature_model:
-            return self._map_model_to_entity(feature_model)
+            return self.mapper.map_model_to_entity(feature_model)
         else:
             return None
 
@@ -151,4 +117,4 @@ class FeatureRepository(IFeatureRepository):
         )
         result = await self._session.execute(stmt)
         features = result.scalars().all()
-        return [self._map_model_to_entity(f) for f in features] if features else []
+        return [self.mapper.map_model_to_entity(f) for f in features] if features else []
