@@ -2,6 +2,7 @@ from apps.feature.domain.aliases import (
     FeatureId,
     OwnerId,
     ProjectId,
+    TagId,
     UserId,
     WorkspaceId,
 )
@@ -30,4 +31,5 @@ __all__ = (
     'ProjectId',
     'OwnerId',
     'UserId',
+    'TagId',
 )

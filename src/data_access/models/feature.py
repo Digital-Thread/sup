@@ -2,11 +2,13 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 from uuid import UUID
 
+from sqlalchemy import TIMESTAMP
+from sqlalchemy import UUID as SQL_UUID
+from sqlalchemy import Column, ForeignKey, Index, Integer, String, Table
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 from apps.feature import Priority, Status
 from data_access.models import Base
-from sqlalchemy import TIMESTAMP, Column, ForeignKey, Index, Integer, String, Table
-from sqlalchemy import UUID as SQL_UUID
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 # пока нет по указанным путям
 if TYPE_CHECKING:
@@ -54,14 +56,10 @@ class FeatureModel(Base):
 
     project_id: Mapped[int] = mapped_column(ForeignKey('projects.id', ondelete='CASCADE'))
 
-    owner_id: Mapped[UUID] = mapped_column(
-        SQL_UUID(as_uuid=True),
-        ForeignKey('users.id')
-    )
+    owner_id: Mapped[UUID] = mapped_column(SQL_UUID(as_uuid=True), ForeignKey('users.id'))
 
     assigned_to_id: Mapped[UUID | None] = mapped_column(
-        SQL_UUID(as_uuid=True),
-        ForeignKey('users.id')
+        SQL_UUID(as_uuid=True), ForeignKey('users.id')
     )
 
     workspace: Mapped['WorkspaceModel'] = relationship(

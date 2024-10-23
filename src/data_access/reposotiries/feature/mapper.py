@@ -27,12 +27,14 @@ class FeatureMapper:
             name=feature_model.name,
             project_id=ProjectId(feature_model.project_id),
             owner_id=OwnerId(feature_model.owner_id),
-            assigned_to=UserId(feature_model.assigned_to_id) if feature_model.assigned_to_id else None,
+            assigned_to=(
+                UserId(feature_model.assigned_to_id) if feature_model.assigned_to_id else None
+            ),
             description=feature_model.description,
             priority=feature_model.priority,
             status=feature_model.status,
             tags=[tag.id for tag in feature_model.tags] if feature_model.tags else None,
-            members=[user.id for user in feature_model.members] if feature_model.members else None
+            members=[user.id for user in feature_model.members] if feature_model.members else None,
         )
         feature.created_at = feature_model.created_at
         feature.updated_at = feature_model.updated_at

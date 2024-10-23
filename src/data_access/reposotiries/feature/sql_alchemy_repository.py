@@ -1,16 +1,20 @@
-from typing import Any, Sequence
-
 from apps.feature import (
     Feature,
     FeatureId,
     FeatureListQuery,
     IFeatureRepository,
+    TagId,
+    UserId,
     WorkspaceId,
 )
 from asyncpg import ForeignKeyViolationError
-from data_access.models import FeatureModel, TagModel, UserModel  # пока нет по указанному пути
+from data_access.models import (  # пока нет по указанному пути
+    FeatureModel,
+    TagModel,
+    UserModel,
+)
 from data_access.reposotiries.feature import DataBaseError, FeatureMapper
-from sqlalchemy import Row, RowMapping, select
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -51,9 +55,10 @@ class FeatureRepository(IFeatureRepository):
                 raise
 
     async def get_by_id(self, feature_id: FeatureId) -> Feature | None:
-        stmt = select(self.model).where(self.model.id == feature_id).options(
-            selectinload(self.model.tags),
-            selectinload(self.model.members)
+        stmt = (
+            select(self.model)
+            .where(self.model.id == feature_id)
+            .options(selectinload(self.model.tags), selectinload(self.model.members))
         )
         result = await self._session.execute(stmt)
         feature_model = result.scalar_one_or_none()
@@ -97,10 +102,7 @@ class FeatureRepository(IFeatureRepository):
         filters = {k: v for k, v in (query.filters or {}).items() if v is not None}
         stmt = (
             select(self.model)
-            .options(
-                selectinload(self.model.tags),
-                selectinload(self.model.members)
-            )
+            .options(selectinload(self.model.tags), selectinload(self.model.members))
             .filter_by(workspace_id=workspace_id, **filters)
             .order_by(
                 getattr(self.model, str(query.order_by.field)).asc()
