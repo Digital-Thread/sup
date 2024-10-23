@@ -33,8 +33,8 @@ class RoleRepository(IRoleRepository):
             raise RoleCreatedException
 
     async def find_by_id(self, role_id: RoleId) -> Optional[Role]:
-        query = await self._session.get(RoleModel, role_id)
-        role = RoleConverter.model_to_entity(query)
+        query: Optional[RoleModel] = await self._session.get(RoleModel, role_id)
+        role = RoleConverter.model_to_entity(query) if query else None
         return role
 
     async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[Role]:
@@ -44,12 +44,12 @@ class RoleRepository(IRoleRepository):
         return roles
 
     async def update(self, role: Role) -> None:
-        model = RoleConverter.entity_to_model(role)
-        stmt = update(RoleModel).filter_by(id=model.id).values(**model.__dict__)
+        update_data = RoleConverter.entity_to_dict(role)
+        stmt = update(RoleModel).filter_by(id=role.id).values(**update_data)
         result = await self._session.execute(stmt)
 
         if result.rowcount == 0:
-            raise RoleNotUpdated(f'Роль с id={model.id} не обновлена')
+            raise RoleNotUpdated(f'Роль с id={role.id} не обновлена')
 
     async def delete(self, role_id: RoleId) -> None:
         stmt = delete(RoleModel).filter_by(id=role_id)

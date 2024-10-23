@@ -32,8 +32,8 @@ class TagRepository(ITagRepository):
             raise TagCreatedException('Ошибка создания тега')
 
     async def find_by_id(self, tag_id: TagId) -> Optional[Tag]:
-        query = await self._session.get(TagModel, tag_id)
-        tag = TagConverter.model_to_entity(query)
+        query: Optional[TagModel] = await self._session.get(TagModel, tag_id)
+        tag = TagConverter.model_to_entity(query) if query else None
         return tag
 
     async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[Tag]:
@@ -43,12 +43,12 @@ class TagRepository(ITagRepository):
         return tags
 
     async def update(self, tag: Tag) -> None:
-        model = TagConverter.entity_to_model(tag)
-        stmt = update(TagModel).filter_by(id=model.id).values(**model.__dict__)
+        update_data = TagConverter.entity_to_dict(tag)
+        stmt = update(TagModel).filter_by(id=tag.id).values(**update_data)
         result = await self._session.execute(stmt)
 
         if result.rowcount == 0:
-            raise TagNotUpdated(f'Тег с id={model.id} не обновлен')
+            raise TagNotUpdated(f'Тег с id={tag.id} не обновлен')
 
     async def delete(self, tag_id: TagId) -> None:
         stmt = delete(TagModel).filter_by(id=tag_id)

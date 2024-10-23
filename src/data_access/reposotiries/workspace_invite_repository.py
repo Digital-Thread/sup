@@ -39,8 +39,8 @@ class WorkspaceInviteRepository(IWorkspaceInviteRepository):
             raise WorkspaceInviteCreatedException('Ошибка создания ссылки приглашения')
 
     async def find_by_id(self, workspace_invite_id: InviteId) -> Optional[WorkspaceInvite]:
-        query = await self._session.get(WorkspaceInviteModel, workspace_invite_id)
-        workspace_invite = WorkspaceInviteConverter.model_to_entity(query)
+        query: Optional[WorkspaceInviteModel] = await self._session.get(WorkspaceInviteModel, workspace_invite_id)
+        workspace_invite = WorkspaceInviteConverter.model_to_entity(query) if query else None
         return workspace_invite
 
     async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[WorkspaceInvite]:
@@ -53,12 +53,12 @@ class WorkspaceInviteRepository(IWorkspaceInviteRepository):
         return categories
 
     async def update(self, workspace_invite: WorkspaceInvite) -> None:
-        model = WorkspaceInviteConverter.entity_to_model(workspace_invite)
-        stmt = update(WorkspaceInviteModel).filter_by(id=model.id).values(**model.__dict__)
+        update_data = WorkspaceInviteConverter.entity_to_dict(workspace_invite)
+        stmt = update(WorkspaceInviteModel).filter_by(id=workspace_invite.id).values(**update_data)
         result = await self._session.execute(stmt)
 
         if result.rowcount == 0:
-            raise WorkspaceInviteNotUpdated(f'Ссылка приглашения с id={model.id} не обновлена')
+            raise WorkspaceInviteNotUpdated(f'Ссылка приглашения с id={workspace_invite.id} не обновлена')
 
     async def delete(self, workspace_invite_id: InviteId) -> None:
         stmt = delete(WorkspaceInviteModel).filter_by(id=workspace_invite_id)

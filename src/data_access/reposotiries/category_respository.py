@@ -32,7 +32,7 @@ class CategoryRepository(ICategoryRepository):
             raise CategoryCreatedException
 
     async def find_by_id(self, category_id: CategoryId) -> Optional[Category]:
-        query = self._session.get(CategoryModel, category_id)
+        query: Optional[CategoryModel] = await self._session.get(CategoryModel, category_id)
         category = CategoryConverter.model_to_entity(query) if query else None
         return category
 
@@ -45,12 +45,12 @@ class CategoryRepository(ICategoryRepository):
         return categories
 
     async def update(self, category: Category) -> None:
-        model = CategoryConverter.entity_to_model(category)
-        stmt = update(CategoryModel).filter_by(id=model.id).values(**model.__dict__)
+        update_data = CategoryConverter.entity_to_dict(category)
+        stmt = update(CategoryModel).filter_by(id=category.id).values(**update_data)
         result = await self._session.execute(stmt)
 
         if result.rowcount == 0:
-            raise CategoryNotUpdated(f'Категория с id={model.id} не обновлена')
+            raise CategoryNotUpdated(f'Категория с id={category.id} не обновлена')
 
     async def delete(self, category_id: CategoryId) -> None:
         stmt = delete(CategoryModel).filter_by(id=category_id)
