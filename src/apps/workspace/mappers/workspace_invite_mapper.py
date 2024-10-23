@@ -3,18 +3,34 @@ from src.apps.workspace.domain.entities.workspace_invite import (
     WorkspaceInvite,
 )
 from src.apps.workspace.domain.types_ids import InviteId, WorkspaceId
-from src.apps.workspace.dtos.workspace_invite_dtos import WorkspaceInviteAppDTO
+from src.apps.workspace.dtos.workspace_invite_dtos import (
+    UpdateWorkspaceInviteAppDTO,
+    WorkspaceInviteAppDTO,
+)
 from src.apps.workspace.mappers.base_mapper import BaseMapper
 
 
 class WorkspaceInviteMapper(BaseMapper[WorkspaceInvite, WorkspaceInviteAppDTO]):
     @staticmethod
     def dto_to_entity(dto: WorkspaceInviteAppDTO) -> WorkspaceInvite:
-        invite = WorkspaceInvite(
+
+        return WorkspaceInvite(
             id=InviteId(dto.id),
             code=dto.code,
             _status=StatusInvite(dto.status),
             created_at=dto.created_at,
             _workspace_id=WorkspaceId(dto.workspace_id),
         )
-        return invite
+
+    @staticmethod
+    def update_data(
+        existing_invite: WorkspaceInvite, dto: UpdateWorkspaceInviteAppDTO
+    ) -> WorkspaceInvite:
+        status = dto.get('status')
+
+        if status == 'Использована':
+            existing_invite.use()
+        elif status == 'Истекла':
+            existing_invite.expire()
+
+        return existing_invite

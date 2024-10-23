@@ -1,6 +1,6 @@
-from src.apps.workspace.domain.types_ids import RoleId, WorkspaceId
+from src.apps.workspace.domain.types_ids import RoleId, TagId, WorkspaceId
 from src.apps.workspace.dtos.tag_dtos import TagAppDTO, UpdateTagAppDTO
-from src.apps.workspace.exceptions.tag_exceptions import TagNotUpdated
+from src.apps.workspace.exceptions.tag_exceptions import TagNotFound, TagNotUpdated
 from src.apps.workspace.mappers.tag_mapper import TagMapper
 from src.apps.workspace.repositories.i_tag_repository import ITagRepository
 
@@ -9,14 +9,17 @@ class UpdateTagUseCase:
     def __init__(self, tag_repository: ITagRepository):
         self.tag_repository = tag_repository
 
-    async def execute(
-        self, workspace_id: WorkspaceId, role_id: RoleId, update_data: UpdateTagAppDTO
-    ) -> None:
-        tag = TagMapper.dto_to_entity(
-            update_data, {'workspace_id': workspace_id, 'role_id': role_id}
-        )
+    async def execute(self, tag_id: TagId, update_data: UpdateTagAppDTO) -> None:
         try:
-            await self.tag_repository.update(tag)
-        except TagNotUpdated:
+            existing_tag = await self.tag_repository.find_by_id(tag_id)
+        except TagNotFound:
             pass
             # TODO пробросить дальше
+        else:
+            updated_tag = TagMapper.update_data(existing_tag, update_data)
+
+            try:
+                await self.tag_repository.update(updated_tag)
+            except TagNotUpdated:
+                pass
+                # TODO пробросить дальше
