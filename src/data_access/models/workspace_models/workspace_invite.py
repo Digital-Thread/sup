@@ -27,9 +27,9 @@ class WorkspaceInviteModel(Base, IntIdPkMixin):
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True))
     expired_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True))
     workspace_id: Mapped[UUID] = mapped_column(
-        PostgreSQLUUID(as_uuid=True), ForeignKey('workspaces.id')
+        PostgreSQLUUID(as_uuid=True), ForeignKey('workspaces.id', ondelete='CASCADE')
     )
 
     workspace: Mapped['WorkspaceModel'] = relationship(
-        'WorkspaceModel', back_populates='invites', cascade='all, delete-orphan'
+        'WorkspaceModel', back_populates='invites'
     )

@@ -28,13 +28,13 @@ class UserModel(Base, UUIDPkMixin):
     email: Mapped[str] = mapped_column(unique=True, nullable=True)
 
     owned_workspaces: Mapped[list['WorkspaceModel']] = relationship(
-        'WorkspaceModel', back_populates='owner'
+        'WorkspaceModel', back_populates='owner', cascade='all, delete-orphan'
     )
     workspaces: Mapped[list['WorkspaceModel']] = relationship(
         'WorkspaceModel', secondary='workspace_members', back_populates='members'
     )
     workspaces_roles: Mapped[list['UserWorkspaceRoleModel']] = relationship(
-        'UserWorkspaceRoleModel', back_populates='user'
+        'UserWorkspaceRoleModel', back_populates='user', cascade='all, delete-orphan'
     )
 
 
@@ -44,7 +44,7 @@ class MeetModel(Base, IntIdPkMixin, DatetimeFieldsMixin):
     name: Mapped[str]
     meet_at: Mapped[datetime]
     workspace_id: Mapped[UUID] = mapped_column(
-        PostgreSQLUUID(as_uuid=True), ForeignKey('workspaces.id', on_delete='CASCADE')
+        PostgreSQLUUID(as_uuid=True), ForeignKey('workspaces.id', ondelete='CASCADE')
     )
     category_id: Mapped[int] = mapped_column(ForeignKey('categories.id'))
 
@@ -56,7 +56,7 @@ class FeatureModel(Base, IntIdPkMixin):
     __tablename__ = 'features'
 
     name: Mapped[str]
-    project_id: Mapped[int] = mapped_column(ForeignKey('projects.id', on_delete='CASCADE'))
+    project_id: Mapped[int] = mapped_column(ForeignKey('projects.id', ondelete='CASCADE'))
     tag_id: Mapped[int] = mapped_column(ForeignKey('tags.id'))
 
     tag: Mapped['TagModel'] = relationship('TagModel', back_populates='features')
@@ -68,7 +68,7 @@ class ProjectModel(Base, IntIdPkMixin):
 
     name: Mapped[str]
     workspace_id: Mapped[UUID] = mapped_column(
-        PostgreSQLUUID(as_uuid=True), ForeignKey('workspaces.id', on_delete='CASCADE')
+        PostgreSQLUUID(as_uuid=True), ForeignKey('workspaces.id', ondelete='CASCADE')
     )
 
     features: Mapped[list['FeatureModel']] = relationship('FeatureModel', back_populates='project')

@@ -21,11 +21,11 @@ class RoleModel(Base, IntIdPkMixin):
     name: Mapped[str] = mapped_column(nullable=False)
     color: Mapped[str] = mapped_column(nullable=False)
     workspace_id: Mapped[UUID] = mapped_column(
-        PostgreSQLUUID(as_uuid=True), ForeignKey('workspaces.id')
+        PostgreSQLUUID(as_uuid=True), ForeignKey('workspaces.id', ondelete='CASCADE')
     )
 
     workspace: Mapped['WorkspaceModel'] = relationship(
-        'WorkspaceModel', back_populates='roles', cascade='all, delete-orphan'
+        'WorkspaceModel', back_populates='roles'
     )
     users: Mapped[list['UserWorkspaceRoleModel']] = relationship(
         'UserWorkspaceRoleModel', back_populates='role'

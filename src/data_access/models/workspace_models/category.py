@@ -18,10 +18,10 @@ class CategoryModel(Base, IntIdPkMixin):
 
     name: Mapped[str] = mapped_column(nullable=False)
     workspace_id: Mapped[UUID] = mapped_column(
-        PostgreSQLUUID(as_uuid=True), ForeignKey('workspaces.id')
+        PostgreSQLUUID(as_uuid=True), ForeignKey('workspaces.id', ondelete='CASCADE')
     )
 
     workspace: Mapped['WorkspaceModel'] = relationship(
-        'WorkspaceModel', back_populates='categories', cascade='all, delete-orphan'
+        'WorkspaceModel', back_populates='categories'
     )
     meets: Mapped[list['MeetModel']] = relationship('MeetModel', back_populates='category')
