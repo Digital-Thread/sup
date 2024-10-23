@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from src.apps.workspace.domain.types_ids import WorkspaceId
 from src.apps.workspace.dtos.category_dtos import CategoryAppDTO
 from src.apps.workspace.exceptions.category_exceptions import WorkspaceCategoryNotFound

@@ -1,6 +1,3 @@
-from uuid import UUID
-
-from src.apps.workspace.domain.entities.role import Role
 from src.apps.workspace.domain.types_ids import WorkspaceId
 from src.apps.workspace.dtos.role_dtos import RoleAppDTO
 from src.apps.workspace.exceptions.role_exceptions import WorkspaceRoleNotFound

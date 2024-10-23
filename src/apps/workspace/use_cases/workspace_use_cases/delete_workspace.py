@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from src.apps.workspace.domain.types_ids import WorkspaceId
 from src.apps.workspace.exceptions.workspace_exceptions import WorkspaceNotFound
 from src.apps.workspace.repositories.i_workspace_repository import IWorkspaceRepository

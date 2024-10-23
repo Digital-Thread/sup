@@ -1,7 +1,5 @@
-from src.apps.workspace.domain.types_ids import OwnerId, WorkspaceId
-from src.apps.workspace.dtos.workspace_dtos import (
-    UpdateWorkspaceAppDTO
-)
+from src.apps.workspace.domain.types_ids import WorkspaceId
+from src.apps.workspace.dtos.workspace_dtos import UpdateWorkspaceAppDTO
 from src.apps.workspace.exceptions.workspace_exceptions import (
     WorkspaceNotFound,
     WorkspaceNotUpdated,

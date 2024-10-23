@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from src.apps.workspace.domain.types_ids import WorkspaceId
 from src.apps.workspace.dtos.workspace_invite_dtos import WorkspaceInviteAppDTO
 from src.apps.workspace.exceptions.workspace_invite_exceptions import (

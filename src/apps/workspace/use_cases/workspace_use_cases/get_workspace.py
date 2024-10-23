@@ -1,10 +1,6 @@
-from uuid import UUID
-
-from src.apps.workspace.domain.entities.workspace import Workspace
 from src.apps.workspace.domain.types_ids import WorkspaceId
 from src.apps.workspace.dtos.workspace_dtos import WorkspaceAppDTO
 from src.apps.workspace.exceptions.workspace_exceptions import WorkspaceNotFound
-from src.apps.workspace.mappers.category_mapper import CategoryMapper
 from src.apps.workspace.mappers.workspace_mapper import WorkspaceMapper
 from src.apps.workspace.repositories.i_workspace_repository import IWorkspaceRepository
 
