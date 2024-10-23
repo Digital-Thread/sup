@@ -1,26 +1,28 @@
-from src.apps.workspace.domain.entities.workspace_invite import WorkspaceInvite
+from src.apps.workspace.domain.entities.workspace_invite import WorkspaceInvite, StatusInvite
+from src.apps.workspace.domain.types_ids import WorkspaceId
 from src.data_access.models.workspace_models.workspace_invite import (
     WorkspaceInviteModel,
 )
 
 
-class WorkspaceInviteConverter[T]:
+class WorkspaceInviteConverter:
     @staticmethod
-    def model_to_entity(workspace_invite_model: T) -> WorkspaceInvite:
-        clean_data = {
-            column.name: getattr(workspace_invite_model, column.name)
-            for column in workspace_invite_model.__table__.columns
-        }
-        invite = WorkspaceInvite(
-            id=clean_data['id'],
-            code=clean_data['code'],
-            _status=clean_data['status'],
-            _workspace_id=clean_data['workspace_id'],
-            created_at=clean_data['created_at'],
+    def model_to_entity(workspace_invite_model: WorkspaceInviteModel) -> WorkspaceInvite:
+        return WorkspaceInvite(
+            id=workspace_invite_model.id,
+            code=workspace_invite_model.code,
+            _status=StatusInvite(workspace_invite_model.status),
+            _workspace_id=WorkspaceId(workspace_invite_model.workspace_id),
+            created_at=workspace_invite_model.created_at,
         )
-        return invite
 
     @staticmethod
     def entity_to_model(entity: WorkspaceInvite) -> WorkspaceInviteModel:
         model = WorkspaceInviteModel(**entity.__dict__)
         return model
+
+    @staticmethod
+    def entity_to_dict(workspace_invite: WorkspaceInvite) -> dict:
+        return {
+            'status': workspace_invite.status,
+        }

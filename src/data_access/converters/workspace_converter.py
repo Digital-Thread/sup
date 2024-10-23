@@ -5,36 +5,33 @@ from src.apps.workspace.domain.types_ids import (
     MemberId,
     ProjectId,
     RoleId,
-    TagId,
+    TagId, OwnerId, WorkspaceId,
 )
 from src.data_access.models.workspace_models.workspace import WorkspaceModel
 
 
-class WorkspaceConverter[T]:
+class WorkspaceConverter:
 
     @staticmethod
-    def model_to_entity(workspace_model: T) -> Workspace:
-        clean_data = {
-            column.name: getattr(workspace_model, column.name)
-            for column in workspace_model.__table__.columns
-        }
-        workspace = Workspace(
-            owner_id=clean_data['owner_id'],
-            _name=clean_data['name'],
-            _id=clean_data['id'],
-            _description=clean_data['description'],
-            logo=clean_data['logo'],
-            created_at=clean_data['created_at'],
-            invite_ids=[InviteId(invite.id) for invite in getattr(workspace_model, 'invites', [])],
+    def model_to_entity(workspace_model: WorkspaceModel) -> Workspace:
+
+        return Workspace(
+            owner_id=OwnerId(workspace_model.owner_id),
+            _name=workspace_model.name,
+            _id=WorkspaceId(workspace_model.id),
+            _description=workspace_model.description,
+            logo=workspace_model.logo,
+            created_at=workspace_model.created_at,
+            invite_ids=[InviteId(invite.id) for invite in workspace_model.invites],
             project_ids=[
-                ProjectId(project.id) for project in getattr(workspace_model, 'projects', [])
+                ProjectId(project.id) for project in workspace_model.projects
             ],
-            meet_ids=[MeetId(meet.id) for meet in getattr(workspace_model, 'meets', [])],
-            tag_ids=[TagId(tag.id) for tag in getattr(workspace_model, 'tags', [])],
-            role_ids=[RoleId(role.id) for role in getattr(workspace_model, 'roles', [])],
-            member_ids=[MemberId(member.id) for member in getattr(workspace_model, 'members', [])],
+            meet_ids=[MeetId(meet.id) for meet in workspace_model.meets],
+            tag_ids=[TagId(tag.id) for tag in workspace_model.tags],
+            role_ids=[RoleId(role.id) for role in workspace_model.roles],
+            member_ids=[MemberId(member.id) for member in workspace_model.members],
         )
-        return workspace
+
 
     @staticmethod
     def entity_to_model(entity: Workspace) -> WorkspaceModel:
@@ -47,3 +44,11 @@ class WorkspaceConverter[T]:
             created_at=entity.created_at,
         )
         return model
+
+    @staticmethod
+    def entity_to_dict(workspace: Workspace) -> dict:
+        return {
+            'name': workspace.name,
+            'description': workspace.description,
+            'logo': workspace.logo,
+        }
