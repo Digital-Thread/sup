@@ -40,7 +40,7 @@ class WorkspaceRepository(IWorkspaceRepository):
             raise WorkspaceCreatedException('Ошибка создания рабочего пространства')
 
     async def find_by_id(self, workspace_id: WorkspaceId) -> Optional[Workspace]:
-        query = await self._session.get(WorkspaceModel, workspace_id)
+        query: Optional[WorkspaceModel] = await self._session.get(WorkspaceModel, workspace_id)
         workspace = WorkspaceConverter.model_to_entity(query) if query else None
         return workspace
 
@@ -53,12 +53,12 @@ class WorkspaceRepository(IWorkspaceRepository):
         return workspaces
 
     async def update(self, workspace: Workspace) -> None:
-        model_data = WorkspaceConverter.entity_to_model(workspace)
+        update_data = WorkspaceConverter.entity_to_dict(workspace)
 
         stmt = (
             update(WorkspaceModel)
-            .filter_by(workspace_id=model_data.id)
-            .values(**model_data.__dict__)
+            .filter_by(workspace_id=workspace.id)
+            .values(**update_data)
         )
         result = await self._session.execute(stmt)
 
