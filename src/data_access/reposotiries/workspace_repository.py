@@ -54,11 +54,7 @@ class WorkspaceRepository(IWorkspaceRepository):
     async def update(self, workspace: Workspace) -> None:
         update_data = WorkspaceConverter.entity_to_dict(workspace)
 
-        stmt = (
-            update(WorkspaceModel)
-            .filter_by(workspace_id=workspace.id)
-            .values(**update_data)
-        )
+        stmt = update(WorkspaceModel).filter_by(workspace_id=workspace.id).values(**update_data)
         result = await self._session.execute(stmt)
 
         if result.rowcount == 0:

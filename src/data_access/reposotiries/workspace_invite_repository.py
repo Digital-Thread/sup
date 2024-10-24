@@ -39,7 +39,9 @@ class WorkspaceInviteRepository(IWorkspaceInviteRepository):
             raise WorkspaceInviteCreatedException('Ошибка создания ссылки приглашения')
 
     async def find_by_id(self, workspace_invite_id: InviteId) -> WorkspaceInvite | None:
-        query: WorkspaceInviteModel | None = await self._session.get(WorkspaceInviteModel, workspace_invite_id)
+        query: WorkspaceInviteModel | None = await self._session.get(
+            WorkspaceInviteModel, workspace_invite_id
+        )
         workspace_invite = WorkspaceInviteConverter.model_to_entity(query) if query else None
         return workspace_invite
 
@@ -58,7 +60,9 @@ class WorkspaceInviteRepository(IWorkspaceInviteRepository):
         result = await self._session.execute(stmt)
 
         if result.rowcount == 0:
-            raise WorkspaceInviteNotUpdated(f'Ссылка приглашения с id={workspace_invite.id} не обновлена')
+            raise WorkspaceInviteNotUpdated(
+                f'Ссылка приглашения с id={workspace_invite.id} не обновлена'
+            )
 
     async def delete(self, workspace_invite_id: InviteId) -> None:
         stmt = delete(WorkspaceInviteModel).filter_by(id=workspace_invite_id)

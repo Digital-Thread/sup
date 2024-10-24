@@ -22,7 +22,5 @@ class TagModel(Base, IntIdPkMixin):
         PostgreSQLUUID(as_uuid=True), ForeignKey('workspaces.id', ondelete='CASCADE')
     )
 
-    workspace: Mapped['WorkspaceModel'] = relationship(
-        'WorkspaceModel', back_populates='tags'
-    )
+    workspace: Mapped['WorkspaceModel'] = relationship('WorkspaceModel', back_populates='tags')
     features: Mapped[list['FeatureModel']] = relationship('FeatureModel', back_populates='tag')

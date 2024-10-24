@@ -22,9 +22,5 @@ class UserWorkspaceRoleModel(Base, IntIdPkMixin):
     )
     role_id: Mapped[int] = mapped_column(ForeignKey('roles.id', ondelete='CASCADE'))
 
-    user: Mapped['UserModel'] = relationship(
-        'UserModel', back_populates='workspaces_roles'
-    )
-    role: Mapped['RoleModel'] = relationship(
-        'RoleModel', back_populates='users'
-    )
+    user: Mapped['UserModel'] = relationship('UserModel', back_populates='workspaces_roles')
+    role: Mapped['RoleModel'] = relationship('RoleModel', back_populates='users')

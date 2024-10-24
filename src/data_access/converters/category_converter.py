@@ -1,5 +1,5 @@
 from src.apps.workspace.domain.entities.category import Category
-from src.apps.workspace.domain.types_ids import WorkspaceId
+from src.apps.workspace.domain.types_ids import CategoryId, WorkspaceId
 from src.data_access.models.workspace_models.category import CategoryModel
 
 
@@ -7,7 +7,7 @@ class CategoryConverter:
     @staticmethod
     def model_to_entity(category_model: CategoryModel) -> Category:
         category = Category(
-            _id=category_model.id,
+            _id=CategoryId(category_model.id),
             _name=category_model.name,
             _workspace_id=WorkspaceId(category_model.workspace_id),
         )
@@ -19,9 +19,9 @@ class CategoryConverter:
         return model
 
     @staticmethod
-    def entity_to_dict(entity: Category) -> dict:
+    def entity_to_dict(category: Category) -> dict[str, str | CategoryId | WorkspaceId]:
         return {
-            'id': entity.id,
-            'name': entity.name,
-            'workspace_id': entity.workspace_id,
+            'id': category.id,
+            'name': category.name,
+            'workspace_id': category.workspace_id,
         }

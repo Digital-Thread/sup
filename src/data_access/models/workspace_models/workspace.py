@@ -22,7 +22,9 @@ if TYPE_CHECKING:
 class WorkspaceModel(Base, UUIDPkMixin):
     __tablename__ = 'workspaces'
 
-    owner_id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), ForeignKey('users.id', ondelete='CASCADE'))
+    owner_id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True), ForeignKey('users.id', ondelete='CASCADE')
+    )
     name: Mapped[str] = mapped_column(unique=True, nullable=False)
     description: Mapped[Optional[str]]
     logo: Mapped[Optional[str]]
@@ -37,9 +39,15 @@ class WorkspaceModel(Base, UUIDPkMixin):
     projects: Mapped[list['ProjectModel']] = relationship(
         'ProjectModel', back_populates='workspace', cascade='all, delete-orphan'
     )
-    meets: Mapped[list['MeetModel']] = relationship('MeetModel', back_populates='workspace', cascade='all, delete-orphan')
-    roles: Mapped[list['RoleModel']] = relationship('RoleModel', back_populates='workspace', cascade='all, delete-orphan')
-    tags: Mapped[list['TagModel']] = relationship('TagModel', back_populates='workspace', cascade='all, delete-orphan')
+    meets: Mapped[list['MeetModel']] = relationship(
+        'MeetModel', back_populates='workspace', cascade='all, delete-orphan'
+    )
+    roles: Mapped[list['RoleModel']] = relationship(
+        'RoleModel', back_populates='workspace', cascade='all, delete-orphan'
+    )
+    tags: Mapped[list['TagModel']] = relationship(
+        'TagModel', back_populates='workspace', cascade='all, delete-orphan'
+    )
     categories: Mapped[list['CategoryModel']] = relationship(
         'CategoryModel', back_populates='workspace', cascade='all, delete-orphan'
     )

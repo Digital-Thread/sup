@@ -30,6 +30,4 @@ class WorkspaceInviteModel(Base, IntIdPkMixin):
         PostgreSQLUUID(as_uuid=True), ForeignKey('workspaces.id', ondelete='CASCADE')
     )
 
-    workspace: Mapped['WorkspaceModel'] = relationship(
-        'WorkspaceModel', back_populates='invites'
-    )
+    workspace: Mapped['WorkspaceModel'] = relationship('WorkspaceModel', back_populates='invites')

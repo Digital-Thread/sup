@@ -24,9 +24,7 @@ class RoleModel(Base, IntIdPkMixin):
         PostgreSQLUUID(as_uuid=True), ForeignKey('workspaces.id', ondelete='CASCADE')
     )
 
-    workspace: Mapped['WorkspaceModel'] = relationship(
-        'WorkspaceModel', back_populates='roles'
-    )
+    workspace: Mapped['WorkspaceModel'] = relationship('WorkspaceModel', back_populates='roles')
     users: Mapped[list['UserWorkspaceRoleModel']] = relationship(
         'UserWorkspaceRoleModel', back_populates='role'
     )
