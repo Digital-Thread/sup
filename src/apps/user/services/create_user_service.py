@@ -8,17 +8,16 @@ import redis.asyncio as redis  # type: ignore
 from passlib.context import CryptContext
 
 from src.apps.user.domain.entities import User
-from src.apps.user.dtos import UserCreateDTO, UserResponseDTO
+from src.apps.user.dtos import UserCreateDTO
 from src.apps.user.dtos.dtos import AdminCreateUserDTO
 from src.apps.user.exceptions import (
     LengthUserPasswordException,
     TokenActivationExpire,
     UserAlreadyExistsError,
-    UserNotFoundByEmailException,
     UserNotFoundError,
     UserPermissionError,
 )
-from src.apps.user.protocols import JWTServiceProtocol, SendMailServiceProtocol
+from src.apps.user.protocols import SendMailServiceProtocol
 from src.apps.user.repositories import IUserRepository
 from src.config import RedisConfig
 
@@ -30,14 +29,12 @@ class CreateUserService:
         send_mail_service: SendMailServiceProtocol,
         repository: IUserRepository,
         redis_config: RedisConfig,
-        token_service: JWTServiceProtocol,
     ):
         self.repository = repository
         self.pwd_context = pwd_context or CryptContext(schemes=['bcrypt'], deprecated='auto')
         self.send_mail_service = send_mail_service
         dsn = redis_config.construct_redis_dsn
         self.redis_client = redis.StrictRedis.from_url(dsn)
-        self.token_service = token_service
 
     async def create_user(self, dto: UserCreateDTO, token: str) -> User:
         existing_user = await self.repository.find_by_email(dto.email)

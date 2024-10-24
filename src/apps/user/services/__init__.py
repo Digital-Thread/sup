@@ -1,6 +1,6 @@
 from .get_user_service import GetUserService
-from .authorize_user_service import AuthorizeUserService
 from .authenticate_user_service import AuthenticateUserService
+from .authorize_user_service import AuthorizeUserService
 from .create_user_service import CreateUserService
 from .update_user_service import UpdateUserService
 

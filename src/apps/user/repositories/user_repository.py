@@ -14,7 +14,9 @@ class IUserRepository(ABC):
         pass
 
     @abstractmethod
-    async def find_all_users(self) -> List[User]:
+    async def find_all_users(
+        self, limit: int, offset: int, sort_by: Optional[str] = None, sort_order: str = 'asc'
+    ) -> List[User]:
         pass
 
     @abstractmethod

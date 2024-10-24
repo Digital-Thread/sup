@@ -9,8 +9,3 @@ class AccessTokenDTO:
 @dataclass
 class RefreshTokenDTO:
     refresh_token: str
-
-
-@dataclass
-class TokenDTO:
-    token: str

@@ -18,8 +18,10 @@ class GetUserService:
         else:
             raise UserNotFoundError()
 
-    async def get_all_users(self) -> List[User]:
-        users = await self.repository.find_all_users()
+    async def get_all_users(
+        self, limit: int, offset: int, sort_by: Optional[str] = None, sort_order: str = 'asc'
+    ) -> List[User]:
+        users = await self.repository.find_all_users(limit, offset, sort_by, sort_order)
         return users
 
     async def get_user_info(

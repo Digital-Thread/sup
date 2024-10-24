@@ -65,8 +65,19 @@ class UserRepository(IUserRepository):
         sql_user = result.scalar_one_or_none()
         return model_to_domain(sql_user) if sql_user else None
 
-    async def find_all_users(self) -> List[User]:
+
+    async def find_all_users(
+        self, limit: int, offset: int, sort_by: Optional[str] = None, sort_order: str = 'asc'
+    ) -> List[User]:
         query = select(self.model)
+        if sort_by:
+            sort_column = getattr(self.model, sort_by, None)
+            if sort_column:
+                if sort_order == 'desc':
+                    query = query.order_by(sort_column.desc())
+                else:
+                    query = query.order_by(sort_column.asc())
+        query = query.offset(offset).limit(limit)
         result = await self._session.execute(query)
         sql_users = result.scalars().all()
         return [model_to_domain(sql_user) for sql_user in sql_users]

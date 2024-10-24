@@ -1,5 +1,5 @@
 from src.apps.user.domain.entities import User
-from src.apps.user.dtos import UserResponseDTO, UserUpdateDTO
+from src.apps.user.dtos import UserUpdateDTO
 from src.apps.user.exceptions import UserAlreadyExistsError
 from src.apps.user.protocols import JWTServiceProtocol
 from src.apps.user.repositories import IUserRepository

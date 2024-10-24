@@ -1,12 +1,12 @@
 import time
-from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, Optional, Union
+from datetime import datetime, timezone
+from typing import Optional, Union
 
 import jwt
 import redis.asyncio as redis  # type: ignore
 from pydantic import EmailStr
 
-from src.apps.auth.dto import AccessTokenDTO, RefreshTokenDTO, TokenDTO
+from src.apps.auth.dto import AccessTokenDTO, RefreshTokenDTO
 from src.apps.auth.exceptions import (
     InvalidTokenError,
     TokenExpireError,

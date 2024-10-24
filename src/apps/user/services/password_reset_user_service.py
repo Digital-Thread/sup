@@ -1,6 +1,5 @@
 from src.apps.user.domain.entities import User
-from src.apps.user.dtos import AdminPasswordUpdateDTO
-from src.apps.user.dtos.dtos import UserPasswordUpdateDTO
+from src.apps.user.dtos import AdminPasswordUpdateDTO, UserPasswordUpdateDTO
 from src.apps.user.exceptions import UserNotFoundByEmailException, UserPasswordException
 from src.apps.user.repositories import IUserRepository
 from src.apps.user.services import AuthenticateUserService, CreateUserService
@@ -45,7 +44,7 @@ class PasswordResetUserService:
             user.password = self.create_service.get_password_hash(dto.new_password)
             await self.repository.update(user)
             if password_sent:
-                await self.create_service.send_mail_service.send_login_email(
+                await self.create_service.send_mail_service.password_reset_email(
                     email=user.email,
                     password=password,
                 )

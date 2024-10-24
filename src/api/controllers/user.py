@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, Dict, Optional
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Path, Query, Request, Response
@@ -14,7 +14,6 @@ from src.api.dtos.user import (
     UserUpdateDTO,
 )
 from src.apps.auth import JWTService
-from src.apps.user.dtos import UserCreateDTO as UserCreate
 from src.apps.user.services import (
     AuthenticateUserService,
     AuthorizeUserService,
@@ -73,19 +72,40 @@ async def get_user(
     get_user_service: FromDishka[GetUserService],
     authorize_service: FromDishka[AuthorizeUserService],
     email: str = Query(...),
-) -> Optional[UserResponseDTO]:
+) -> UserResponseDTO:
     user = await authenticate_and_create_tokens(request, get_user_service)
-    return await authorize_service.get_authorize_user_by_email(user=user, email=email)
+    user = await authorize_service.get_authorize_user_by_email(user=user, email=email)
+    return UserResponseDTO.model_validate(user)
 
 
-@router.get('/admin/users', response_model=List[UserResponseDTO])
+@router.get('/admin/users', response_model=Dict[str, Any])
 async def get_users(
     request: Request,
     get_user_service: FromDishka[GetUserService],
     authorize_service: FromDishka[AuthorizeUserService],
-) -> List[UserResponseDTO]:
+    page: Optional[int] = Query(1, ge=1, description='Номер страницы'),
+    limit: Optional[int] = Query(50, ge=10, le=50, description='Лимит пользователей на странице'),
+    sort_by: Optional[str] = Query(None, description='Поле для сортировки'),
+    sort_order: Optional[str] = Query(
+        'asc', regex='^(asc|desc)$', description='Порядок сортировки'
+    ),
+) -> Dict[str, Any]:
     user = await authenticate_and_create_tokens(request, get_user_service)
-    return await authorize_service.get_authorize_users(user=user)
+    await authorize_service.get_authorize_users(user=user)
+    offset = (page - 1) * limit
+    users = await get_user_service.get_all_users(
+        limit=limit, offset=offset, sort_by=sort_by, sort_order=sort_order
+    )
+
+    total_users = len(users)
+
+
+    return {
+        'page': page,
+        'limit': limit,
+        'total_users': total_users,
+        'users': [UserResponseDTO.model_validate(user) for user in users],
+    }
 
 
 @router.get('/aboutme', response_model=UserResponseDTO)
@@ -94,19 +114,7 @@ async def about_me(
     get_user_service: FromDishka[GetUserService],
 ) -> UserResponseDTO:
     user = await authenticate_and_create_tokens(request, get_user_service)
-    return UserResponseDTO(
-        first_name=user.first_name,
-        last_name=user.last_name,
-        email=user.email,
-        username_tg=user.username_tg,
-        nick_tg=user.nick_tg,
-        nick_gmeet=user.nick_gmeet,
-        nick_gitlab=user.nick_gitlab,
-        nick_github=user.nick_github,
-        avatar=user.avatar,
-        is_superuser=user.is_superuser,
-        is_active=user.is_active,
-    )
+    return UserResponseDTO.model_validate(user)
 
 
 @router.get('/invite_link')
@@ -168,20 +176,8 @@ async def create_user(
     create_user_service: FromDishka[CreateUserService],
     invite_token: str = Path(...),
 ) -> UserResponseDTO:
-    user_entity = UserCreate(
-        first_name=create_user_dto.first_name,
-        last_name=create_user_dto.last_name,
-        email=create_user_dto.email,
-        password=create_user_dto.password,
-        username_tg=create_user_dto.username_tg,
-        nick_tg=create_user_dto.nick_tg,
-        nick_gmeet=create_user_dto.nick_gmeet,
-        nick_gitlab=create_user_dto.nick_gitlab,
-        nick_github=create_user_dto.nick_github,
-        avatar=create_user_dto.avatar,
-    )
-    new_user = await create_user_service.create_user(dto=user_entity, token=invite_token)
-    return new_user
+    new_user = await create_user_service.create_user(dto=create_user_dto, token=invite_token)
+    return UserResponseDTO.model_validate(new_user)
 
 
 @router.put('/update', response_model=UserResponseDTO)
@@ -198,7 +194,7 @@ async def update_user(
         user=user, user_data=user_update_dto, user_agent=user_agent
     )
 
-    return updated_user
+    return UserResponseDTO.model_validate(updated_user)
 
 
 @router.post('/reset_password')

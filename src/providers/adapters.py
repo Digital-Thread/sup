@@ -102,14 +102,12 @@ class RepositoriesProvider(Provider):
         send_mail_service: SendMailServiceProtocol,
         repository: IUserRepository,
         redis_config: RedisConfig,
-        token_service: JWTServiceProtocol,
     ) -> CreateUserService:
         return CreateUserService(
             pwd_context=pwd_context,
             send_mail_service=send_mail_service,
             repository=repository,
             redis_config=redis_config,
-            token_service=token_service,
         )
 
     @provide(scope=scope)
@@ -133,9 +131,9 @@ class RepositoriesProvider(Provider):
     def provide_authorize_user_service(
         self,
         repository: IUserRepository,
-        token_service: JWTServiceProtocol,
+        get_user_service: GetUserService,
     ) -> AuthorizeUserService:
-        return AuthorizeUserService(repository=repository, token_service=token_service)
+        return AuthorizeUserService(repository=repository, get_user_service=get_user_service)
 
     @provide(scope=scope)
     def provide_update_user_service(

@@ -3,7 +3,6 @@ from passlib.context import CryptContext
 from src.apps.user.domain.entities import User
 from src.apps.user.dtos import AuthDTO
 from src.apps.user.exceptions import NotActivationExpire, UserPasswordException
-from src.apps.user.protocols import JWTServiceProtocol
 from src.apps.user.repositories import IUserRepository
 from src.apps.user.services import GetUserService
 

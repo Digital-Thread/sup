@@ -1,9 +1,9 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional
 
 
 @dataclass
-class BaseUserDTO:
+class UserCreateDTO:
     first_name: str
     last_name: str
     email: str
@@ -13,10 +13,6 @@ class BaseUserDTO:
     nick_gitlab: Optional[str] = None
     nick_github: Optional[str] = None
     avatar: Optional[str] = None
-
-
-@dataclass
-class UserCreateDTO(BaseUserDTO):
     password: str = None
 
 
@@ -24,12 +20,6 @@ class UserCreateDTO(BaseUserDTO):
 class AdminCreateUserDTO(UserCreateDTO):
     is_active: Optional[bool] = False
     send_mail: Optional[bool] = False
-
-
-@dataclass
-class UserResponseDTO(BaseUserDTO):
-    is_superuser: Optional[bool] = False
-    is_active: Optional[bool] = False
 
 
 @dataclass

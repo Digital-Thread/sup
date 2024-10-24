@@ -47,3 +47,6 @@ class SendMailServiceProtocol(Protocol):
 
     async def send_login_email(self, email: str, password: str) -> None:
         pass
+
+    async def password_reset_email(self, email: str, password: str) -> None:
+        pass
