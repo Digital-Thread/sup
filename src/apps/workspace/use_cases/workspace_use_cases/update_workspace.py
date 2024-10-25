@@ -1,6 +1,8 @@
+from src.apps.workspace.domain.entities.workspace import Workspace
 from src.apps.workspace.domain.types_ids import WorkspaceId
 from src.apps.workspace.dtos.workspace_dtos import UpdateWorkspaceAppDTO
 from src.apps.workspace.exceptions.workspace_exceptions import (
+    WorkspaceException,
     WorkspaceNotFound,
     WorkspaceNotUpdated,
 )
@@ -13,16 +15,27 @@ class UpdateWorkspaceUseCase:
         self.workspace_repository = workspace_repository
 
     async def execute(self, workspace_id: WorkspaceId, updated_data: UpdateWorkspaceAppDTO) -> None:
+        updated_workspace = await self._map_to_update_data(workspace_id, updated_data)
+        try:
+            await self.workspace_repository.update(updated_workspace)
+        except WorkspaceNotUpdated as error:
+            raise WorkspaceException(str(error))
+
+    async def _get_existing_workspace_by_id(self, workspace_id: WorkspaceId) -> Workspace:
         try:
             existing_workspace = await self.workspace_repository.find_by_id(workspace_id)
-        except WorkspaceNotFound:
-            pass
-            # TODO пробросить дальше
+        except WorkspaceNotFound as error:
+            raise WorkspaceException(f'{str(error)} при попытке обновить')
         else:
-            updated_workspace = WorkspaceMapper.update_data(updated_data, existing_workspace)
+            return existing_workspace
 
-            try:
-                await self.workspace_repository.update(updated_workspace)
-            except WorkspaceNotUpdated:
-                pass
-                # TODO пробросить дальше
+    async def _map_to_update_data(
+        self, workspace_id: WorkspaceId, updated_data: UpdateWorkspaceAppDTO
+    ) -> Workspace:
+        existing_workspace = await self._get_existing_workspace_by_id(workspace_id)
+        try:
+            updated_workspace = WorkspaceMapper.update_data(updated_data, existing_workspace)
+        except ValueError as error:
+            raise WorkspaceException(f'{str(error)} при попытке обновить')
+        else:
+            return updated_workspace
