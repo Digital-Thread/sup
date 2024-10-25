@@ -30,9 +30,7 @@ class WorkspaceModel(Base, UUIDPkMixin):
     logo: Mapped[Optional[str]]
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True))
 
-    owner: Mapped['UserModel'] = relationship(
-        'UserModel', back_populates='owned_workspaces', cascade='all, delete-orphan'
-    )
+    owner: Mapped['UserModel'] = relationship('UserModel', back_populates='owned_workspaces')
     members: Mapped[list['UserModel']] = relationship(
         'UserModel', secondary='workspace_members', back_populates='workspaces'
     )
