@@ -19,9 +19,7 @@ class RoleMapper(BaseMapper[Role, RoleAppDTO]):
 
     @staticmethod
     def update_data(existing_role: Role, dto: UpdateRoleAppDTO) -> Role:
-
-        for key, value in dto.items():
-            attr_name = RoleMapper.ATTRIBUTE_MAP.get(key, key)
-            setattr(existing_role, attr_name, value)
+        existing_role.name = dto.get('name')
+        existing_role.color = dto.get('color')
 
         return existing_role

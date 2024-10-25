@@ -22,8 +22,7 @@ class TagMapper(BaseMapper[Tag, TagAppDTO]):
     @staticmethod
     def update_data(existing_tag: Tag, dto: UpdateTagAppDTO) -> Tag:
 
-        for key, value in dto.items():
-            attr_name = TagMapper.ATTRIBUTE_MAP.get(key, key)
-            setattr(existing_tag, attr_name, value)
+        existing_tag.name = dto.get('name')
+        existing_tag.color = dto.get('color')
 
         return existing_tag

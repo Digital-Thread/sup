@@ -1,5 +1,3 @@
-from typing import Any
-
 from src.apps.workspace.domain.entities.workspace import Workspace
 from src.apps.workspace.domain.types_ids import (
     InviteId,
@@ -45,9 +43,8 @@ class WorkspaceMapper(BaseMapper[Workspace, WorkspaceAppDTO]):
 
     @staticmethod
     def update_data(dto: UpdateWorkspaceAppDTO, existing_workspace: Workspace) -> Workspace:
-
-        for key, value in dto.items():
-            attr_name = WorkspaceMapper.ATTRIBUTE_MAP.get(key, key)
-            setattr(existing_workspace, attr_name, value)
+        existing_workspace.name = dto.get('name')
+        existing_workspace.description = dto.get('description')
+        existing_workspace.logo = dto.get('logo')
 
         return existing_workspace
