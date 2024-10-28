@@ -5,7 +5,6 @@ from src.apps.workspace.mappers.base_mapper import BaseMapper
 
 
 class RoleMapper(BaseMapper[Role, RoleAppDTO]):
-    ATTRIBUTE_MAP = {'name': '_name', 'color': '_color'}
 
     @staticmethod
     def dto_to_entity(dto: RoleAppDTO) -> Role:
