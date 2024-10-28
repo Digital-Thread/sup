@@ -1,5 +1,5 @@
 from src.apps.workspace.domain.entities.workspace import Workspace
-from src.apps.workspace.domain.types_ids import OwnerId
+from src.apps.workspace.domain.types_ids import OwnerId, WorkspaceId, MemberId
 from src.apps.workspace.dtos.workspace_dtos import CreateWorkspaceAppDTO
 from src.apps.workspace.exceptions.workspace_exceptions import (
     OwnerWorkspaceNotFound,
@@ -22,3 +22,9 @@ class CreateWorkspaceUseCase:
             await self._workspace_repository.save(workspace)
         except (WorkspaceAlreadyExists, OwnerWorkspaceNotFound) as error:
             raise WorkspaceException(f'{str(error)}')
+        else:
+            await self._add_owner_as_member(workspace.id, workspace.owner_id)
+
+    async def _add_owner_as_member(self, workspace_id: WorkspaceId, owner_id: OwnerId) -> None:
+        """Метод для автоматического добавления пользователя, как члена рабочего пространства"""
+        await self._workspace_repository.add_member(workspace_id, MemberId(owner_id))

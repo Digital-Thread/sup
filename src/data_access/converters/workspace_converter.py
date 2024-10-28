@@ -16,7 +16,6 @@ class WorkspaceConverter:
 
     @staticmethod
     def model_to_entity(workspace_model: WorkspaceModel) -> Workspace:
-
         return Workspace(
             owner_id=OwnerId(workspace_model.owner_id),
             _name=workspace_model.name,
@@ -24,12 +23,12 @@ class WorkspaceConverter:
             _description=workspace_model.description,
             logo=workspace_model.logo,
             created_at=workspace_model.created_at,
-            invite_ids=[InviteId(invite.id) for invite in workspace_model.invites],
-            project_ids=[ProjectId(project.id) for project in workspace_model.projects],
-            meet_ids=[MeetId(meet.id) for meet in workspace_model.meets],
-            tag_ids=[TagId(tag.id) for tag in workspace_model.tags],
-            role_ids=[RoleId(role.id) for role in workspace_model.roles],
-            member_ids=[MemberId(member.id) for member in workspace_model.members],
+            # invite_ids=[InviteId(invite.id) for invite in workspace_model.invites],
+            # project_ids=[ProjectId(project.id) for project in workspace_model.projects],
+            # meet_ids=[MeetId(meet.id) for meet in workspace_model.meets],
+            # tag_ids=[TagId(tag.id) for tag in workspace_model.tags],
+            # role_ids=[RoleId(role.id) for role in workspace_model.roles],
+            # member_ids=[MemberId(member.id) for member in workspace_model.members],
         )
 
     @staticmethod

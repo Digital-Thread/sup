@@ -8,7 +8,7 @@ from sqlalchemy.orm import joinedload, selectinload
 
 from src.apps.workspace.domain.entities.role import Role
 from src.apps.workspace.domain.entities.workspace import Workspace
-from src.apps.workspace.domain.types_ids import OwnerId, RoleId, WorkspaceId
+from src.apps.workspace.domain.types_ids import OwnerId, RoleId, WorkspaceId, MemberId
 from src.apps.workspace.exceptions.role_exceptions import RoleNotFound
 from src.apps.workspace.exceptions.workspace_exceptions import (
     OwnerWorkspaceNotFound,
@@ -23,7 +23,7 @@ from src.data_access.models import (
     RoleModel,
     UserModel,
     UserWorkspaceRoleModel,
-    WorkspaceModel,
+    WorkspaceModel, WorkspaceMemberModel,
 )
 
 
@@ -36,6 +36,7 @@ class WorkspaceRepository(IWorkspaceRepository):
         self._session.add(stmt)
         try:
             await self._session.flush()
+            workspace._id = stmt.id
         except IntegrityError as error:
             warning(error)
             if isinstance(error.orig.__cause__, ForeignKeyViolationError):
@@ -90,6 +91,14 @@ class WorkspaceRepository(IWorkspaceRepository):
             raise WorkspaceNotFound(
                 f'Рабочее пространство с id = {workspace_id} не было найдено при удалении'
             )
+
+    async def add_member(self, workspace_id: WorkspaceId, user_id: MemberId) -> None:
+        stmt = WorkspaceMemberModel(workspace_id=workspace_id, user_id=user_id)
+        self._session.add(stmt)
+        try:
+            await self._session.flush()
+        except IntegrityError as error:
+            warning(error)
 
     async def assign_role_to_user(
         self, workspace_id: WorkspaceId, user_id: OwnerId, role_id: RoleId

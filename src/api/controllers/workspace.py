@@ -84,7 +84,7 @@ async def update_workspace(
     return {'redirect_url': '/'}
 
 
-@workspace_router.delete('/{workspace_id}', status_code=status.HTTP_204_NO_CONTENT)
+@workspace_router.delete('/{workspace_id}')
 @inject
 async def delete_workspace(
     workspace_id: WorkspaceId, use_case: FromDishka[DeleteWorkspaceUseCase]
