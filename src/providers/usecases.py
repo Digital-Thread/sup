@@ -1,18 +1,18 @@
 from dishka import Provider, Scope, provide
 
+from src.apps.workspace.use_cases.role_use_cases import (
+    CreateRoleUseCase,
+    DeleteRoleUseCase,
+    GetRoleByIdUseCase,
+    GetRoleByWorkspaceUseCase,
+    UpdateRoleUseCase,
+)
 from src.apps.workspace.use_cases.workspace_use_cases import (
     CreateWorkspaceUseCase,
     DeleteWorkspaceUseCase,
     GetWorkspaceByIdUseCase,
     GetWorkspaceByMemberUseCase,
     UpdateWorkspaceUseCase,
-)
-from src.apps.workspace.use_cases.role_use_cases import (
-    CreateRoleUseCase,
-    DeleteRoleUseCase,
-    GetRoleByIdUseCase,
-    GetRoleByWorkspaceUseCase,
-    UpdateRoleUseCase
 )
 
 
