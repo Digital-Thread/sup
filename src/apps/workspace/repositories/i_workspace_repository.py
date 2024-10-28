@@ -5,7 +5,23 @@ from src.apps.workspace.domain.types_ids import MemberId, OwnerId, RoleId, Works
 from src.apps.workspace.repositories.base_repository import IBaseRepository
 
 
-class IWorkspaceRepository(IBaseRepository[Workspace, WorkspaceId]):
+class IWorkspaceRepository:
+    @abstractmethod
+    async def save(self, workspace: Workspace) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def find_by_id(self, workspace_id: WorkspaceId) -> Workspace | None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def update(self, workspace: Workspace) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def delete(self, workspace_id: WorkspaceId) -> None:
+        raise NotImplementedError
+
     @abstractmethod
     async def find_by_member_id(self, member_id: MemberId) -> list[Workspace]:
         raise NotImplementedError
