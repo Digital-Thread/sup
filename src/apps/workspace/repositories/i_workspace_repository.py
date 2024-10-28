@@ -1,13 +1,13 @@
 from abc import abstractmethod
 
 from src.apps.workspace.domain.entities.workspace import Workspace
-from src.apps.workspace.domain.types_ids import OwnerId, RoleId, WorkspaceId, MemberId
+from src.apps.workspace.domain.types_ids import MemberId, OwnerId, RoleId, WorkspaceId
 from src.apps.workspace.repositories.base_repository import IBaseRepository
 
 
 class IWorkspaceRepository(IBaseRepository[Workspace, WorkspaceId]):
     @abstractmethod
-    async def find_by_owner_id(self, owner_id: OwnerId) -> list[Workspace]:
+    async def find_by_member_id(self, member_id: MemberId) -> list[Workspace]:
         raise NotImplementedError
 
     @abstractmethod

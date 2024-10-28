@@ -7,7 +7,7 @@ from src.api.dtos.workspace_dtos import (
     ResponseWorkspaceDTO,
     UpdateWorkspaceDTO,
 )
-from src.apps.workspace.domain.types_ids import OwnerId, WorkspaceId
+from src.apps.workspace.domain.types_ids import MemberId, WorkspaceId
 from src.apps.workspace.dtos.workspace_dtos import (
     CreateWorkspaceAppDTO,
     UpdateWorkspaceAppDTO,
@@ -17,7 +17,7 @@ from src.apps.workspace.use_cases.workspace_use_cases import (
     CreateWorkspaceUseCase,
     DeleteWorkspaceUseCase,
     GetWorkspaceByIdUseCase,
-    GetWorkspaceByOwnerUseCase,
+    GetWorkspaceByMemberUseCase,
     UpdateWorkspaceUseCase,
 )
 
@@ -57,11 +57,11 @@ async def get_workspace_by_id(
     '/', status_code=status.HTTP_200_OK, response_model=list[ResponseWorkspaceDTO]
 )
 @inject
-async def get_workspaces_by_owner_id(
-    owner_id: OwnerId, use_case: FromDishka[GetWorkspaceByOwnerUseCase]
+async def get_workspaces_by_member_id(
+    member_id: MemberId, use_case: FromDishka[GetWorkspaceByMemberUseCase]
 ) -> list[ResponseWorkspaceDTO]:
     try:
-        response = await use_case.execute(owner_id)
+        response = await use_case.execute(member_id)
     except WorkspaceException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'{str(e)}')
 

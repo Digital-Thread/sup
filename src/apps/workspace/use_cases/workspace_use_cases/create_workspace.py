@@ -1,8 +1,8 @@
 from src.apps.workspace.domain.entities.workspace import Workspace
-from src.apps.workspace.domain.types_ids import OwnerId, WorkspaceId, MemberId
+from src.apps.workspace.domain.types_ids import MemberId, OwnerId, WorkspaceId
 from src.apps.workspace.dtos.workspace_dtos import CreateWorkspaceAppDTO
 from src.apps.workspace.exceptions.workspace_exceptions import (
-    OwnerWorkspaceNotFound,
+    MemberWorkspaceNotFound,
     WorkspaceAlreadyExists,
     WorkspaceException,
 )
@@ -20,7 +20,7 @@ class CreateWorkspaceUseCase:
 
         try:
             await self._workspace_repository.save(workspace)
-        except (WorkspaceAlreadyExists, OwnerWorkspaceNotFound) as error:
+        except (WorkspaceAlreadyExists, MemberWorkspaceNotFound) as error:
             raise WorkspaceException(f'{str(error)}')
         else:
             await self._add_owner_as_member(workspace.id, workspace.owner_id)

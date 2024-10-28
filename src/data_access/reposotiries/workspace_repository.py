@@ -4,14 +4,14 @@ from asyncpg.exceptions import ForeignKeyViolationError
 from sqlalchemy import delete, exists, select, update
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload, selectinload
+from sqlalchemy.orm import joinedload
 
 from src.apps.workspace.domain.entities.role import Role
 from src.apps.workspace.domain.entities.workspace import Workspace
-from src.apps.workspace.domain.types_ids import OwnerId, RoleId, WorkspaceId, MemberId
+from src.apps.workspace.domain.types_ids import MemberId, OwnerId, RoleId, WorkspaceId
 from src.apps.workspace.exceptions.role_exceptions import RoleNotFound
 from src.apps.workspace.exceptions.workspace_exceptions import (
-    OwnerWorkspaceNotFound,
+    MemberWorkspaceNotFound,
     WorkspaceAlreadyExists,
     WorkspaceNotFound,
     WorkspaceNotUpdated,
@@ -23,7 +23,8 @@ from src.data_access.models import (
     RoleModel,
     UserModel,
     UserWorkspaceRoleModel,
-    WorkspaceModel, WorkspaceMemberModel,
+    WorkspaceMemberModel,
+    WorkspaceModel,
 )
 
 
@@ -36,11 +37,11 @@ class WorkspaceRepository(IWorkspaceRepository):
         self._session.add(stmt)
         try:
             await self._session.flush()
-            workspace._id = stmt.id
+            workspace._id = WorkspaceId(stmt.id)
         except IntegrityError as error:
             warning(error)
             if isinstance(error.orig.__cause__, ForeignKeyViolationError):
-                raise OwnerWorkspaceNotFound(f'Владелец с id={workspace.owner_id} не существует')
+                raise MemberWorkspaceNotFound(f'Владелец с id={workspace.owner_id} не существует')
             raise WorkspaceAlreadyExists(
                 f'Рабочее пространство с именем {workspace.name} уже существует'
             )
@@ -57,18 +58,18 @@ class WorkspaceRepository(IWorkspaceRepository):
             workspace_entity = WorkspaceConverter.model_to_entity(workspace_model)
             return workspace_entity
 
-    async def find_by_owner_id(self, owner_id: OwnerId) -> list[Workspace]:
+    async def find_by_member_id(self, member_id: MemberId) -> list[Workspace]:
         query = (
             select(WorkspaceModel)
-            .options(selectinload(WorkspaceModel.members))
-            .filter_by(owner_id=owner_id)
+            .join(WorkspaceMemberModel, WorkspaceModel.id == WorkspaceMemberModel.workspace_id)
+            .filter(WorkspaceMemberModel.user_id == member_id)
         )
         result = await self._session.execute(query)
         try:
             workspace_models = result.scalars().all()
         except NoResultFound as error:
             warning(error)
-            raise OwnerWorkspaceNotFound(f'Владелец с id={owner_id} не найден.')
+            raise MemberWorkspaceNotFound(f'Участник с id={member_id} не найден.')
         else:
             workspaces = [
                 WorkspaceConverter.model_to_entity(workspace) for workspace in workspace_models
