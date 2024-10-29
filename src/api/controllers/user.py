@@ -99,7 +99,6 @@ async def get_users(
 
     total_users = len(users)
 
-
     return {
         'page': page,
         'limit': limit,
@@ -171,12 +170,26 @@ async def create_user_by_admin(
 
 
 @router.post('/registration/{invite_token}', response_model=UserResponseDTO)
-async def create_user(
+async def create_user_by_invite(
     create_user_dto: UserCreateDTO,
     create_user_service: FromDishka[CreateUserService],
     invite_token: str = Path(...),
+) -> dict[str, UserResponseDTO]:
+    new_user, inviter_user_id = await create_user_service.create_user_by_invite(
+        dto=create_user_dto, token=invite_token
+    )
+    return {
+        'new_user': UserResponseDTO.model_validate(new_user),
+        'inviter_user_id': inviter_user_id,
+    }
+
+
+@router.post('/registration', response_model=UserResponseDTO)
+async def create_user(
+    create_user_dto: UserCreateDTO,
+    create_user_service: FromDishka[CreateUserService],
 ) -> UserResponseDTO:
-    new_user = await create_user_service.create_user(dto=create_user_dto, token=invite_token)
+    new_user = await create_user_service.create_user(dto=create_user_dto)
     return UserResponseDTO.model_validate(new_user)
 
 

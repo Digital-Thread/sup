@@ -65,7 +65,6 @@ class UserRepository(IUserRepository):
         sql_user = result.scalar_one_or_none()
         return model_to_domain(sql_user) if sql_user else None
 
-
     async def find_all_users(
         self, limit: int, offset: int, sort_by: Optional[str] = None, sort_order: str = 'asc'
     ) -> List[User]:
