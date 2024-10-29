@@ -7,6 +7,13 @@ from src.apps.workspace.use_cases.role_use_cases import (
     GetRoleByWorkspaceUseCase,
     UpdateRoleUseCase,
 )
+from src.apps.workspace.use_cases.tag_use_cases import (
+    CreateTagUseCase,
+    DeleteTagUseCase,
+    GetTagByIdUseCase,
+    GetTagByWorkspaceUseCase,
+    UpdateTagUseCase,
+)
 from src.apps.workspace.use_cases.workspace_use_cases import (
     CreateWorkspaceUseCase,
     DeleteWorkspaceUseCase,
@@ -34,3 +41,13 @@ class RoleUseCaseProvider(Provider):
     get_role_by_workspace = provide(GetRoleByWorkspaceUseCase)
     update_role = provide(UpdateRoleUseCase)
     delete_role = provide(DeleteRoleUseCase)
+
+
+class TagUseCaseProvider(Provider):
+    scope = Scope.REQUEST
+
+    create_tag = provide(CreateTagUseCase)
+    get_tag_by_id = provide(GetTagByIdUseCase)
+    get_tag_by_workspace = provide(GetTagByWorkspaceUseCase)
+    update_tag = provide(UpdateTagUseCase)
+    delete_tag = provide(DeleteTagUseCase)

@@ -16,7 +16,11 @@ from src.providers.adapters import (
     RepositoriesProvider,
     SqlalchemyProvider,
 )
-from src.providers.usecases import RoleUseCaseProvider, WorkspaceUseCaseProvider
+from src.providers.usecases import (
+    RoleUseCaseProvider,
+    TagUseCaseProvider,
+    WorkspaceUseCaseProvider,
+)
 from src.utils import log
 
 logger = structlog.stdlib.get_logger()
@@ -36,6 +40,7 @@ def container_factory() -> AsyncContainer:
         RepositoriesProvider(),
         WorkspaceUseCaseProvider(),
         RoleUseCaseProvider(),
+        TagUseCaseProvider(),
     )
 
 
