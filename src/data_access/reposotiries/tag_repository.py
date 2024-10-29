@@ -1,18 +1,21 @@
 from logging import warning
 
-from sqlalchemy import delete, select, update
-from sqlalchemy.exc import IntegrityError
+from asyncpg.exceptions import UniqueViolationError
+from sqlalchemy import delete, exists, select, update
+from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.apps.workspace.domain.entities.tag import Tag
 from src.apps.workspace.domain.types_ids import TagId, WorkspaceId
 from src.apps.workspace.exceptions.tag_exceptions import (
-    TagCreatedException,
-    TagNotDeleted,
+    TagAlreadyExists,
+    TagNotFound,
     TagNotUpdated,
+    WorkspaceTagNotFound,
 )
 from src.apps.workspace.repositories.i_tag_repository import ITagRepository
 from src.data_access.converters.tag_converter import TagConverter
+from src.data_access.models import WorkspaceModel
 from src.data_access.models.workspace_models.tag import TagModel
 
 
@@ -28,17 +31,34 @@ class TagRepository(ITagRepository):
             await self._session.flush()
         except IntegrityError as error:
             warning(error)
-            raise TagCreatedException('Ошибка создания тега')
+            if isinstance(error.orig.__cause__, UniqueViolationError):
+                raise TagAlreadyExists(
+                    'Тег с таким именем в этом рабочем пространстве уже существует.'
+                )
 
-    async def find_by_id(self, tag_id: TagId) -> Tag | None:
-        query: TagModel | None = await self._session.get(TagModel, tag_id)
-        tag = TagConverter.model_to_entity(query) if query else None
-        return tag
+            raise WorkspaceTagNotFound(
+                f'Рабочего пространства с id={tag.workspace_id} не существует'
+            )
+
+    async def find_by_id(self, tag_id: TagId, workspace_id: WorkspaceId) -> Tag | None:
+        query = select(TagModel).filter_by(id=tag_id, workspace_id=workspace_id)
+        result = await self._session.execute(query)
+        try:
+            tag_model = result.scalar_one()
+        except NoResultFound as error:
+            warning(error)
+            raise TagNotFound(f'Тег с id={tag_id} не найден')
+        else:
+            return TagConverter.model_to_entity(tag_model)
 
     async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[Tag]:
         query = select(TagModel).filter_by(workspace_id=workspace_id)
         result = await self._session.execute(query)
         tags = [TagConverter.model_to_entity(tag) for tag in result.scalars().all()]
+        if not tags:
+            if not await self._session.get(WorkspaceModel, workspace_id):
+                raise WorkspaceTagNotFound(f'Рабочее пространство с id={workspace_id} не найдено')
+
         return tags
 
     async def update(self, tag: Tag) -> None:
@@ -49,9 +69,13 @@ class TagRepository(ITagRepository):
         if result.rowcount == 0:
             raise TagNotUpdated(f'Тег с id={tag.id} не обновлен')
 
-    async def delete(self, tag_id: TagId) -> None:
-        stmt = delete(TagModel).filter_by(id=tag_id)
-        result = await self._session.execute(stmt)
+    async def delete(self, tag_id: TagId, workspace_id: WorkspaceId) -> None:
+        exists_tag = await self._session.execute(
+            select(exists().where(TagModel.id == tag_id, TagModel.workspace_id == workspace_id))
+        )
 
-        if result.rowcount == 0:
-            raise TagNotDeleted(f'Тег с id={tag_id} не удален')
+        if not exists_tag.scalar():
+            raise TagNotFound(f'Тег с id={tag_id} не найден в рабочем пространстве')
+
+        stmt = delete(TagModel).filter_by(id=tag_id, workspace_id=workspace_id)
+        await self._session.execute(stmt)
