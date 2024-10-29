@@ -1,19 +1,19 @@
 """empty message
 
-Revision ID: 66f7078dbad2
+Revision ID: 17e6b71f043e
 Revises:
-Create Date: 2024-10-25 07:57:59.752715
+Create Date: 2024-10-29 09:07:56.331034
 
 """
 
 from typing import Sequence, Union
 
-import sqlalchemy as sa
 from alembic import op
+import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '66f7078dbad2'
+revision: str = '17e6b71f043e'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -105,6 +105,7 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint('id', name=op.f('pk_tags')),
         sa.UniqueConstraint('id', name=op.f('uq_tags_id')),
+        sa.UniqueConstraint('name', 'workspace_id', name='uix_name_workspace_id'),
     )
     op.create_table(
         'workspace_invites',

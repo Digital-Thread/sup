@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -24,3 +24,5 @@ class TagModel(Base, IntIdPkMixin):
 
     workspace: Mapped['WorkspaceModel'] = relationship('WorkspaceModel', back_populates='tags')
     features: Mapped[list['FeatureModel']] = relationship('FeatureModel', back_populates='tag')
+
+    __table_args__ = (UniqueConstraint('name', 'workspace_id', name='uix_name_workspace_id'),)
