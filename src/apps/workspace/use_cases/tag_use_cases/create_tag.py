@@ -1,7 +1,11 @@
 from src.apps.workspace.domain.entities.tag import Tag
 from src.apps.workspace.domain.types_ids import WorkspaceId
 from src.apps.workspace.dtos.tag_dtos import CreateTagAppDTO
-from src.apps.workspace.exceptions.tag_exceptions import TagCreatedException
+from src.apps.workspace.exceptions.tag_exceptions import (
+    TagAlreadyExists,
+    TagException,
+    WorkspaceTagNotFound,
+)
 from src.apps.workspace.repositories.i_tag_repository import ITagRepository
 
 
@@ -19,6 +23,5 @@ class CreateTagUseCase:
                     _workspace_id=WorkspaceId(tag_data['workspace_id']),
                 )
             )
-        except TagCreatedException:
-            pass
-            # TODO пробросить дальше
+        except (ValueError, WorkspaceTagNotFound, TagAlreadyExists) as error:
+            raise TagException(f'{str(error)}')
