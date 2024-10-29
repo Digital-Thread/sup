@@ -17,7 +17,12 @@ class TagConverter:
 
     @staticmethod
     def entity_to_model(entity: Tag) -> TagModel:
-        model = TagModel(**entity.__dict__)
+        model = TagModel(
+            id=entity.id,
+            name=entity.name,
+            color=entity.color,
+            workspace_id=entity.workspace_id,
+        )
         return model
 
     @staticmethod

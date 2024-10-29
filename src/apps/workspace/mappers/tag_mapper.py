@@ -7,7 +7,6 @@ from src.apps.workspace.mappers.base_mapper import BaseMapper
 
 
 class TagMapper(BaseMapper[Tag, TagAppDTO]):
-    ATTRIBUTE_MAP = {'name': '_name', 'color': '_color'}
 
     @staticmethod
     def dto_to_entity(dto: TagAppDTO) -> Tag:
@@ -21,8 +20,8 @@ class TagMapper(BaseMapper[Tag, TagAppDTO]):
 
     @staticmethod
     def update_data(existing_tag: Tag, dto: UpdateTagAppDTO) -> Tag:
-
-        existing_tag.name = dto.get('name')
-        existing_tag.color = dto.get('color')
+        for field, value in dto.items():
+            if value is not None:
+                setattr(existing_tag, field, value)
 
         return existing_tag
