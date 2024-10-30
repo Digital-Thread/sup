@@ -1,6 +1,8 @@
-from src.apps.workspace.domain.types_ids import CategoryId
+from src.apps.workspace.domain.entities.category import Category
+from src.apps.workspace.domain.types_ids import CategoryId, WorkspaceId
 from src.apps.workspace.dtos.category_dtos import UpdateCategoryAppDTO
 from src.apps.workspace.exceptions.category_exceptions import (
+    CategoryException,
     CategoryNotFound,
     CategoryNotUpdated,
 )
@@ -12,17 +14,33 @@ class UpdateCategoryUseCase:
     def __init__(self, category_repository: ICategoryRepository):
         self.category_repository = category_repository
 
-    async def execute(self, category_id: CategoryId, update_data: UpdateCategoryAppDTO) -> None:
+    async def execute(
+        self, category_id: CategoryId, workspace_id: WorkspaceId, update_data: UpdateCategoryAppDTO
+    ) -> None:
+        existing_category = await self._get_existing_category_in_workspace(
+            category_id, workspace_id
+        )
+        updated_category = self._map_to_update_data(existing_category, update_data)
         try:
-            existing_category = await self.category_repository.find_by_id(category_id)
-        except CategoryNotFound:
-            pass
-            # TODO пробросить дальше
-        else:
-            update_category = CategoryMapper.update_data(existing_category, update_data)
+            await self.category_repository.update(updated_category)
+        except CategoryNotUpdated as error:
+            raise CategoryException(f'{str(error)}')
 
-            try:
-                await self.category_repository.update(update_category)
-            except CategoryNotUpdated:
-                pass
-                # TODO пробросить дальше
+    async def _get_existing_category_in_workspace(
+        self, category_id: CategoryId, workspace_id: WorkspaceId
+    ) -> Category:
+        try:
+            existing_category = await self.category_repository.find_by_id(category_id, workspace_id)
+        except CategoryNotFound as error:
+            raise CategoryException(f'{str(error)}')
+        else:
+            return existing_category
+
+    @staticmethod
+    def _map_to_update_data(category: Category, update_data: UpdateCategoryAppDTO) -> Category:
+        try:
+            updated_category = CategoryMapper.update_data(category, update_data)
+        except ValueError as error:
+            raise CategoryException(f'{str(error)}')
+        else:
+            return updated_category
