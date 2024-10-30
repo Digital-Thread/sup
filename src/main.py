@@ -20,6 +20,7 @@ from src.providers.usecases import (
     CategoryUseCaseProvider,
     RoleUseCaseProvider,
     TagUseCaseProvider,
+    WorkspaceInviteUseCaseProvider,
     WorkspaceUseCaseProvider,
 )
 from src.utils import log
@@ -43,6 +44,7 @@ def container_factory() -> AsyncContainer:
         RoleUseCaseProvider(),
         TagUseCaseProvider(),
         CategoryUseCaseProvider(),
+        WorkspaceInviteUseCaseProvider(),
     )
 
 

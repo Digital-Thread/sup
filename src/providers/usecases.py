@@ -21,6 +21,13 @@ from src.apps.workspace.use_cases.tag_use_cases import (
     GetTagByWorkspaceUseCase,
     UpdateTagUseCase,
 )
+from src.apps.workspace.use_cases.workspace_invite_use_cases import (
+    CreateWorkspaceInviteUseCase,
+    DeleteWorkspaceInviteUseCase,
+    GetWorkspaceInviteByIdUseCase,
+    GetWorkspaceInviteByWorkspaceUseCase,
+    UpdateWorkspaceInviteUseCase,
+)
 from src.apps.workspace.use_cases.workspace_use_cases import (
     CreateWorkspaceUseCase,
     DeleteWorkspaceUseCase,
@@ -68,3 +75,13 @@ class CategoryUseCaseProvider(Provider):
     get_category_by_workspace = provide(GetCategoryByWorkspaceUseCase)
     update_category = provide(UpdateCategoryUseCase)
     delete_category = provide(DeleteCategoryUseCase)
+
+
+class WorkspaceInviteUseCaseProvider(Provider):
+    scope = Scope.REQUEST
+
+    create_workspace_invite = provide(CreateWorkspaceInviteUseCase)
+    get_workspace_invite_by_id = provide(GetWorkspaceInviteByIdUseCase)
+    get_workspace_invite_by_workspace = provide(GetWorkspaceInviteByWorkspaceUseCase)
+    update_workspace_invite = provide(UpdateWorkspaceInviteUseCase)
+    delete_workspace_invite = provide(DeleteWorkspaceInviteUseCase)
