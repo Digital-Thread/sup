@@ -14,8 +14,12 @@ class CategoryConverter:
         return category
 
     @staticmethod
-    def entity_to_model(entity: Category) -> CategoryModel:
-        model = CategoryModel(**entity.__dict__)
+    def entity_to_model(category: Category) -> CategoryModel:
+        model = CategoryModel(
+            id=category.id,
+            name=category.name,
+            workspace_id=category.workspace_id,
+        )
         return model
 
     @staticmethod
