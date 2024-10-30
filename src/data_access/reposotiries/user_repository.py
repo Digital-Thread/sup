@@ -60,7 +60,7 @@ class UserRepository(IUserRepository):
         await self._session.commit()
 
     async def find_by_email(self, email: str) -> Optional[User]:
-        query = select(self.model).where(self.model.email == email)
+        query = select(self.model).where(self.model.email == email.lower())
         result = await self._session.execute(query)
         sql_user = result.scalar_one_or_none()
         return model_to_domain(sql_user) if sql_user else None

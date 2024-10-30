@@ -46,6 +46,9 @@ class User:
         return self._id
 
     def __post_init__(self) -> None:
+        self.first_name = self.first_name.capitalize()
+        self.last_name = self.last_name.capitalize()
+        self.email = self.email.lower()
         self._validate_all_fields()
         self._validate_password(password=self.password)
 
@@ -60,9 +63,9 @@ class User:
         ]:
             value = getattr(self, field_name)
             self._validate_length(value, field_name)
+
             if field_name in ['first_name', 'last_name']:
                 self._validate_name(value)
-        self._validate_email(self.email)
 
         if not (self.nick_gitlab or self.nick_github):
             raise OneOfTheExpire()
@@ -80,11 +83,10 @@ class User:
             raise ValidateLengthError(field_name, max_length)
 
     @staticmethod
-    def _validate_name(name: str) -> str:
+    def _validate_name(name: str) -> None:
         pattern = r'^[a-zA-Zа-яА-ЯёЁ]+$'
         if not re.match(pattern, name):
             raise InvalidNameError()
-        return name.capitalize() if isinstance(name, str) else name
 
     @staticmethod
     def _validate_email(email: str) -> None:

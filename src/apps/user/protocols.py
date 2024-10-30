@@ -32,6 +32,9 @@ class JWTServiceProtocol(Protocol):
     async def removing_tokens(self, email: EmailStr, user_agent: str) -> None:
         pass
 
+    async def delete_tokens_user(self, email: EmailStr) -> None:
+        pass
+
 
 @dataclass
 class SendMailServiceProtocol(Protocol):

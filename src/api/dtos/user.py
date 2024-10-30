@@ -1,4 +1,5 @@
 from typing import Optional
+from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, EmailStr
 
@@ -29,6 +30,11 @@ class UserResponseDTO(UserUpdateDTO):
     is_active: Optional[bool] = False
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class RegistrationResponseDTO(BaseModel):
+    new_user: UserResponseDTO
+    inviter_user_id: UUID
 
 
 class UserPasswordUpdateDTO(BaseModel):

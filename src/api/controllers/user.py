@@ -4,16 +4,17 @@ from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Path, Query, Request, Response
 
 from src.api.dependencies.auth_helpers import authenticate_and_create_tokens
-from src.api.dtos.user import (
+from src.api.dtos.user import (  # UserCreateDTO,
     AdminCreateUserDTO,
     AdminPasswordUpdateDTO,
     AuthDTO,
-    UserCreateDTO,
+    RegistrationResponseDTO,
     UserPasswordUpdateDTO,
     UserResponseDTO,
     UserUpdateDTO,
 )
 from src.apps.auth import JWTService
+from src.apps.user.dtos import UserCreateDTO
 from src.apps.user.services import (
     AuthenticateUserService,
     AuthorizeUserService,
@@ -120,14 +121,12 @@ async def about_me(
 async def invite_link(
     request: Request,
     get_user_service: FromDishka[GetUserService],
-    authorize_service: FromDishka[AuthorizeUserService],
     create_user_service: FromDishka[CreateUserService],
     email: str = Query(...),
 ) -> dict[str, str]:
     user = await authenticate_and_create_tokens(request, get_user_service)
 
-    await authorize_service.get_access_admin(user=user)
-    await create_user_service.send_invite_link(email=email)
+    await create_user_service.send_invite_link(from_email=user.email, to_email=email)
 
     return {'detail': f'Инвайт отправлен на почту {email}'}
 
@@ -169,19 +168,19 @@ async def create_user_by_admin(
     return {'detail': f'Пользователь зарегистрирован email: {user_email} пароль: {user_password}'}
 
 
-@router.post('/registration/{invite_token}', response_model=UserResponseDTO)
+@router.post('/registration/{invite_token}', response_model=RegistrationResponseDTO)
 async def create_user_by_invite(
     create_user_dto: UserCreateDTO,
     create_user_service: FromDishka[CreateUserService],
     invite_token: str = Path(...),
-) -> dict[str, UserResponseDTO]:
+) -> RegistrationResponseDTO:
     new_user, inviter_user_id = await create_user_service.create_user_by_invite(
         dto=create_user_dto, token=invite_token
     )
-    return {
-        'new_user': UserResponseDTO.model_validate(new_user),
-        'inviter_user_id': inviter_user_id,
-    }
+    return RegistrationResponseDTO(
+        new_user=UserResponseDTO.model_validate(new_user),
+        inviter_user_id=inviter_user_id,
+    )
 
 
 @router.post('/registration', response_model=UserResponseDTO)
@@ -241,12 +240,17 @@ async def reset_password_by_admin(
 
 @router.delete('/remove')
 async def remove_user(
+    response: Response,
     request: Request,
     get_user_service: FromDishka[GetUserService],
     remove_user_service: FromDishka[RemoveUserService],
+    token_service: FromDishka[JWTService],
 ) -> dict[str, str]:
     user = await authenticate_and_create_tokens(request, get_user_service)
     await remove_user_service.remove_user(email=user.email)
+    await token_service.delete_tokens_user(email=user.email)
+    response.delete_cookie('sup_access_token')
+    response.delete_cookie('sup_refresh_token')
     return {'detail': f'Пользователь с email:{user.email} - удален'}
 
 
@@ -256,9 +260,11 @@ async def remove_user_by_admin(
     get_user_service: FromDishka[GetUserService],
     remove_user_service: FromDishka[RemoveUserService],
     authorize_service: FromDishka[AuthorizeUserService],
+    token_service: FromDishka[JWTService],
     email: str = Query(...),
 ) -> dict[str, str]:
     user = await authenticate_and_create_tokens(request, get_user_service)
     await authorize_service.get_access_admin(user)
+    await token_service.delete_tokens_user(email=email)
     await remove_user_service.remove_user(email=email)
     return {'detail': f'Пользователь с email:{email} - удален'}

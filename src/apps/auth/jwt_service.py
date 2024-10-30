@@ -4,7 +4,6 @@ from typing import Optional, Union
 
 import jwt
 import redis.asyncio as redis  # type: ignore
-from pydantic import EmailStr
 
 from src.apps.auth.dto import AccessTokenDTO, RefreshTokenDTO
 from src.apps.auth.exceptions import (
@@ -26,7 +25,7 @@ class JWTService:
         dsn = redis_config.construct_redis_dsn
         self.redis_client = redis.StrictRedis.from_url(dsn)
 
-    async def create_access_token(self, email: EmailStr) -> tuple[AccessTokenDTO, int]:
+    async def create_access_token(self, email: str) -> tuple[AccessTokenDTO, int]:
         expiration_access = datetime.now(timezone.utc) + self.access_token_lifetime
         max_age_access = int(expiration_access.timestamp()) - int(time.time())
         access_token = jwt.encode(
@@ -34,7 +33,7 @@ class JWTService:
         )
         return access_token, max_age_access
 
-    async def create_refresh_token(self, email: EmailStr) -> tuple[RefreshTokenDTO, int]:
+    async def create_refresh_token(self, email: str) -> tuple[RefreshTokenDTO, int]:
         expiration_refresh = datetime.now(timezone.utc) + self.refresh_token_lifetime
         max_age_refresh = int(expiration_refresh.timestamp()) - int(time.time())
         refresh_token = jwt.encode(
@@ -63,7 +62,7 @@ class JWTService:
             raise InvalidTokenError()
 
     async def creating_tokens(
-        self, email: EmailStr, user_agent: str
+        self, email: str, user_agent: str
     ) -> tuple[AccessTokenDTO, int, RefreshTokenDTO, int]:
         access_token, access_max_age = await self.create_access_token(email)
         refresh_token, refresh_max_age = await self.create_refresh_token(email)
@@ -76,13 +75,13 @@ class JWTService:
         )
         return access_token, access_max_age, refresh_token, refresh_max_age
 
-    async def removing_tokens(self, email: EmailStr, user_agent: str) -> None:
+    async def removing_tokens(self, email: str, user_agent: str) -> None:
         await self.redis_client.delete(f'access_token:{email}/{user_agent}')
         await self.redis_client.delete(f'refresh_token:{email}/{user_agent}')
         return
 
     async def access_token_protected_resource(
-        self, email: EmailStr, access_token_client: str, user_agent: str
+        self, email: str, access_token_client: str, user_agent: str
     ) -> Union[bool, RefreshTokenDTO]:
         access_token = await self.redis_client.get(f'access_token:{email}/{user_agent}')
         if access_token is not None:
@@ -94,7 +93,7 @@ class JWTService:
         return False
 
     async def refresh_token_protected_resource(
-        self, email: EmailStr, refresh_token_client: str, user_agent: str
+        self, email: str, refresh_token_client: str, user_agent: str
     ) -> bool:
         refresh_token = await self.redis_client.get(f'refresh_token:{email}/{user_agent}')
         if refresh_token is not None:
@@ -102,3 +101,12 @@ class JWTService:
         if refresh_token == refresh_token_client:
             return True
         raise TokenRefreshExpireError()
+
+    async def delete_tokens_user(self, email: str) -> None:
+        pattern = f'access_token:{email}/*'
+        async for key in self.redis_client.scan_iter(pattern):
+            await self.redis_client.delete(key)
+
+        pattern = f'refresh_token:{email}/*'
+        async for key in self.redis_client.scan_iter(pattern):
+            await self.redis_client.delete(key)
