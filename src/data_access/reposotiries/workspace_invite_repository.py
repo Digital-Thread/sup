@@ -1,17 +1,15 @@
 from logging import warning
-from typing import Optional
-from uuid import UUID
 
-from sqlalchemy import delete, select, update
+from sqlalchemy import delete, exists, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.apps.workspace.domain.entities.workspace_invite import WorkspaceInvite
 from src.apps.workspace.domain.types_ids import InviteId, WorkspaceId
 from src.apps.workspace.exceptions.workspace_invite_exceptions import (
-    WorkspaceInviteCreatedException,
-    WorkspaceInviteNotDeleted,
+    WorkspaceInviteNotFound,
     WorkspaceInviteNotUpdated,
+    WorkspaceWorkspaceInviteNotFound,
 )
 from src.apps.workspace.repositories.i_workspace_invite_repository import (
     IWorkspaceInviteRepository,
@@ -36,9 +34,13 @@ class WorkspaceInviteRepository(IWorkspaceInviteRepository):
             await self._session.flush()
         except IntegrityError as error:
             warning(error)
-            raise WorkspaceInviteCreatedException('Ошибка создания ссылки приглашения')
+            raise WorkspaceWorkspaceInviteNotFound(
+                f'Рабочего пространства с id={workspace_invite.workspace_id} не существует'
+            )
 
-    async def find_by_id(self, workspace_invite_id: InviteId) -> WorkspaceInvite | None:
+    async def find_by_id(
+        self, workspace_invite_id: InviteId, workspace_id: WorkspaceId
+    ) -> WorkspaceInvite | None:
         query: WorkspaceInviteModel | None = await self._session.get(
             WorkspaceInviteModel, workspace_invite_id
         )
@@ -64,11 +66,22 @@ class WorkspaceInviteRepository(IWorkspaceInviteRepository):
                 f'Ссылка приглашения с id={workspace_invite.id} не обновлена'
             )
 
-    async def delete(self, workspace_invite_id: InviteId) -> None:
-        stmt = delete(WorkspaceInviteModel).filter_by(id=workspace_invite_id)
-        result = await self._session.execute(stmt)
-
-        if result.rowcount == 0:
-            raise WorkspaceInviteNotDeleted(
-                f'Ссылка приглашения с id={workspace_invite_id} не удалена'
+    async def delete(self, workspace_invite_id: InviteId, workspace_id: WorkspaceId) -> None:
+        exists_workspace_invite = await self._session.execute(
+            select(
+                exists().where(
+                    WorkspaceInviteModel.id == workspace_invite_id,
+                    WorkspaceInviteModel.workspace_id == workspace_id,
+                )
             )
+        )
+
+        if not exists_workspace_invite.scalar():
+            raise WorkspaceInviteNotFound(
+                f'Ссылка приглашения с id={workspace_invite_id} не найдена в рабочем пространстве'
+            )
+
+        stmt = delete(WorkspaceInviteModel).filter_by(
+            id=workspace_invite_id, workspace_id=workspace_id
+        )
+        await self._session.execute(stmt)
