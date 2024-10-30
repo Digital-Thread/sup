@@ -17,6 +17,7 @@ from src.providers.adapters import (
     SqlalchemyProvider,
 )
 from src.providers.usecases import (
+    CategoryUseCaseProvider,
     RoleUseCaseProvider,
     TagUseCaseProvider,
     WorkspaceUseCaseProvider,
@@ -41,6 +42,7 @@ def container_factory() -> AsyncContainer:
         WorkspaceUseCaseProvider(),
         RoleUseCaseProvider(),
         TagUseCaseProvider(),
+        CategoryUseCaseProvider(),
     )
 
 

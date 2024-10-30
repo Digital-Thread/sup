@@ -1,5 +1,12 @@
 from dishka import Provider, Scope, provide
 
+from src.apps.workspace.use_cases.category_use_cases import (
+    CreateCategoryUseCase,
+    DeleteCategoryUseCase,
+    GetCategoryByIdUseCase,
+    GetCategoryByWorkspaceUseCase,
+    UpdateCategoryUseCase,
+)
 from src.apps.workspace.use_cases.role_use_cases import (
     CreateRoleUseCase,
     DeleteRoleUseCase,
@@ -51,3 +58,13 @@ class TagUseCaseProvider(Provider):
     get_tag_by_workspace = provide(GetTagByWorkspaceUseCase)
     update_tag = provide(UpdateTagUseCase)
     delete_tag = provide(DeleteTagUseCase)
+
+
+class CategoryUseCaseProvider(Provider):
+    scope = Scope.REQUEST
+
+    create_category = provide(CreateCategoryUseCase)
+    get_category_by_id = provide(GetCategoryByIdUseCase)
+    get_category_by_workspace = provide(GetCategoryByWorkspaceUseCase)
+    update_category = provide(UpdateCategoryUseCase)
+    delete_category = provide(DeleteCategoryUseCase)
