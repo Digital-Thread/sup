@@ -27,7 +27,7 @@ category_router = APIRouter(route_class=DishkaRoute)
 async def create_category(
     body: CreateCategoryDTO, use_case: FromDishka[CreateCategoryUseCase]
 ) -> dict[str, str]:
-    request = CreateCategoryAppDTO(**body.model_dump())  # type: ignore
+    request = CreateCategoryAppDTO(**body.model_dump())
     try:
         await use_case.execute(request)
     except CategoryException as error:
@@ -53,7 +53,7 @@ async def update_category(
     category_id: CategoryId,
     use_case: FromDishka[UpdateCategoryUseCase],
 ) -> dict[str, str]:
-    request = UpdateCategoryAppDTO(**body.model_dump(exclude_none=True))  # type: ignore
+    request = UpdateCategoryAppDTO(**body.model_dump(exclude_none=True))
     try:
         await use_case.execute(category_id, workspace_id, request)
     except CategoryException as error:

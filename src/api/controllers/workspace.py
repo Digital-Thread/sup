@@ -31,7 +31,7 @@ workspace_router = APIRouter(route_class=DishkaRoute)
 async def create_workspace(
     body: CreateWorkspaceDTO, use_case: FromDishka[CreateWorkspaceUseCase]
 ) -> dict[str, str]:
-    request = CreateWorkspaceAppDTO(**body.model_dump())  # type: ignore
+    request = CreateWorkspaceAppDTO(**body.model_dump())
     try:
         await use_case.execute(request)
     except WorkspaceException as error:
@@ -74,7 +74,7 @@ async def update_workspace(
     workspace_id: WorkspaceId,
     use_case: FromDishka[UpdateWorkspaceUseCase],
 ) -> dict[str, str]:
-    request = UpdateWorkspaceAppDTO(**body.model_dump(exclude_none=True))  # type: ignore
+    request = UpdateWorkspaceAppDTO(**body.model_dump(exclude_none=True))
     try:
         await use_case.execute(workspace_id, request)
     except WorkspaceException as error:

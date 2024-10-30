@@ -26,7 +26,7 @@ class WorkspaceInviteMapper(BaseMapper[WorkspaceInvite, WorkspaceInviteAppDTO]):
     def update_data(
         existing_invite: WorkspaceInvite, dto: UpdateWorkspaceInviteAppDTO
     ) -> WorkspaceInvite:
-        status = dto.get('status')
+        status = dto.status
 
         if status.value == 'Использована':
             existing_invite.use()

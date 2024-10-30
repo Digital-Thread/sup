@@ -1,5 +1,7 @@
+from dataclasses import asdict
+
 from src.apps.workspace.domain.entities.role import Role
-from src.apps.workspace.domain.types_ids import RoleId, WorkspaceId
+from src.apps.workspace.domain.types_ids import RoleId
 from src.apps.workspace.dtos.role_dtos import RoleWithUserCountAppDTO, UpdateRoleAppDTO
 from src.apps.workspace.mappers.base_mapper import BaseMapper
 
@@ -8,7 +10,7 @@ class RoleMapper(BaseMapper[Role, RoleWithUserCountAppDTO]):
 
     @staticmethod
     def update_data(existing_role: Role, dto: UpdateRoleAppDTO) -> Role:
-        for field, value in dto.items():
+        for field, value in asdict(dto).items():
             if value is not None:
                 setattr(existing_role, field, value)
 

@@ -1,6 +1,5 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import TypedDict
 from uuid import UUID
 
 from src.apps.workspace.domain.entities.workspace_invite import StatusInvite
@@ -16,5 +15,6 @@ class WorkspaceInviteAppDTO:
     expired_at: datetime
 
 
-class UpdateWorkspaceInviteAppDTO(TypedDict):
-    status: StatusInvite
+@dataclass
+class UpdateWorkspaceInviteAppDTO:
+    status: StatusInvite | None = None

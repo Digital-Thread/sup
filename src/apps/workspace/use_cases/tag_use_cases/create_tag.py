@@ -18,9 +18,9 @@ class CreateTagUseCase:
         try:
             await self._tag_repository.save(
                 Tag(
-                    _name=tag_data['name'],
-                    _color=tag_data['color'],
-                    _workspace_id=WorkspaceId(tag_data['workspace_id']),
+                    _name=tag_data.name,
+                    _color=tag_data.color,
+                    _workspace_id=WorkspaceId(tag_data.workspace_id),
                 )
             )
         except (ValueError, WorkspaceTagNotFound, TagAlreadyExists) as error:

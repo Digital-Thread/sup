@@ -17,9 +17,9 @@ class CreateRoleUseCase:
         try:
             await self._role_repository.save(
                 Role(
-                    _workspace_id=WorkspaceId(role_data['workspace_id']),
-                    _name=role_data['name'],
-                    _color=role_data['color'],
+                    _workspace_id=WorkspaceId(role_data.workspace_id),
+                    _name=role_data.name,
+                    _color=role_data.color,
                 )
             )
         except (ValueError, WorkspaceRoleNotFound) as error:

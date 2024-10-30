@@ -24,7 +24,7 @@ role_router = APIRouter(route_class=DishkaRoute)
 async def create_role(
     body: CreateRoleDTO, use_case: FromDishka[CreateRoleUseCase]
 ) -> dict[str, str]:
-    request = CreateRoleAppDTO(**body.model_dump())  # type: ignore
+    request = CreateRoleAppDTO(**body.model_dump())
     try:
         await use_case.execute(request)
     except RoleException as error:
@@ -52,7 +52,7 @@ async def update_role(
     role_id: RoleId,
     use_case: FromDishka[UpdateRoleUseCase],
 ) -> dict[str, str]:
-    request = UpdateRoleAppDTO(**body.model_dump(exclude_none=True))  # type: ignore
+    request = UpdateRoleAppDTO(**body.model_dump(exclude_none=True))
     try:
         await use_case.execute(role_id, workspace_id, request)
     except RoleException as error:

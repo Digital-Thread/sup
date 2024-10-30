@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import TypedDict
 from uuid import UUID
 
 
-class CreateWorkspaceAppDTO(TypedDict):
+@dataclass
+class CreateWorkspaceAppDTO:
     name: str
     owner_id: UUID
 
@@ -25,7 +25,8 @@ class WorkspaceAppDTO:
     member_ids: list[UUID] = field(default_factory=list)
 
 
-class UpdateWorkspaceAppDTO(TypedDict, total=False):
-    name: str
-    description: str
-    logo: str
+@dataclass
+class UpdateWorkspaceAppDTO:
+    name: str | None = None
+    description: str | None = None
+    logo: str | None = None

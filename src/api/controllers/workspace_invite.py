@@ -64,7 +64,7 @@ async def update_status_invite(
     workspace_invite_id: InviteId,
     use_case: FromDishka[UpdateWorkspaceInviteUseCase],
 ) -> dict[str, str]:
-    request = UpdateWorkspaceInviteAppDTO(**body.model_dump(exclude_none=True))  # type: ignore
+    request = UpdateWorkspaceInviteAppDTO(**body.model_dump(exclude_none=True))
 
     try:
         await use_case.execute(workspace_invite_id, workspace_id, request)

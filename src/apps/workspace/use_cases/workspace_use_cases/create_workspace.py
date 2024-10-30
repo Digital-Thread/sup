@@ -16,7 +16,7 @@ class CreateWorkspaceUseCase:
     async def execute(self, workspace_data: CreateWorkspaceAppDTO) -> None:
         try:
             workspace = Workspace(
-                owner_id=OwnerId(workspace_data['owner_id']), _name=workspace_data['name']
+                owner_id=OwnerId(workspace_data.owner_id), _name=workspace_data.name
             )
         except ValueError as error:
             raise WorkspaceException(f'{str(error)}')
