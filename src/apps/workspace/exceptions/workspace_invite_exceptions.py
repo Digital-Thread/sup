@@ -23,7 +23,3 @@ class WorkspaceWorkspaceInviteNotFound(WorkspaceInviteException):
 
 class WorkspaceInviteAlreadyExists(WorkspaceInviteException):
     """Ссылка приглашения уже существует"""
-
-
-class WorkspaceInviteCreatedException(WorkspaceInviteException):
-    """Ссылка приглашения не создана"""
