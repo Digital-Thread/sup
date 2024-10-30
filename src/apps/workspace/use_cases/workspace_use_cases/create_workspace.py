@@ -14,16 +14,19 @@ class CreateWorkspaceUseCase:
         self._workspace_repository = workspace_repository
 
     async def execute(self, workspace_data: CreateWorkspaceAppDTO) -> None:
-        workspace = Workspace(
-            owner_id=OwnerId(workspace_data['owner_id']), _name=workspace_data['name']
-        )
-
         try:
-            await self._workspace_repository.save(workspace)
-        except (WorkspaceAlreadyExists, MemberWorkspaceNotFound) as error:
+            workspace = Workspace(
+                owner_id=OwnerId(workspace_data['owner_id']), _name=workspace_data['name']
+            )
+        except ValueError as error:
             raise WorkspaceException(f'{str(error)}')
         else:
-            await self._add_owner_as_member(workspace.id, workspace.owner_id)
+            try:
+                await self._workspace_repository.save(workspace)
+            except (WorkspaceAlreadyExists, MemberWorkspaceNotFound) as error:
+                raise WorkspaceException(f'{str(error)}')
+            else:
+                await self._add_owner_as_member(workspace.id, workspace.owner_id)
 
     async def _add_owner_as_member(self, workspace_id: WorkspaceId, owner_id: OwnerId) -> None:
         """Метод для автоматического добавления пользователя, как члена рабочего пространства"""

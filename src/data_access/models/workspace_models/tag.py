@@ -25,4 +25,4 @@ class TagModel(Base, IntIdPkMixin):
     workspace: Mapped['WorkspaceModel'] = relationship('WorkspaceModel', back_populates='tags')
     features: Mapped[list['FeatureModel']] = relationship('FeatureModel', back_populates='tag')
 
-    __table_args__ = (UniqueConstraint('name', 'workspace_id', name='uix_name_workspace_id'),)
+    __table_args__ = (UniqueConstraint('name', 'workspace_id', name='uix_name_workspace_id_tags'),)

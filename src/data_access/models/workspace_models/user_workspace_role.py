@@ -16,7 +16,9 @@ if TYPE_CHECKING:
 class UserWorkspaceRoleModel(Base, IntIdPkMixin):
     __tablename__ = 'user_workspace_roles'
 
-    user_id: Mapped[UUID] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'))
+    user_id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True), ForeignKey('users.id', ondelete='CASCADE')
+    )
     workspace_id: Mapped[UUID] = mapped_column(
         PostgreSQLUUID(as_uuid=True), ForeignKey('workspaces.id', ondelete='CASCADE')
     )

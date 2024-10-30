@@ -26,4 +26,6 @@ class CategoryModel(Base, IntIdPkMixin):
     )
     meets: Mapped[list['MeetModel']] = relationship('MeetModel', back_populates='category')
 
-    __table_args__ = (UniqueConstraint('name', 'workspace_id', name='uix_name_workspace_id'),)
+    __table_args__ = (
+        UniqueConstraint('name', 'workspace_id', name='uix_name_workspace_id_categories'),
+    )

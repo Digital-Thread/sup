@@ -75,7 +75,9 @@ class TagRepository(ITagRepository):
         )
 
         if not exists_tag.scalar():
-            raise TagNotFound(f'Тег с id={tag_id} не найден в рабочем пространстве')
+            raise TagNotFound(
+                f'Тег с id={tag_id} не найден в указанном рабочем пространстве при удалении.'
+            )
 
         stmt = delete(TagModel).filter_by(id=tag_id, workspace_id=workspace_id)
         await self._session.execute(stmt)

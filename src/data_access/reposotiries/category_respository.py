@@ -48,7 +48,9 @@ class CategoryRepository(ICategoryRepository):
             category_model = result.scalar_one()
         except NoResultFound as error:
             warning(error)
-            raise CategoryNotFound(f'Категория с id={category_id} не найдена')
+            raise CategoryNotFound(
+                f'Категория с id={category_id} не найдена в указанном рабочем пространстве.'
+            )
         else:
             return CategoryConverter.model_to_entity(category_model)
 

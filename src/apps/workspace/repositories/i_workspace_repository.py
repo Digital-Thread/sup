@@ -19,7 +19,7 @@ class IWorkspaceRepository:
         raise NotImplementedError
 
     @abstractmethod
-    async def delete(self, workspace_id: WorkspaceId) -> None:
+    async def delete(self, workspace_id: WorkspaceId, owner_id: OwnerId) -> None:
         raise NotImplementedError
 
     @abstractmethod

@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 17e6b71f043e
+Revision ID: cf353899bc30
 Revises:
-Create Date: 2024-10-29 09:07:56.331034
+Create Date: 2024-10-30 16:01:15.997263
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '17e6b71f043e'
+revision: str = 'cf353899bc30'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -61,6 +61,7 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint('id', name=op.f('pk_categories')),
         sa.UniqueConstraint('id', name=op.f('uq_categories_id')),
+        sa.UniqueConstraint('name', 'workspace_id', name='uix_name_workspace_id_categories'),
     )
     op.create_table(
         'projects',
@@ -90,6 +91,7 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint('id', name=op.f('pk_roles')),
         sa.UniqueConstraint('id', name=op.f('uq_roles_id')),
+        sa.UniqueConstraint('name', 'workspace_id', name='uix_name_workspace_id_roles'),
     )
     op.create_table(
         'tags',
@@ -105,7 +107,7 @@ def upgrade() -> None:
         ),
         sa.PrimaryKeyConstraint('id', name=op.f('pk_tags')),
         sa.UniqueConstraint('id', name=op.f('uq_tags_id')),
-        sa.UniqueConstraint('name', 'workspace_id', name='uix_name_workspace_id'),
+        sa.UniqueConstraint('name', 'workspace_id', name='uix_name_workspace_id_tags'),
     )
     op.create_table(
         'workspace_invites',
@@ -122,6 +124,7 @@ def upgrade() -> None:
             ondelete='CASCADE',
         ),
         sa.PrimaryKeyConstraint('id', name=op.f('pk_workspace_invites')),
+        sa.UniqueConstraint('code', name=op.f('uq_workspace_invites_code')),
         sa.UniqueConstraint('id', name=op.f('uq_workspace_invites_id')),
     )
     op.create_table(

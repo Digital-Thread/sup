@@ -3,8 +3,8 @@ from src.apps.workspace.domain.types_ids import InviteId, WorkspaceId
 from src.apps.workspace.dtos.workspace_invite_dtos import UpdateWorkspaceInviteAppDTO
 from src.apps.workspace.exceptions.workspace_invite_exceptions import (
     WorkspaceInviteException,
-    WorkspaceInviteNotFound,
     WorkspaceInviteNotUpdated,
+    WorkspaceWorkspaceInviteNotFound,
 )
 from src.apps.workspace.mappers.workspace_invite_mapper import WorkspaceInviteMapper
 from src.apps.workspace.repositories.i_workspace_invite_repository import (
@@ -36,7 +36,7 @@ class UpdateWorkspaceInviteUseCase:
             existing_invite = await self._workspace_invite_repository.find_by_id(
                 invite_id, workspace_id
             )
-        except WorkspaceInviteNotFound as error:
+        except WorkspaceWorkspaceInviteNotFound as error:
             raise WorkspaceInviteException(f'{str(error)}')
         else:
             return existing_invite

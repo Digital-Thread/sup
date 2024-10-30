@@ -84,14 +84,23 @@ class WorkspaceRepository(IWorkspaceRepository):
         if result.rowcount == 0:
             raise WorkspaceNotUpdated('Рабочее пространство не обновлено')
 
-    async def delete(self, workspace_id: WorkspaceId) -> None:
-        stmt = delete(WorkspaceModel).filter_by(id=workspace_id)
-        result = await self._session.execute(stmt)
-
-        if result.rowcount == 0:
-            raise WorkspaceNotFound(
-                f'Рабочее пространство с id = {workspace_id} не было найдено при удалении'
+    async def delete(self, workspace_id: WorkspaceId, owner_id: OwnerId) -> None:
+        exists_workspace = await self._session.execute(
+            select(
+                exists().where(
+                    WorkspaceModel.id == workspace_id,
+                    WorkspaceModel.owner_id == owner_id,
+                )
             )
+        )
+
+        if not exists_workspace.scalar():
+            raise WorkspaceNotFound(
+                f'Рабочее пространство с id={workspace_id} не найдено у этого пользователя.'
+            )
+
+        stmt = delete(WorkspaceModel).filter_by(id=workspace_id, owner_id=owner_id)
+        await self._session.execute(stmt)
 
     async def add_member(self, workspace_id: WorkspaceId, user_id: MemberId) -> None:
         stmt = WorkspaceMemberModel(workspace_id=workspace_id, user_id=user_id)

@@ -52,7 +52,7 @@ async def update_role(
     role_id: RoleId,
     use_case: FromDishka[UpdateRoleUseCase],
 ) -> dict[str, str]:
-    request = UpdateRoleAppDTO(**body.model_dump(exclude_none=True))
+    request = UpdateRoleAppDTO(**body.model_dump(exclude_none=True))  # type: ignore
     try:
         await use_case.execute(role_id, workspace_id, request)
     except RoleException as error:

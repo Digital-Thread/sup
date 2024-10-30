@@ -17,7 +17,7 @@ tag_router = APIRouter(route_class=DishkaRoute)
 
 
 @tag_router.post('/create_tag', status_code=status.HTTP_201_CREATED)
-async def create_tag(body: CreateTagDTO, use_case: FromDishka[CreateTagUseCase]):
+async def create_tag(body: CreateTagDTO, use_case: FromDishka[CreateTagUseCase]) -> dict[str, str]:
     request = CreateTagAppDTO(**body.model_dump())  # type: ignore
     try:
         await use_case.execute(request)
@@ -44,7 +44,7 @@ async def update_tag(
     tag_id: TagId,
     use_case: FromDishka[UpdateTagUseCase],
 ) -> dict[str, str]:
-    request = UpdateTagAppDTO(**body.model_dump(exclude_none=True))
+    request = UpdateTagAppDTO(**body.model_dump(exclude_none=True))  # type: ignore
     try:
         await use_case.execute(tag_id, workspace_id, request)
     except TagException as error:

@@ -32,7 +32,7 @@ class WorkspaceInviteConverter:
         return model
 
     @staticmethod
-    def entity_to_dict(workspace_invite: WorkspaceInvite) -> dict[str, StatusInvite]:
+    def entity_to_dict(workspace_invite: WorkspaceInvite) -> dict[str, str]:
         return {
             'status': workspace_invite.status.value,
         }

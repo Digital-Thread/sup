@@ -43,8 +43,8 @@ class WorkspaceMapper(BaseMapper[Workspace, WorkspaceAppDTO]):
 
     @staticmethod
     def update_data(dto: UpdateWorkspaceAppDTO, existing_workspace: Workspace) -> Workspace:
-        existing_workspace.name = dto.get('name')
-        existing_workspace.description = dto.get('description')
-        existing_workspace.logo = dto.get('logo')
+        for field, value in dto.items():
+            if value is not None:
+                setattr(existing_workspace, field, value)
 
         return existing_workspace
