@@ -23,7 +23,3 @@ class WorkspaceCategoryNotFound(CategoryException):
 
 class CategoryAlreadyExists(CategoryException):
     """Категория уже существует"""
-
-
-class CategoryCreatedException(CategoryException):
-    """Категория не создана"""
