@@ -28,9 +28,9 @@ class WorkspaceInviteMapper(BaseMapper[WorkspaceInvite, WorkspaceInviteAppDTO]):
     ) -> WorkspaceInvite:
         status = dto.get('status')
 
-        if status == 'Использована':
+        if status.value == 'Использована':
             existing_invite.use()
-        elif status == 'Истекла':
+        elif status.value == 'Истекла':
             existing_invite.expire()
 
         return existing_invite

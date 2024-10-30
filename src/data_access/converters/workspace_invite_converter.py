@@ -20,12 +20,19 @@ class WorkspaceInviteConverter:
         )
 
     @staticmethod
-    def entity_to_model(entity: WorkspaceInvite) -> WorkspaceInviteModel:
-        model = WorkspaceInviteModel(**entity.__dict__)
+    def entity_to_model(workspace_invite: WorkspaceInvite) -> WorkspaceInviteModel:
+        model = WorkspaceInviteModel(
+            id=workspace_invite.id,
+            code=workspace_invite.code,
+            status=workspace_invite.status.value,
+            created_at=workspace_invite.created_at,
+            expired_at=workspace_invite.expired_at,
+            workspace_id=workspace_invite.workspace_id,
+        )
         return model
 
     @staticmethod
     def entity_to_dict(workspace_invite: WorkspaceInvite) -> dict[str, StatusInvite]:
         return {
-            'status': workspace_invite.status,
+            'status': workspace_invite.status.value,
         }
