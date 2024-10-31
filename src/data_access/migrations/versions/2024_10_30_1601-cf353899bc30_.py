@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 73b78390aa67
+Revision ID: cf353899bc30
 Revises:
-Create Date: 2024-10-22 15:37:51.246816
+Create Date: 2024-10-30 16:01:15.997263
 
 """
 
@@ -13,7 +13,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = '73b78390aa67'
+revision: str = 'cf353899bc30'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -40,7 +40,10 @@ def upgrade() -> None:
         sa.Column('created_at', sa.TIMESTAMP(timezone=True), nullable=False),
         sa.Column('id', sa.UUID(), server_default=sa.text('uuid_generate_v4()'), nullable=False),
         sa.ForeignKeyConstraint(
-            ['owner_id'], ['users.id'], name=op.f('fk_workspaces_owner_id_users')
+            ['owner_id'],
+            ['users.id'],
+            name=op.f('fk_workspaces_owner_id_users'),
+            ondelete='CASCADE',
         ),
         sa.PrimaryKeyConstraint('id', name=op.f('pk_workspaces')),
         sa.UniqueConstraint('name', name=op.f('uq_workspaces_name')),
@@ -51,10 +54,14 @@ def upgrade() -> None:
         sa.Column('workspace_id', sa.UUID(), nullable=False),
         sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
         sa.ForeignKeyConstraint(
-            ['workspace_id'], ['workspaces.id'], name=op.f('fk_categories_workspace_id_workspaces')
+            ['workspace_id'],
+            ['workspaces.id'],
+            name=op.f('fk_categories_workspace_id_workspaces'),
+            ondelete='CASCADE',
         ),
         sa.PrimaryKeyConstraint('id', name=op.f('pk_categories')),
         sa.UniqueConstraint('id', name=op.f('uq_categories_id')),
+        sa.UniqueConstraint('name', 'workspace_id', name='uix_name_workspace_id_categories'),
     )
     op.create_table(
         'projects',
@@ -62,7 +69,10 @@ def upgrade() -> None:
         sa.Column('workspace_id', sa.UUID(), nullable=False),
         sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
         sa.ForeignKeyConstraint(
-            ['workspace_id'], ['workspaces.id'], name=op.f('fk_projects_workspace_id_workspaces')
+            ['workspace_id'],
+            ['workspaces.id'],
+            name=op.f('fk_projects_workspace_id_workspaces'),
+            ondelete='CASCADE',
         ),
         sa.PrimaryKeyConstraint('id', name=op.f('pk_projects')),
         sa.UniqueConstraint('id', name=op.f('uq_projects_id')),
@@ -74,10 +84,14 @@ def upgrade() -> None:
         sa.Column('workspace_id', sa.UUID(), nullable=False),
         sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
         sa.ForeignKeyConstraint(
-            ['workspace_id'], ['workspaces.id'], name=op.f('fk_roles_workspace_id_workspaces')
+            ['workspace_id'],
+            ['workspaces.id'],
+            name=op.f('fk_roles_workspace_id_workspaces'),
+            ondelete='CASCADE',
         ),
         sa.PrimaryKeyConstraint('id', name=op.f('pk_roles')),
         sa.UniqueConstraint('id', name=op.f('uq_roles_id')),
+        sa.UniqueConstraint('name', 'workspace_id', name='uix_name_workspace_id_roles'),
     )
     op.create_table(
         'tags',
@@ -86,10 +100,14 @@ def upgrade() -> None:
         sa.Column('workspace_id', sa.UUID(), nullable=False),
         sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
         sa.ForeignKeyConstraint(
-            ['workspace_id'], ['workspaces.id'], name=op.f('fk_tags_workspace_id_workspaces')
+            ['workspace_id'],
+            ['workspaces.id'],
+            name=op.f('fk_tags_workspace_id_workspaces'),
+            ondelete='CASCADE',
         ),
         sa.PrimaryKeyConstraint('id', name=op.f('pk_tags')),
         sa.UniqueConstraint('id', name=op.f('uq_tags_id')),
+        sa.UniqueConstraint('name', 'workspace_id', name='uix_name_workspace_id_tags'),
     )
     op.create_table(
         'workspace_invites',
@@ -103,8 +121,10 @@ def upgrade() -> None:
             ['workspace_id'],
             ['workspaces.id'],
             name=op.f('fk_workspace_invites_workspace_id_workspaces'),
+            ondelete='CASCADE',
         ),
         sa.PrimaryKeyConstraint('id', name=op.f('pk_workspace_invites')),
+        sa.UniqueConstraint('code', name=op.f('uq_workspace_invites_code')),
         sa.UniqueConstraint('id', name=op.f('uq_workspace_invites_id')),
     )
     op.create_table(
@@ -112,12 +132,16 @@ def upgrade() -> None:
         sa.Column('workspace_id', sa.UUID(), nullable=False),
         sa.Column('user_id', sa.UUID(), nullable=False),
         sa.ForeignKeyConstraint(
-            ['user_id'], ['users.id'], name=op.f('fk_workspace_members_user_id_users')
+            ['user_id'],
+            ['users.id'],
+            name=op.f('fk_workspace_members_user_id_users'),
+            ondelete='CASCADE',
         ),
         sa.ForeignKeyConstraint(
             ['workspace_id'],
             ['workspaces.id'],
             name=op.f('fk_workspace_members_workspace_id_workspaces'),
+            ondelete='CASCADE',
         ),
         sa.PrimaryKeyConstraint('workspace_id', 'user_id', name=op.f('pk_workspace_members')),
     )
@@ -128,7 +152,10 @@ def upgrade() -> None:
         sa.Column('tag_id', sa.Integer(), nullable=False),
         sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
         sa.ForeignKeyConstraint(
-            ['project_id'], ['projects.id'], name=op.f('fk_features_project_id_projects')
+            ['project_id'],
+            ['projects.id'],
+            name=op.f('fk_features_project_id_projects'),
+            ondelete='CASCADE',
         ),
         sa.ForeignKeyConstraint(['tag_id'], ['tags.id'], name=op.f('fk_features_tag_id_tags')),
         sa.PrimaryKeyConstraint('id', name=op.f('pk_features')),
@@ -147,7 +174,10 @@ def upgrade() -> None:
             ['category_id'], ['categories.id'], name=op.f('fk_meets_category_id_categories')
         ),
         sa.ForeignKeyConstraint(
-            ['workspace_id'], ['workspaces.id'], name=op.f('fk_meets_workspace_id_workspaces')
+            ['workspace_id'],
+            ['workspaces.id'],
+            name=op.f('fk_meets_workspace_id_workspaces'),
+            ondelete='CASCADE',
         ),
         sa.PrimaryKeyConstraint('id', name=op.f('pk_meets')),
         sa.UniqueConstraint('id', name=op.f('uq_meets_id')),
@@ -159,15 +189,22 @@ def upgrade() -> None:
         sa.Column('role_id', sa.Integer(), nullable=False),
         sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
         sa.ForeignKeyConstraint(
-            ['role_id'], ['roles.id'], name=op.f('fk_user_workspace_roles_role_id_roles')
+            ['role_id'],
+            ['roles.id'],
+            name=op.f('fk_user_workspace_roles_role_id_roles'),
+            ondelete='CASCADE',
         ),
         sa.ForeignKeyConstraint(
-            ['user_id'], ['users.id'], name=op.f('fk_user_workspace_roles_user_id_users')
+            ['user_id'],
+            ['users.id'],
+            name=op.f('fk_user_workspace_roles_user_id_users'),
+            ondelete='CASCADE',
         ),
         sa.ForeignKeyConstraint(
             ['workspace_id'],
             ['workspaces.id'],
             name=op.f('fk_user_workspace_roles_workspace_id_workspaces'),
+            ondelete='CASCADE',
         ),
         sa.PrimaryKeyConstraint('id', name=op.f('pk_user_workspace_roles')),
         sa.UniqueConstraint('id', name=op.f('uq_user_workspace_roles_id')),

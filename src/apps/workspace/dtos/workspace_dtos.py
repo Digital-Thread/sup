@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import TypedDict
 from uuid import UUID
 
 
-class CreateWorkspaceAppDTO(TypedDict):
+@dataclass
+class CreateWorkspaceAppDTO:
     name: str
     owner_id: UUID
 
@@ -23,13 +23,10 @@ class WorkspaceAppDTO:
     tag_ids: list[int] = field(default_factory=list)
     role_ids: list[int] = field(default_factory=list)
     member_ids: list[UUID] = field(default_factory=list)
-    member_roles: dict[UUID, int] = field(default_factory=dict)
-    feature_tags: dict[int, set[int]] = field(default_factory=dict)
-    task_tags: dict[int, set[int]] = field(default_factory=dict)
-    meet_categories: dict[int, int] = field(default_factory=dict)
 
 
-class UpdateWorkspaceAppDTO(TypedDict, total=False):
-    name: str
-    description: str
-    logo: str
+@dataclass
+class UpdateWorkspaceAppDTO:
+    name: str | None = None
+    description: str | None = None
+    logo: str | None = None

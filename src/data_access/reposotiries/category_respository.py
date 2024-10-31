@@ -1,15 +1,17 @@
 from logging import warning
 
-from sqlalchemy import delete, select, update
-from sqlalchemy.exc import IntegrityError
+from asyncpg.exceptions import UniqueViolationError
+from sqlalchemy import delete, exists, select, update
+from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.apps.workspace.domain.entities.category import Category
 from src.apps.workspace.domain.types_ids import CategoryId, WorkspaceId
 from src.apps.workspace.exceptions.category_exceptions import (
-    CategoryCreatedException,
-    CategoryNotDeleted,
+    CategoryAlreadyExists,
+    CategoryNotFound,
     CategoryNotUpdated,
+    WorkspaceCategoryNotFound,
 )
 from src.apps.workspace.repositories.i_category_repository import ICategoryRepository
 from src.data_access.converters.category_converter import CategoryConverter
@@ -28,12 +30,29 @@ class CategoryRepository(ICategoryRepository):
             await self._session.flush()
         except IntegrityError as error:
             warning(error)
-            raise CategoryCreatedException
+            if isinstance(error.orig.__cause__, UniqueViolationError):
+                raise CategoryAlreadyExists(
+                    'Категория с таким именем в этом рабочем пространстве уже существует.'
+                )
 
-    async def find_by_id(self, category_id: CategoryId) -> Category | None:
-        query: CategoryModel | None = await self._session.get(CategoryModel, category_id)
-        category = CategoryConverter.model_to_entity(query) if query else None
-        return category
+            raise WorkspaceCategoryNotFound(
+                f'Рабочего пространства с id={category.workspace_id} не существует'
+            )
+
+    async def find_by_id(
+        self, category_id: CategoryId, workspace_id: WorkspaceId
+    ) -> Category | None:
+        query = select(CategoryModel).filter_by(id=category_id, workspace_id=workspace_id)
+        result = await self._session.execute(query)
+        try:
+            category_model = result.scalar_one()
+        except NoResultFound as error:
+            warning(error)
+            raise CategoryNotFound(
+                f'Категория с id={category_id} не найдена в указанном рабочем пространстве.'
+            )
+        else:
+            return CategoryConverter.model_to_entity(category_model)
 
     async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[Category]:
         query = select(CategoryModel).filter_by(workspace_id=workspace_id)
@@ -41,6 +60,9 @@ class CategoryRepository(ICategoryRepository):
         categories = [
             CategoryConverter.model_to_entity(category) for category in result.scalars().all()
         ]
+        if not categories:
+            raise WorkspaceCategoryNotFound(f'Рабочее пространство с id={workspace_id} не найдено')
+
         return categories
 
     async def update(self, category: Category) -> None:
@@ -51,9 +73,19 @@ class CategoryRepository(ICategoryRepository):
         if result.rowcount == 0:
             raise CategoryNotUpdated(f'Категория с id={category.id} не обновлена')
 
-    async def delete(self, category_id: CategoryId) -> None:
-        stmt = delete(CategoryModel).filter_by(id=category_id)
-        result = await self._session.execute(stmt)
+    async def delete(self, category_id: CategoryId, workspace_id: WorkspaceId) -> None:
+        exists_category = await self._session.execute(
+            select(
+                exists().where(
+                    CategoryModel.id == category_id, CategoryModel.workspace_id == workspace_id
+                )
+            )
+        )
 
-        if result.rowcount == 0:
-            raise CategoryNotDeleted(f'Категория с id={category_id} не удалена')
+        if not exists_category.scalar():
+            raise CategoryNotFound(
+                f'Категория с id={category_id} не найдена в рабочем пространстве'
+            )
+
+        stmt = delete(CategoryModel).filter_by(id=category_id, workspace_id=workspace_id)
+        await self._session.execute(stmt)

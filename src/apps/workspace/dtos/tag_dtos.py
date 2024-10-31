@@ -3,7 +3,8 @@ from typing import TypedDict
 from uuid import UUID
 
 
-class CreateTagAppDTO(TypedDict):
+@dataclass
+class CreateTagAppDTO:
     name: str
     color: str
     workspace_id: UUID
@@ -17,6 +18,7 @@ class TagAppDTO:
     workspace_id: UUID
 
 
-class UpdateTagAppDTO(TypedDict, total=False):
-    name: str
-    color: str
+@dataclass
+class UpdateTagAppDTO:
+    name: str | None = None
+    color: str | None = None

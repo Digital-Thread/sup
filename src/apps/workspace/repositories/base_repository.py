@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
 
+from src.apps.workspace.domain.types_ids import WorkspaceId
+
 
 class IBaseRepository[T, ID](ABC):
     """
-    Параметры:
+    param:
     T - это экземпляр сущности,
     ID - это id экземпляра сущности
     """
@@ -13,7 +15,7 @@ class IBaseRepository[T, ID](ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def find_by_id(self, entity_id: ID) -> T | None:
+    async def find_by_id(self, entity_id: ID, workspace_id: WorkspaceId) -> T | None:
         raise NotImplementedError
 
     @abstractmethod
@@ -21,5 +23,5 @@ class IBaseRepository[T, ID](ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def delete(self, entity_id: ID) -> None:
+    async def delete(self, entity_id: ID, workspace_id: WorkspaceId) -> None:
         raise NotImplementedError

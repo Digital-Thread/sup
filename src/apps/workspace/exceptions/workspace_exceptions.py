@@ -17,8 +17,8 @@ class WorkspaceNotDeleted(WorkspaceException):
     """Рабочее пространство не удалено"""
 
 
-class OwnerWorkspaceNotFound(WorkspaceException):
-    """Владелец рабочего пространства не найден"""
+class MemberWorkspaceNotFound(WorkspaceException):
+    """Участник, состоящий в рабочих пространствах, не найден"""
 
 
 class WorkspaceAlreadyExists(WorkspaceException):

@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -25,3 +25,7 @@ class CategoryModel(Base, IntIdPkMixin):
         'WorkspaceModel', back_populates='categories'
     )
     meets: Mapped[list['MeetModel']] = relationship('MeetModel', back_populates='category')
+
+    __table_args__ = (
+        UniqueConstraint('name', 'workspace_id', name='uix_name_workspace_id_categories'),
+    )

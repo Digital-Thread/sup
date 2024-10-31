@@ -16,5 +16,5 @@ class CategoryMapper(BaseMapper[Category, CategoryAppDTO]):
 
     @staticmethod
     def update_data(existing_category: Category, dto: UpdateCategoryAppDTO) -> Category:
-        existing_category.name = dto.get('name')
+        existing_category.name = dto.name
         return existing_category

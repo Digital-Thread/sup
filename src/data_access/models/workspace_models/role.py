@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -24,9 +24,9 @@ class RoleModel(Base, IntIdPkMixin):
         PostgreSQLUUID(as_uuid=True), ForeignKey('workspaces.id', ondelete='CASCADE')
     )
 
-    workspace: Mapped['WorkspaceModel'] = relationship(
-        'WorkspaceModel', back_populates='roles'
-    )
+    workspace: Mapped['WorkspaceModel'] = relationship('WorkspaceModel', back_populates='roles')
     users: Mapped[list['UserWorkspaceRoleModel']] = relationship(
         'UserWorkspaceRoleModel', back_populates='role'
     )
+
+    __table_args__ = (UniqueConstraint('name', 'workspace_id', name='uix_name_workspace_id_roles'),)

@@ -1,7 +1,11 @@
 from src.apps.workspace.domain.entities.category import Category
 from src.apps.workspace.domain.types_ids import WorkspaceId
 from src.apps.workspace.dtos.category_dtos import CreateCategoryAppDTO
-from src.apps.workspace.exceptions.category_exceptions import CategoryCreatedException
+from src.apps.workspace.exceptions.category_exceptions import (
+    CategoryAlreadyExists,
+    CategoryException,
+    WorkspaceCategoryNotFound,
+)
 from src.apps.workspace.repositories.i_category_repository import ICategoryRepository
 
 
@@ -13,10 +17,9 @@ class CreateCategoryUseCase:
         try:
             await self._category_repository.save(
                 Category(
-                    _name=category_data.get('name'),
-                    _workspace_id=WorkspaceId(category_data.get('workspace_id')),
+                    _name=category_data.name,
+                    _workspace_id=WorkspaceId(category_data.workspace_id),
                 )
             )
-        except CategoryCreatedException:
-            pass
-            # TODO пробросить дальше
+        except (ValueError, WorkspaceCategoryNotFound, CategoryAlreadyExists) as error:
+            raise CategoryException(f'{str(error)}')

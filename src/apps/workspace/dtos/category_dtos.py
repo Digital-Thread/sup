@@ -1,9 +1,9 @@
 from dataclasses import dataclass
-from typing import TypedDict
 from uuid import UUID
 
 
-class CreateCategoryAppDTO(TypedDict):
+@dataclass
+class CreateCategoryAppDTO:
     name: str
     workspace_id: UUID
 
@@ -15,5 +15,6 @@ class CategoryAppDTO:
     workspace_id: UUID
 
 
-class UpdateCategoryAppDTO(TypedDict, total=False):
-    name: str
+@dataclass
+class UpdateCategoryAppDTO:
+    name: str | None = None

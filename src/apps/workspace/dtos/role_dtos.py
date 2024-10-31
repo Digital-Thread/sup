@@ -1,22 +1,23 @@
 from dataclasses import dataclass
-from typing import TypedDict
 from uuid import UUID
 
 
-class CreatRoleAppDTO(TypedDict):
+@dataclass
+class CreateRoleAppDTO:
     name: str
     color: str
     workspace_id: UUID
 
 
 @dataclass
-class RoleAppDTO:
+class RoleWithUserCountAppDTO:
     id: int
     name: str
     color: str
-    workspace_id: UUID
+    user_count: int
 
 
-class UpdateRoleAppDTO(TypedDict, total=False):
-    name: str
-    color: str
+@dataclass
+class UpdateRoleAppDTO:
+    name: str | None = None
+    color: str | None = None

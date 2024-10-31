@@ -5,7 +5,7 @@ from uuid import UUID, uuid4
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.dialects.postgresql import TIMESTAMP
 from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID
-from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.data_access.models.base import Base
 from src.data_access.models.mixins import IntIdPkMixin
@@ -22,6 +22,7 @@ class WorkspaceInviteModel(Base, IntIdPkMixin):
         default=uuid4,
         server_default=func.uuid_generate_v4(),
         nullable=False,
+        unique=True,
     )
     status: Mapped[str]
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True))
@@ -30,6 +31,4 @@ class WorkspaceInviteModel(Base, IntIdPkMixin):
         PostgreSQLUUID(as_uuid=True), ForeignKey('workspaces.id', ondelete='CASCADE')
     )
 
-    workspace: Mapped['WorkspaceModel'] = relationship(
-        'WorkspaceModel', back_populates='invites'
-    )
+    workspace: Mapped['WorkspaceModel'] = relationship('WorkspaceModel', back_populates='invites')

@@ -1,4 +1,4 @@
-from typing import Any
+from dataclasses import asdict
 
 from src.apps.workspace.domain.entities.tag import Tag
 from src.apps.workspace.domain.types_ids import TagId, WorkspaceId
@@ -7,7 +7,6 @@ from src.apps.workspace.mappers.base_mapper import BaseMapper
 
 
 class TagMapper(BaseMapper[Tag, TagAppDTO]):
-    ATTRIBUTE_MAP = {'name': '_name', 'color': '_color'}
 
     @staticmethod
     def dto_to_entity(dto: TagAppDTO) -> Tag:
@@ -21,9 +20,8 @@ class TagMapper(BaseMapper[Tag, TagAppDTO]):
 
     @staticmethod
     def update_data(existing_tag: Tag, dto: UpdateTagAppDTO) -> Tag:
-
-        for key, value in dto.items():
-            attr_name = TagMapper.ATTRIBUTE_MAP.get(key, key)
-            setattr(existing_tag, attr_name, value)
+        for field, value in asdict(dto).items():
+            if value is not None:
+                setattr(existing_tag, field, value)
 
         return existing_tag

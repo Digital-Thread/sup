@@ -1,4 +1,4 @@
-from typing import Any
+from dataclasses import asdict
 
 from src.apps.workspace.domain.entities.workspace import Workspace
 from src.apps.workspace.domain.types_ids import (
@@ -20,11 +20,6 @@ from src.apps.workspace.mappers.base_mapper import BaseMapper
 
 class WorkspaceMapper(BaseMapper[Workspace, WorkspaceAppDTO]):
 
-    ATTRIBUTE_MAP = {
-        'name': '_name',
-        'description': '_description',
-    }
-
     @staticmethod
     def dto_to_entity(dto: WorkspaceAppDTO) -> Workspace:
 
@@ -45,9 +40,8 @@ class WorkspaceMapper(BaseMapper[Workspace, WorkspaceAppDTO]):
 
     @staticmethod
     def update_data(dto: UpdateWorkspaceAppDTO, existing_workspace: Workspace) -> Workspace:
-
-        for key, value in dto.items():
-            attr_name = WorkspaceMapper.ATTRIBUTE_MAP.get(key, key)
-            setattr(existing_workspace, attr_name, value)
+        for field, value in asdict(dto).items():
+            if value is not None:
+                setattr(existing_workspace, field, value)
 
         return existing_workspace

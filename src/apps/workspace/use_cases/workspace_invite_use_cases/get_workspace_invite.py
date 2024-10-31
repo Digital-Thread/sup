@@ -1,4 +1,4 @@
-from src.apps.workspace.domain.types_ids import InviteId
+from src.apps.workspace.domain.types_ids import InviteId, WorkspaceId
 from src.apps.workspace.dtos.workspace_invite_dtos import WorkspaceInviteAppDTO
 from src.apps.workspace.exceptions.workspace_invite_exceptions import (
     WorkspaceInviteNotFound,
@@ -13,10 +13,12 @@ class GetWorkspaceInviteByIdUseCase:
     def __init__(self, workspace_invite_repository: IWorkspaceInviteRepository):
         self._workspaceInvite_repository = workspace_invite_repository
 
-    async def execute(self, workspace_invite_id: InviteId) -> WorkspaceInviteAppDTO:
+    async def execute(
+        self, workspace_invite_id: InviteId, workspace_id: WorkspaceId
+    ) -> WorkspaceInviteAppDTO:
         try:
             workspace_invite = await self._workspaceInvite_repository.find_by_id(
-                workspace_invite_id
+                workspace_invite_id, workspace_id
             )
         except WorkspaceInviteNotFound:
             raise ValueError(f'Ссылка приглашения с id={workspace_invite_id} не найдена')
