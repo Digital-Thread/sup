@@ -1,4 +1,4 @@
-from apps.feature.domain.aliases import (
+from .domain.aliases import (
     FeatureId,
     OwnerId,
     ProjectId,
@@ -6,8 +6,8 @@ from apps.feature.domain.aliases import (
     UserId,
     WorkspaceId,
 )
-from apps.feature.domain.entities.feature import Feature, Priority, Status
-from apps.feature.repositories.feature_repository import (
+from .domain.entities.feature import Feature, Priority, Status
+from .repositories.feature_repository import (
     FeatureListQuery,
     FilterField,
     IFeatureRepository,
