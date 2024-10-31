@@ -2,8 +2,15 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from re import match
-from typing import Optional, Set
-from uuid import UUID
+
+from src.apps.project.domain.types_ids import (
+    AssignedId,
+    FeatureId,
+    OwnerId,
+    ParticipantId,
+    ProjectId,
+    WorkspaceId,
+)
 
 
 class StatusProject(Enum):
@@ -17,14 +24,16 @@ class StatusProject(Enum):
 @dataclass
 class Project:
     _name: str
-    workspace_id: UUID
-    owner_id: UUID
-    id: Optional[int] = field(default=None)
-    logo: Optional[str] = field(default=None)
-    _description: Optional[str] = field(default=None)
+    _workspace_id: WorkspaceId
+    _owner_id: OwnerId
+    _id: ProjectId | None = field(default=None)
+    _description: str | None = field(default=None)
+    logo: str | None = field(default=None)
     _status: StatusProject = field(default=StatusProject.DISCUSSION)
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    assigned_to: Set[UUID] = field(default_factory=set)
+    assigned_to: AssignedId | None = field(default=None)
+    feature_ids: list[FeatureId] = field(default_factory=list)
+    participant_ids: list[ParticipantId] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         self._validate_name(self._name)
@@ -42,9 +51,21 @@ class Project:
             )
 
     @staticmethod
-    def _validate_description(description: Optional[str]) -> None:
+    def _validate_description(description: str | None) -> None:
         if not len(description) <= 500:
             raise ValueError('Длина описания не должна превышать 500 символов.')
+
+    @property
+    def id(self) -> ProjectId | None:
+        return self._id
+
+    @property
+    def owner_id(self) -> OwnerId:
+        return self._owner_id
+
+    @property
+    def workspace_id(self) -> WorkspaceId:
+        return self._workspace_id
 
     @property
     def name(self) -> str:
