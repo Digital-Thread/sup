@@ -7,6 +7,7 @@ from .role import role_router
 from .tag import tag_router
 from .workspace import workspace_router
 from .workspace_invite import workspace_invite_router
+from .project import project_router
 
 
 def init_routes(app: FastAPI) -> None:
@@ -26,6 +27,7 @@ def init_routes(app: FastAPI) -> None:
         tags=['WorkspaceInvite'],
     )
     app.include_router(router=comment_router, prefix=f'{prefix}/comments', tags=['Comment'])
+    app.include_router(router=project_router, prefix=f'{prefix}/projects', tags=['Project'])
 
 
 __all__ = ('init_routes',)
