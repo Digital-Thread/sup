@@ -13,13 +13,13 @@ class ProjectNotUpdated(ProjectException):
     """Категория не обновлена"""
 
 
-class ProjectNotDeleted(ProjectException):
-    """Категория не удалена"""
-
-
 class WorkspaceForProjectNotFound(ProjectException):
     """Рабочее пространство для категории не найдено"""
 
 
 class ProjectAlreadyExists(ProjectException):
     """Категория уже существует"""
+
+
+class ParticipantNotFound(ProjectException):
+    """Участник не найден"""

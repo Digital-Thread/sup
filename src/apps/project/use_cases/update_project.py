@@ -2,6 +2,7 @@ from src.apps.project.domain.entity.project import Project
 from src.apps.project.domain.types_ids import ProjectId, WorkspaceId
 from src.apps.project.dtos import UpdateProjectAppDTO
 from src.apps.project.exceptions import (
+    ParticipantNotFound,
     ProjectException,
     ProjectNotFound,
     ProjectNotUpdated,
@@ -18,9 +19,11 @@ class UpdateProjectUseCase:
         self, project_id: ProjectId, workspace_id: WorkspaceId, update_data: UpdateProjectAppDTO
     ) -> None:
         existing_project = await self._get_existing_project_in_workspace(project_id, workspace_id)
-        updated_project = self._map_to_update_data(existing_project, update_data)
+        await self.update_participant(existing_project, update_data)
+        updated_project = self._apply_update_data_to_project(existing_project, update_data)
+
         try:
-            await self._project_repository.update(updated_project)
+            await self._project_repository.update_project(updated_project)
         except ProjectNotUpdated as error:
             raise ProjectException(f'{str(error)}')
 
@@ -34,8 +37,33 @@ class UpdateProjectUseCase:
         else:
             return existing_project
 
+    async def update_participant(
+        self, existing_project: Project, update_data: UpdateProjectAppDTO
+    ) -> None:
+        if self._has_participants_changed(existing_project, update_data):
+            try:
+                await self._project_repository.update_participants(
+                    existing_project.id, existing_project.workspace_id, update_data.participant_ids
+                )
+            except ParticipantNotFound as error:
+                raise ProjectException(f'{str(error)}')
+
     @staticmethod
-    def _map_to_update_data(project: Project, update_data: UpdateProjectAppDTO) -> Project:
+    def _has_participants_changed(
+        existing_project: Project, update_data: UpdateProjectAppDTO
+    ) -> bool:
+        if (
+            update_data.participant_ids
+            and existing_project.participant_ids != update_data.participant_ids
+        ):
+            return True
+
+        return False
+
+    @staticmethod
+    def _apply_update_data_to_project(
+        project: Project, update_data: UpdateProjectAppDTO
+    ) -> Project:
         try:
             updated_project = ProjectMapper.update_data(project, update_data)
         except ValueError as error:
