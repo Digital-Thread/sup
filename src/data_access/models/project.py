@@ -10,8 +10,9 @@ from .base import Base
 from .mixins import IntIdPkMixin
 
 if TYPE_CHECKING:
-    from src.data_access.models.feature import FeatureModel
-    from src.data_access.models.workspace_models.workspace import WorkspaceModel
+    # from src.data_access.models.feature import FeatureModel
+    from src.data_access.models.project_participants import ProjectParticipantsModel
+    from src.data_access.models.stubs import WorkspaceModel
 
 
 class ProjectModel(Base, IntIdPkMixin):
@@ -22,16 +23,21 @@ class ProjectModel(Base, IntIdPkMixin):
     logo: Mapped[str | None]
     status: Mapped[str] = mapped_column(nullable=False)
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True))
-    assigned_to: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), ForeignKey('users.id'))
+    assigned_to: Mapped[UUID | None] = mapped_column(
+        PostgreSQLUUID(as_uuid=True), ForeignKey('users.id')
+    )
     workspace_id: Mapped[UUID] = mapped_column(
         PostgreSQLUUID(as_uuid=True), ForeignKey('workspaces.id', ondelete='CASCADE')
     )
     owner_id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), ForeignKey('users.id'))
 
-    features: Mapped[list['FeatureModel']] = relationship(
-        'FeatureModel', back_populates='project', cascade='all, delete-orphan'
-    )
+    # features: Mapped[list['FeatureModel']] = relationship(
+    #     'FeatureModel', back_populates='project', cascade='all, delete-orphan'
+    # )
     workspace: Mapped['WorkspaceModel'] = relationship('WorkspaceModel', back_populates='projects')
+    participants: Mapped[list['ProjectParticipantsModel']] = relationship(
+        'ProjectParticipantsModel', back_populates='project'
+    )
 
     __table_args__ = (
         UniqueConstraint('name', 'workspace_id', name='uix_name_workspace_id_projects'),
