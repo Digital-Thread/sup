@@ -5,7 +5,6 @@ from re import match
 
 from src.apps.project.domain.types_ids import (
     AssignedId,
-    FeatureId,
     OwnerId,
     ParticipantId,
     ProjectId,
@@ -32,7 +31,6 @@ class Project:
     _status: StatusProject = field(default=StatusProject.DISCUSSION)
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     assigned_to: AssignedId | None = field(default=None)
-    feature_ids: list[FeatureId] = field(default_factory=list)
     participant_ids: list[ParticipantId] = field(default_factory=list)
 
     def __post_init__(self) -> None:
