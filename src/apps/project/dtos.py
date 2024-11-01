@@ -10,16 +10,15 @@ class CreateProjectAppDTO:
     workspace_id: UUID
     owner_id: UUID
     name: str
-    logo: str | None
-    description: str | None
     status: StatusProject
-    assigned_to: UUID | None
-    feature_ids: list[int] | None
-    participant_ids: list[UUID] | None
+    logo: str | None = None
+    description: str | None = None
+    assigned_to: UUID | None = None
+    participant_ids: list[UUID] | None = None
 
 
 @dataclass
-class ProjectAppDTO:
+class ProjectWithParticipantCountAppDTO:
     id: int
     workspace_id: UUID
     owner_id: UUID
@@ -29,8 +28,7 @@ class ProjectAppDTO:
     status: StatusProject
     created_at: datetime | None
     assigned_to: UUID | None
-    feature_ids: list[int] | None
-    participant_ids: list[UUID] | None
+    participants_count: int
 
 
 @dataclass
@@ -39,6 +37,5 @@ class UpdateProjectAppDTO:
     logo: str | None = None
     description: str | None = None
     status: StatusProject | None = None
-    assigned_to: list[UUID] | None = None
-    feature_ids: list[int] | None = None
+    assigned_to: UUID | None = None
     participant_ids: list[UUID] | None = None
