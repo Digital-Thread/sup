@@ -43,3 +43,13 @@ class CommentOutDto(BaseCommentDto):
 class CommentPaginationDto:
     page: int
     page_size: int
+
+
+@dataclasses.dataclass
+class FetchTaskCommentDto(CommentPaginationDto):
+    task_id: int
+
+
+@dataclasses.dataclass
+class FetchFeatureCommentDto(CommentPaginationDto):
+    feature_id: int

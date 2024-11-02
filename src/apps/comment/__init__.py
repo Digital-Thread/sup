@@ -4,6 +4,8 @@ from .dtos import (
     CommentPaginationDto,
     DeleteCommentDto,
     FetchCommentDto,
+    FetchFeatureCommentDto,
+    FetchTaskCommentDto,
     UpdateCommentDto,
 )
 from .exceptions import (
@@ -20,6 +22,8 @@ from .interactors import (
     AddCommentInteractor,
     DeleteCommentInteractor,
     FetchAllCommentsInteractor,
+    FetchAllFeatureCommentsInteractor,
+    FetchAllTaskCommentsInteractor,
     FetchCommentInteractor,
     UpdateCommentInteractor,
 )
@@ -45,4 +49,8 @@ __all__ = (
     'UpdateCommentInteractor',
     'DeleteCommentInteractor',
     'DeleteCommentDto',
+    'FetchTaskCommentDto',
+    'FetchAllFeatureCommentsInteractor',
+    'FetchAllTaskCommentsInteractor',
+    'FetchFeatureCommentDto',
 )

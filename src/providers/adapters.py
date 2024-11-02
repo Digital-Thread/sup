@@ -10,12 +10,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from src.apps.comment.domain import (
-    CommentEntity,
-    CommentId,
-    Content,
-    ICommentRepository,
-)
+from src.apps.comment.domain import ICommentRepository
 from src.config import Config, DbConfig
 from src.data_access.reposotiries import CommentRepository
 
@@ -56,6 +51,4 @@ class ConfigProvider(Provider):
 
 class RepositoriesProvider(Provider):
     scope = Scope.REQUEST
-    comment_repo = provide(
-        CommentRepository, provides=ICommentRepository[Content, CommentId, CommentEntity]
-    )
+    comment_repo = provide(CommentRepository, provides=ICommentRepository)

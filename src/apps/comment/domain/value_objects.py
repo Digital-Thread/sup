@@ -9,6 +9,7 @@ __all__ = (
     'Content',
     'CreatedAt',
     'UpdatedAt',
+    'ValueObject',
 )
 
 from datetime import datetime
