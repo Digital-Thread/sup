@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from src.apps.workspace.domain.types_ids import RoleId, WorkspaceId
 from src.apps.workspace.exceptions.role_exceptions import (
     RoleException,
@@ -11,8 +13,8 @@ class DeleteRoleUseCase:
     def __init__(self, role_repository: IRoleRepository):
         self._role_repository = role_repository
 
-    async def execute(self, role_id: RoleId, workspace_id: WorkspaceId) -> None:
+    async def execute(self, role_id: int, workspace_id: UUID) -> None:
         try:
-            await self._role_repository.delete(role_id, workspace_id)
+            await self._role_repository.delete(RoleId(role_id), WorkspaceId(workspace_id))
         except (RoleNotFound, WorkspaceRoleNotFound) as error:
             raise RoleException(f'{str(error)}')

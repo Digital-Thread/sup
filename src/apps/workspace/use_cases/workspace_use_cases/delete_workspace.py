@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from src.apps.workspace.domain.types_ids import OwnerId, WorkspaceId
 from src.apps.workspace.exceptions.workspace_exceptions import (
     WorkspaceException,
@@ -10,8 +12,8 @@ class DeleteWorkspaceUseCase:
     def __init__(self, workspace_repository: IWorkspaceRepository):
         self._workspace_repository = workspace_repository
 
-    async def execute(self, workspace_id: WorkspaceId, owner_id: OwnerId) -> None:
+    async def execute(self, workspace_id: UUID, owner_id: UUID) -> None:
         try:
-            await self._workspace_repository.delete(workspace_id, owner_id)
+            await self._workspace_repository.delete(WorkspaceId(workspace_id), OwnerId(owner_id))
         except WorkspaceNotFound as error:
             raise WorkspaceException(f'{str(error)}')

@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from src.apps.workspace.domain.types_ids import WorkspaceId
 from src.apps.workspace.dtos.category_dtos import CategoryAppDTO
 from src.apps.workspace.exceptions.category_exceptions import (
@@ -12,9 +14,11 @@ class GetCategoryByWorkspaceUseCase:
     def __init__(self, category_repository: ICategoryRepository):
         self._category_repository = category_repository
 
-    async def execute(self, workspace_id: WorkspaceId) -> list[CategoryAppDTO]:
+    async def execute(self, workspace_id: UUID) -> list[CategoryAppDTO]:
         try:
-            categories = await self._category_repository.find_by_workspace_id(workspace_id)
+            categories = await self._category_repository.find_by_workspace_id(
+                WorkspaceId(workspace_id)
+            )
         except WorkspaceCategoryNotFound as error:
             raise CategoryException(f'{str(error)}')
         else:

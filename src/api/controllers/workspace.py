@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter, HTTPException, status
@@ -7,7 +9,6 @@ from src.api.dtos.workspace_dtos import (
     ResponseWorkspaceDTO,
     UpdateWorkspaceDTO,
 )
-from src.apps.workspace.domain.types_ids import MemberId, OwnerId, WorkspaceId
 from src.apps.workspace.dtos.workspace_dtos import (
     CreateWorkspaceAppDTO,
     UpdateWorkspaceAppDTO,
@@ -44,7 +45,7 @@ async def create_workspace(
     '/{workspace_id}', status_code=status.HTTP_200_OK, response_model=ResponseWorkspaceDTO
 )
 async def get_workspace_by_id(
-    workspace_id: WorkspaceId, use_case: FromDishka[GetWorkspaceByIdUseCase]
+    workspace_id: UUID, use_case: FromDishka[GetWorkspaceByIdUseCase]
 ) -> ResponseWorkspaceDTO:
     try:
         response = await use_case.execute(workspace_id)
@@ -58,7 +59,7 @@ async def get_workspace_by_id(
     '/', status_code=status.HTTP_200_OK, response_model=list[ResponseWorkspaceDTO]
 )
 async def get_workspaces_by_member_id(
-    member_id: MemberId, use_case: FromDishka[GetWorkspaceByMemberUseCase]
+    member_id: UUID, use_case: FromDishka[GetWorkspaceByMemberUseCase]
 ) -> list[ResponseWorkspaceDTO]:
     try:
         response = await use_case.execute(member_id)
@@ -71,7 +72,7 @@ async def get_workspaces_by_member_id(
 @workspace_router.patch('/{workspace_id}')
 async def update_workspace(
     body: UpdateWorkspaceDTO,
-    workspace_id: WorkspaceId,
+    workspace_id: UUID,
     use_case: FromDishka[UpdateWorkspaceUseCase],
 ) -> dict[str, str]:
     request = UpdateWorkspaceAppDTO(**body.model_dump(exclude_none=True))
@@ -85,7 +86,7 @@ async def update_workspace(
 
 @workspace_router.delete('/{workspace_id}')
 async def delete_workspace(
-    workspace_id: WorkspaceId, owner_id: OwnerId, use_case: FromDishka[DeleteWorkspaceUseCase]
+    workspace_id: UUID, owner_id: UUID, use_case: FromDishka[DeleteWorkspaceUseCase]
 ) -> dict[str, str]:
     try:
         await use_case.execute(workspace_id, owner_id)

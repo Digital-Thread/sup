@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from src.apps.workspace.domain.entities.category import Category
 from src.apps.workspace.domain.types_ids import CategoryId, WorkspaceId
 from src.apps.workspace.dtos.category_dtos import UpdateCategoryAppDTO
@@ -15,10 +17,10 @@ class UpdateCategoryUseCase:
         self.category_repository = category_repository
 
     async def execute(
-        self, category_id: CategoryId, workspace_id: WorkspaceId, update_data: UpdateCategoryAppDTO
+        self, category_id: int, workspace_id: UUID, update_data: UpdateCategoryAppDTO
     ) -> None:
         existing_category = await self._get_existing_category_in_workspace(
-            category_id, workspace_id
+            CategoryId(category_id), WorkspaceId(workspace_id)
         )
         updated_category = self._map_to_update_data(existing_category, update_data)
         try:

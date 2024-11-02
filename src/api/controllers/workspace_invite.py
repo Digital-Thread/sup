@@ -1,4 +1,5 @@
 from typing import Annotated
+from uuid import UUID
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
@@ -8,7 +9,6 @@ from src.api.dtos.workspace_invite_dtos import (
     ResponseWorkspaceInviteDTO,
     UpdateWorkspaceInviteDTO,
 )
-from src.apps.workspace.domain.types_ids import InviteId, WorkspaceId
 from src.apps.workspace.dtos.workspace_invite_dtos import UpdateWorkspaceInviteAppDTO
 from src.apps.workspace.exceptions.workspace_invite_exceptions import (
     WorkspaceInviteException,
@@ -25,7 +25,7 @@ workspace_invite_router = APIRouter(route_class=DishkaRoute)
 
 @workspace_invite_router.post('/create_category', status_code=status.HTTP_201_CREATED)
 async def create_category(
-    workspace_id: Annotated[WorkspaceId, Body(embed=True)],
+    workspace_id: Annotated[UUID, Body(embed=True)],
     use_case: FromDishka[CreateWorkspaceInviteUseCase],
 ) -> dict[str, str]:
     try:
@@ -41,7 +41,7 @@ async def create_category(
 )
 async def get_invites_by_workspace_id(
     request: Request,
-    workspace_id: WorkspaceId,
+    workspace_id: UUID,
     use_case: FromDishka[GetWorkspaceInviteByWorkspaceUseCase],
 ) -> list[ResponseWorkspaceInviteDTO]:
     try:
@@ -60,8 +60,8 @@ async def get_invites_by_workspace_id(
 @workspace_invite_router.patch('/{workspace_invite}', status_code=status.HTTP_200_OK)
 async def update_status_invite(
     body: UpdateWorkspaceInviteDTO,
-    workspace_id: WorkspaceId,
-    workspace_invite_id: InviteId,
+    workspace_id: UUID,
+    workspace_invite_id: int,
     use_case: FromDishka[UpdateWorkspaceInviteUseCase],
 ) -> dict[str, str]:
     request = UpdateWorkspaceInviteAppDTO(**body.model_dump(exclude_none=True))
@@ -76,8 +76,8 @@ async def update_status_invite(
 
 @workspace_invite_router.delete('/{workspace_invite}', status_code=status.HTTP_200_OK)
 async def delete_category_by_id(
-    invite_id: InviteId,
-    workspace_id: WorkspaceId,
+    invite_id: int,
+    workspace_id: UUID,
     use_case: FromDishka[DeleteWorkspaceInviteUseCase],
 ) -> dict[str, str]:
     try:

@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from src.apps.workspace.domain.entities.role import Role
 from src.apps.workspace.domain.types_ids import RoleId, WorkspaceId
 from src.apps.workspace.dtos.role_dtos import UpdateRoleAppDTO
@@ -15,9 +17,11 @@ class UpdateRoleUseCase:
         self.role_repository = role_repository
 
     async def execute(
-        self, role_id: RoleId, workspace_id: WorkspaceId, update_data: UpdateRoleAppDTO
+        self, role_id: int, workspace_id: UUID, update_data: UpdateRoleAppDTO
     ) -> None:
-        existing_role = await self._get_existing_role_in_workspace(role_id, workspace_id)
+        existing_role = await self._get_existing_role_in_workspace(
+            RoleId(role_id), WorkspaceId(workspace_id)
+        )
         updated_role = self._map_to_update_data(existing_role, update_data)
         try:
             await self.role_repository.update(updated_role)

@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from src.apps.workspace.domain.types_ids import WorkspaceId
 from src.apps.workspace.dtos.role_dtos import RoleWithUserCountAppDTO
 from src.apps.workspace.exceptions.role_exceptions import RoleException, RoleNotFound
@@ -9,9 +11,9 @@ class GetRoleByWorkspaceUseCase:
     def __init__(self, role_repository: IRoleRepository):
         self._role_repository = role_repository
 
-    async def execute(self, workspace_id: WorkspaceId) -> list[RoleWithUserCountAppDTO]:
+    async def execute(self, workspace_id: UUID) -> list[RoleWithUserCountAppDTO]:
         try:
-            roles = await self._role_repository.find_by_workspace_id(workspace_id)
+            roles = await self._role_repository.find_by_workspace_id(WorkspaceId(workspace_id))
         except RoleNotFound as error:
             raise RoleException(f'{str(error)}')
         else:

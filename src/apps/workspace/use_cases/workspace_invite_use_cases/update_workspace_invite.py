@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from src.apps.workspace.domain.entities.workspace_invite import WorkspaceInvite
 from src.apps.workspace.domain.types_ids import InviteId, WorkspaceId
 from src.apps.workspace.dtos.workspace_invite_dtos import UpdateWorkspaceInviteAppDTO
@@ -18,11 +20,13 @@ class UpdateWorkspaceInviteUseCase:
 
     async def execute(
         self,
-        invite_id: InviteId,
-        workspace_id: WorkspaceId,
+        invite_id: int,
+        workspace_id: UUID,
         update_data: UpdateWorkspaceInviteAppDTO,
     ) -> None:
-        existing_invite = await self._get_existing_invite_in_workspace(invite_id, workspace_id)
+        existing_invite = await self._get_existing_invite_in_workspace(
+            InviteId(invite_id), WorkspaceId(workspace_id)
+        )
         updated_invite = self._map_to_update_data(existing_invite, update_data)
         try:
             await self._workspace_invite_repository.update(updated_invite)

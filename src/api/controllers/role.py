@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter, HTTPException, status
@@ -7,7 +9,6 @@ from src.api.dtos.role_dtos import (
     ResponseRoleWithUserCountDTO,
     UpdateRoleDTO,
 )
-from src.apps.workspace.domain.types_ids import RoleId, WorkspaceId
 from src.apps.workspace.dtos.role_dtos import CreateRoleAppDTO, UpdateRoleAppDTO
 from src.apps.workspace.exceptions.role_exceptions import RoleException
 from src.apps.workspace.use_cases.role_use_cases import (
@@ -36,7 +37,7 @@ async def create_role(
     '/', status_code=status.HTTP_200_OK, response_model=list[ResponseRoleWithUserCountDTO]
 )
 async def get_roles_by_workspace_id(
-    workspace_id: WorkspaceId, use_case: FromDishka[GetRoleByWorkspaceUseCase]
+    workspace_id: UUID, use_case: FromDishka[GetRoleByWorkspaceUseCase]
 ) -> list[ResponseRoleWithUserCountDTO]:
     try:
         response = await use_case.execute(workspace_id)
@@ -48,8 +49,8 @@ async def get_roles_by_workspace_id(
 @role_router.patch('/{role_id}', status_code=status.HTTP_200_OK)
 async def update_role(
     body: UpdateRoleDTO,
-    workspace_id: WorkspaceId,
-    role_id: RoleId,
+    workspace_id: UUID,
+    role_id: int,
     use_case: FromDishka[UpdateRoleUseCase],
 ) -> dict[str, str]:
     request = UpdateRoleAppDTO(**body.model_dump(exclude_none=True))
@@ -62,7 +63,7 @@ async def update_role(
 
 @role_router.delete('/{role_id}')
 async def delete_role_by_id(
-    role_id: RoleId, workspace_id: WorkspaceId, use_case: FromDishka[DeleteRoleUseCase]
+    role_id: int, workspace_id: UUID, use_case: FromDishka[DeleteRoleUseCase]
 ) -> dict[str, str]:
     try:
         await use_case.execute(role_id, workspace_id)

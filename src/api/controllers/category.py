@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter, HTTPException, status
@@ -7,7 +9,6 @@ from src.api.dtos.category_dtos import (
     ResponseCategoryDTO,
     UpdateCategoryDTO,
 )
-from src.apps.workspace.domain.types_ids import CategoryId, WorkspaceId
 from src.apps.workspace.dtos.category_dtos import (
     CreateCategoryAppDTO,
     UpdateCategoryAppDTO,
@@ -37,7 +38,7 @@ async def create_category(
 
 @category_router.get('/', status_code=status.HTTP_200_OK, response_model=list[ResponseCategoryDTO])
 async def get_categories_by_workspace_id(
-    workspace_id: WorkspaceId, use_case: FromDishka[GetCategoryByWorkspaceUseCase]
+    workspace_id: UUID, use_case: FromDishka[GetCategoryByWorkspaceUseCase]
 ) -> list[ResponseCategoryDTO]:
     try:
         response = await use_case.execute(workspace_id)
@@ -49,8 +50,8 @@ async def get_categories_by_workspace_id(
 @category_router.patch('/{category_id}', status_code=status.HTTP_200_OK)
 async def update_category(
     body: UpdateCategoryDTO,
-    workspace_id: WorkspaceId,
-    category_id: CategoryId,
+    workspace_id: UUID,
+    category_id: int,
     use_case: FromDishka[UpdateCategoryUseCase],
 ) -> dict[str, str]:
     request = UpdateCategoryAppDTO(**body.model_dump(exclude_none=True))
@@ -63,7 +64,7 @@ async def update_category(
 
 @category_router.delete('/{category_id}')
 async def delete_category_by_id(
-    category_id: CategoryId, workspace_id: WorkspaceId, use_case: FromDishka[DeleteCategoryUseCase]
+    category_id: int, workspace_id: UUID, use_case: FromDishka[DeleteCategoryUseCase]
 ) -> dict[str, str]:
     try:
         await use_case.execute(category_id, workspace_id)

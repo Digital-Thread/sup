@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from src.apps.workspace.domain.entities.workspace import Workspace
 from src.apps.workspace.domain.types_ids import WorkspaceId
 from src.apps.workspace.dtos.workspace_dtos import UpdateWorkspaceAppDTO
@@ -14,8 +16,8 @@ class UpdateWorkspaceUseCase:
     def __init__(self, workspace_repository: IWorkspaceRepository):
         self.workspace_repository = workspace_repository
 
-    async def execute(self, workspace_id: WorkspaceId, updated_data: UpdateWorkspaceAppDTO) -> None:
-        updated_workspace = await self._map_to_update_data(workspace_id, updated_data)
+    async def execute(self, workspace_id: UUID, updated_data: UpdateWorkspaceAppDTO) -> None:
+        updated_workspace = await self._map_to_update_data(WorkspaceId(workspace_id), updated_data)
         try:
             await self.workspace_repository.update(updated_workspace)
         except WorkspaceNotUpdated as error:
