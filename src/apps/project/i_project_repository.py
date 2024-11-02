@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from uuid import UUID
 
 from src.apps.project.domain.entity.project import Project
-from src.apps.project.domain.types_ids import ProjectId, WorkspaceId
+from src.apps.project.domain.types_ids import ParticipantId, ProjectId, WorkspaceId
 
 
 class IProjectRepository(ABC):
@@ -25,7 +25,10 @@ class IProjectRepository(ABC):
 
     @abstractmethod
     async def update_participants(
-        self, project_id: ProjectId, workspace_id: WorkspaceId, update_participants: list[UUID]
+        self,
+        project_id: ProjectId,
+        workspace_id: WorkspaceId,
+        update_participants: list[ParticipantId],
     ) -> None:
         raise NotImplementedError
 

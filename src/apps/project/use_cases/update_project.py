@@ -1,5 +1,7 @@
+from uuid import UUID
+
 from src.apps.project.domain.entity.project import Project
-from src.apps.project.domain.types_ids import ProjectId, WorkspaceId
+from src.apps.project.domain.types_ids import ParticipantId, ProjectId, WorkspaceId
 from src.apps.project.dtos import UpdateProjectAppDTO
 from src.apps.project.exceptions import (
     ParticipantNotFound,
@@ -16,9 +18,11 @@ class UpdateProjectUseCase:
         self._project_repository = project_repository
 
     async def execute(
-        self, project_id: ProjectId, workspace_id: WorkspaceId, update_data: UpdateProjectAppDTO
+        self, project_id: int, workspace_id: UUID, update_data: UpdateProjectAppDTO
     ) -> None:
-        existing_project = await self._get_existing_project_in_workspace(project_id, workspace_id)
+        existing_project = await self._get_existing_project_in_workspace(
+            ProjectId(project_id), WorkspaceId(workspace_id)
+        )
         await self.update_participant(existing_project, update_data)
         updated_project = self._apply_update_data_to_project(existing_project, update_data)
 
@@ -43,7 +47,9 @@ class UpdateProjectUseCase:
         if self._has_participants_changed(existing_project, update_data):
             try:
                 await self._project_repository.update_participants(
-                    existing_project.id, existing_project.workspace_id, update_data.participant_ids
+                    existing_project.id,
+                    existing_project.workspace_id,
+                    [ParticipantId(participant) for participant in update_data.participant_ids],
                 )
             except ParticipantNotFound as error:
                 raise ProjectException(f'{str(error)}')

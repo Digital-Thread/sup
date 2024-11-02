@@ -62,7 +62,7 @@ class ProjectMapper:
                     logo=project[0].logo,
                     status=project[0].status,
                     created_at=project[0].created_at,
-                    assigned_to=project[0].assigned_to,
+                    assigned_to=AssignedId(project[0].assigned_to),
                     participants_count=project[1],
                 )
             )

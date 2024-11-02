@@ -1,5 +1,4 @@
 from logging import warning
-from uuid import UUID
 
 from asyncpg.exceptions import ForeignKeyViolationError, UniqueViolationError
 from sqlalchemy import delete, exists, func, select, update
@@ -9,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.apps.project.domain.entity.project import Project
-from src.apps.project.domain.types_ids import ProjectId, WorkspaceId
+from src.apps.project.domain.types_ids import ParticipantId, ProjectId, WorkspaceId
 from src.apps.project.exceptions import (
     ParticipantNotFound,
     ProjectAlreadyExists,
@@ -110,7 +109,10 @@ class ProjectRepository(IProjectRepository):
         await self._session.execute(stmt)
 
     async def update_participants(
-        self, project_id: ProjectId, workspace_id: WorkspaceId, update_participants: list[UUID]
+        self,
+        project_id: ProjectId,
+        workspace_id: WorkspaceId,
+        update_participants: list[ParticipantId],
     ) -> None:
         await self._delete_participants(project_id, workspace_id)
         await self._insert_participants(project_id, workspace_id, update_participants)
@@ -123,7 +125,7 @@ class ProjectRepository(IProjectRepository):
         await self._session.execute(delete_stmt)
 
     async def _insert_participants(
-        self, project_id: ProjectId, workspace_id: WorkspaceId, participant_ids: list[UUID]
+        self, project_id: ProjectId, workspace_id: WorkspaceId, participant_ids: list[ParticipantId]
     ) -> None:
         participant_insert_stmt = insert(ProjectParticipantsModel).values(
             [
