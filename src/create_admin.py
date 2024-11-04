@@ -1,7 +1,7 @@
 import asyncio
-from getpass import getpass
+
 from passlib.context import CryptContext
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from data_access.repositories.user_repository import UserRepository
@@ -51,11 +51,11 @@ class CreateUserAdmin:
         print('Администратор успешно создан.')
 
 
-async def main():
+async def main() -> None:
     # Создаем сессию и необходимые объекты
     async with AsyncSessionLocal() as session:
         user_repository = UserRepository(session)
-        pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+        pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
         create_user_admin = CreateUserAdmin(user_repository, pwd_context)
 
         # Запрашиваем данные у пользователя
