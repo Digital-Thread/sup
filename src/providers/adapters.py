@@ -17,7 +17,12 @@ from src.apps.workspace.repositories import (
     IWorkspaceInviteRepository,
     IWorkspaceRepository,
 )
-from src.config import Config, DbConfig
+from src.apps.comment.domain import (
+    CommentEntity,
+    CommentId,
+    Content,
+    ICommentRepository,
+)
 from src.data_access.reposotiries import (
     CategoryRepository,
     RoleRepository,
@@ -25,6 +30,8 @@ from src.data_access.reposotiries import (
     WorkspaceInviteRepository,
     WorkspaceRepository,
 )
+from src.data_access.reposotiries import CommentRepository
+from src.config import Config, DbConfig
 
 
 class SqlalchemyProvider(Provider):
@@ -70,3 +77,6 @@ class RepositoriesProvider(Provider):
     category_repository = provide(CategoryRepository, provides=ICategoryRepository)
     role_repository = provide(RoleRepository, provides=IRoleRepository)
     tag_repository = provide(TagRepository, provides=ITagRepository)
+    comment_repo = provide(
+        CommentRepository, provides=ICommentRepository[Content, CommentId, CommentEntity]
+    )

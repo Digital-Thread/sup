@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from .comment import comment_router
 from .category import category_router
 from .health_check import router
 from .role import role_router
@@ -24,6 +25,7 @@ def init_routes(app: FastAPI) -> None:
         prefix=f'{prefix}/workspace_invites',
         tags=['WorkspaceInvite'],
     )
+    app.include_router(router=comment_router, prefix=f'{prefix}/comments', tags=['Comment'])
 
 
 __all__ = ('init_routes',)
