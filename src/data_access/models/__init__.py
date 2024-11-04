@@ -8,6 +8,8 @@ from .workspace_models.workspace_invite import WorkspaceInviteModel
 from .workspace_models.workspace_members import WorkspaceMemberModel
 from .comment import CommentModel
 from .user import UserModel
+from .project import ProjectModel
+
 
 __all__ = (
     'Base',

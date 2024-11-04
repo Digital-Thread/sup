@@ -23,6 +23,7 @@ from src.providers.usecases import (
     TagUseCaseProvider,
     WorkspaceInviteUseCaseProvider,
     WorkspaceUseCaseProvider,
+    ProjectUseCaseProvider,
 )
 
 from src.utils import log
@@ -42,6 +43,7 @@ def container_factory() -> AsyncContainer:
         SqlalchemyProvider(),
         ConfigProvider(),
         RepositoriesProvider(),
+        ProjectUseCaseProvider(),
         InteractorProvider(),
         WorkspaceUseCaseProvider(),
         RoleUseCaseProvider(),

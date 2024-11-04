@@ -49,6 +49,12 @@ from src.apps.workspace.use_cases.workspace_use_cases import (
     GetWorkspaceByMemberUseCase,
     UpdateWorkspaceUseCase,
 )
+from src.apps.project.use_cases import (
+    CreateProjectUseCase,
+    DeleteProjectUseCase,
+    GetProjectByWorkspaceUseCase,
+    UpdateProjectUseCase,
+)
 
 
 class InteractorProvider(Provider):
@@ -64,7 +70,6 @@ class InteractorProvider(Provider):
         UpdateCommentInteractor, provides=Interactor[UpdateCommentDto, CommentOutDto]
     )
     delete_comment = provide(DeleteCommentInteractor, provides=Interactor[DeleteCommentDto, None])
-
 
 
 class WorkspaceUseCaseProvider(Provider):
@@ -115,3 +120,12 @@ class WorkspaceInviteUseCaseProvider(Provider):
     get_workspace_invite_by_workspace = provide(GetWorkspaceInviteByWorkspaceUseCase)
     update_workspace_invite = provide(UpdateWorkspaceInviteUseCase)
     delete_workspace_invite = provide(DeleteWorkspaceInviteUseCase)
+
+
+class ProjectUseCaseProvider(Provider):
+    scope = Scope.REQUEST
+
+    create_project = provide(CreateProjectUseCase)
+    get_project_by_workspace = provide(GetProjectByWorkspaceUseCase)
+    update_project = provide(UpdateProjectUseCase)
+    delete_project = provide(DeleteProjectUseCase)

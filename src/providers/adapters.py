@@ -31,7 +31,9 @@ from src.data_access.reposotiries import (
     WorkspaceRepository,
 )
 from src.data_access.reposotiries import CommentRepository
+from src.apps.project.i_project_repository import IProjectRepository
 from src.config import Config, DbConfig
+from src.data_access.reposotiries.project_repository import ProjectRepository
 
 
 class SqlalchemyProvider(Provider):
@@ -80,3 +82,5 @@ class RepositoriesProvider(Provider):
     comment_repo = provide(
         CommentRepository, provides=ICommentRepository[Content, CommentId, CommentEntity]
     )
+
+    project_repository = provide(ProjectRepository, provides=IProjectRepository)
