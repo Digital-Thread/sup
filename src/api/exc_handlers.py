@@ -2,12 +2,21 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
 from src.apps import ApplicationException
+from src.apps.feature.exceptions import (
+    FeatureCreateError,
+    FeatureDeleteError,
+    FeatureDoesNotExistError,
+    FeatureUpdateError,
+)
 
 __all__ = ('init_exception_handlers',)
 
-
 exception_status_codes = {
     # ExampleNotFoundException: status.HTTP_404_NOT_FOUND,
+    FeatureCreateError: status.HTTP_400_BAD_REQUEST,
+    FeatureDeleteError: status.HTTP_400_BAD_REQUEST,
+    FeatureDoesNotExistError: status.HTTP_404_NOT_FOUND,
+    FeatureUpdateError: status.HTTP_400_BAD_REQUEST,
     ApplicationException: status.HTTP_500_INTERNAL_SERVER_ERROR,
 }
 
