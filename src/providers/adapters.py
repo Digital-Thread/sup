@@ -24,7 +24,7 @@ from src.apps.user.services import (
 from src.apps.user.services.password_reset_user_service import PasswordResetUserService
 from src.apps.user.services.remove_user_service import RemoveUserService
 from src.config import Config, DbConfig, JWTConfig, RedisConfig, SMTPConfig
-from src.data_access.reposotiries.user_repository import UserRepository
+from src.data_access.repositories.user_repository import UserRepository
 
 
 class SqlalchemyProvider(Provider):
@@ -74,8 +74,8 @@ class RepositoriesProvider(Provider):
     scope = Scope.REQUEST
 
     @provide(scope=scope, provides=SendMailServiceProtocol)
-    def provide_send_mail_service(self, smtp_config: SMTPConfig) -> SendMailService:
-        return SendMailService(smtp_config)
+    def provide_send_mail_service(self) -> SendMailService:
+        return SendMailService()
 
     @provide(scope=scope, provides=JWTServiceProtocol)
     def provide_jwt_protocol_service(
@@ -102,12 +102,14 @@ class RepositoriesProvider(Provider):
         send_mail_service: SendMailServiceProtocol,
         repository: IUserRepository,
         redis_config: RedisConfig,
+        smtp_config: SMTPConfig,
     ) -> CreateUserService:
         return CreateUserService(
             pwd_context=pwd_context,
             send_mail_service=send_mail_service,
             repository=repository,
             redis_config=redis_config,
+            smtp_config=smtp_config,
         )
 
     @provide(scope=scope)

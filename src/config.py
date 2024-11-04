@@ -141,7 +141,7 @@ class SMTPConfig:
     port: int
     password: str
     email: str
-    TLS: bool = True
+    tls: bool
 
     @staticmethod
     def from_env(env: Env) -> 'SMTPConfig':
@@ -149,11 +149,13 @@ class SMTPConfig:
         port = env.int('SMTP_PORT')
         password = env.str('SMTP_PASS')
         email = env.str('SMTP_EMAIL')
+        tls = env.bool('SMTP_TLS')
         return SMTPConfig(
             host=host,
             port=port,
             password=password,
             email=email,
+            tls=tls,
         )
 
 

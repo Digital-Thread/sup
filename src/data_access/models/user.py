@@ -6,6 +6,7 @@ from .mixins import DatetimeFieldsMixin, UUIDPkMixin
 
 
 class User(Base, DatetimeFieldsMixin, UUIDPkMixin):
+    __tablename__ = 'users'
     first_name: Mapped[str] = mapped_column(String(20), nullable=False)
     last_name: Mapped[str] = mapped_column(String(20), nullable=False)
     email: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)

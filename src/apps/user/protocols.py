@@ -1,7 +1,9 @@
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Protocol, Union
+from typing import Optional, Protocol, Union
 
 from pydantic import EmailStr
+
+from src.config import SMTPConfig
 
 
 @dataclass
@@ -39,17 +41,21 @@ class JWTServiceProtocol(Protocol):
 @dataclass
 class SendMailServiceProtocol(Protocol):
 
-    async def send_activation_email(self, email: str, token: str) -> None:
+    async def send_activation_email(self, smtp_config: SMTPConfig, email: str, token: str) -> None:
         pass
 
-    async def send_invite_email(self, email: str, token: str) -> None:
+    async def send_invite_email(self, smtp_config: SMTPConfig, email: str, token: str) -> None:
         pass
 
-    async def send_login_and_activate_email(self, email: str, password: str, token: str) -> None:
+    async def send_login_and_activate_email(
+        self, smtp_config: SMTPConfig, email: str, password: str, token: str
+    ) -> None:
         pass
 
-    async def send_login_email(self, email: str, password: str) -> None:
+    async def send_login_email(self, smtp_config: SMTPConfig, email: str, password: str) -> None:
         pass
 
-    async def password_reset_email(self, email: str, password: str) -> None:
+    async def password_reset_email(
+        self, smtp_config: SMTPConfig, email: str, password: str
+    ) -> None:
         pass

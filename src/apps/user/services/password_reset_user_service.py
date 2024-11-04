@@ -45,6 +45,7 @@ class PasswordResetUserService:
             await self.repository.update(user)
             if password_sent:
                 await self.create_service.send_mail_service.password_reset_email(
+                    smtp_config=self.create_service.smtp_config,
                     email=user.email,
                     password=password,
                 )
