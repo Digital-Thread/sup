@@ -10,7 +10,9 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
+from src.apps.feature.repositories import IFeatureRepository
 from src.config import Config, DbConfig
+from src.data_access.reposotiries import FeatureRepository
 
 
 class SqlalchemyProvider(Provider):
@@ -50,3 +52,4 @@ class ConfigProvider(Provider):
 
 class RepositoriesProvider(Provider):
     scope = Scope.REQUEST
+    feature_repository = provide(FeatureRepository, provides=IFeatureRepository)
