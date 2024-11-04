@@ -10,6 +10,8 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
+from src.apps.comment.domain import ICommentRepository
+from src.config import Config, DbConfig
 from src.apps.workspace.repositories import (
     ICategoryRepository,
     IRoleRepository,
@@ -72,6 +74,8 @@ class ConfigProvider(Provider):
 
 class RepositoriesProvider(Provider):
     scope = Scope.REQUEST
+    
+    comment_repo = provide(CommentRepository, provides=ICommentRepository)
     workspace_repository = provide(WorkspaceRepository, provides=IWorkspaceRepository)
     workspace_invite_repository = provide(
         WorkspaceInviteRepository, provides=IWorkspaceInviteRepository
@@ -82,5 +86,4 @@ class RepositoriesProvider(Provider):
     comment_repo = provide(
         CommentRepository, provides=ICommentRepository[Content, CommentId, CommentEntity]
     )
-
     project_repository = provide(ProjectRepository, provides=IProjectRepository)

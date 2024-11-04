@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
@@ -9,13 +10,15 @@ from src.apps.comment.domain import (
     CommentEntity,
     CommentId,
     Content,
+    FeatureId,
     ICommentRepository,
+    TaskId,
 )
 from src.data_access import CommentConverter
 from src.data_access.models import CommentModel
 
 
-class CommentRepository(ICommentRepository[Content, CommentId, CommentEntity]):
+class CommentRepository(ICommentRepository):
 
     def __init__(self, session_factory: AsyncSession) -> None:
         self._session = session_factory
@@ -42,13 +45,30 @@ class CommentRepository(ICommentRepository[Content, CommentId, CommentEntity]):
             raise CommentNotFoundError()
         return CommentConverter.convert_db_model_to_comment_entity(comment)
 
-    async def fetch_all(self, page: int, page_size: int) -> list[CommentEntity]:
+    async def _fetch_comments(self, query: Any, page: int, page_size: int) -> list[CommentEntity]:
         offset = (page - 1) * page_size
-        result = await self._session.execute(select(CommentModel).offset(offset).limit(page_size))
+        stmt = query.offset(offset).limit(page_size)
+        result = await self._session.execute(stmt)
         comments = result.scalars().all()
         return [
             CommentConverter.convert_db_model_to_comment_entity(comment) for comment in comments
         ]
+
+    async def fetch_all(self, page: int, page_size: int) -> list[CommentEntity]:
+        query = select(CommentModel)
+        return await self._fetch_comments(query, page, page_size)
+
+    async def fetch_task_comments(
+        self, task_id: TaskId, page: int, page_size: int
+    ) -> list[CommentEntity]:
+        query = select(CommentModel).where(CommentModel.task_id == task_id.to_raw())
+        return await self._fetch_comments(query, page, page_size)
+
+    async def fetch_feature_comments(
+        self, feature_id: FeatureId, page: int, page_size: int
+    ) -> list[CommentEntity]:
+        query = select(CommentModel).where(CommentModel.feature_id == feature_id.to_raw())
+        return await self._fetch_comments(query, page, page_size)
 
     async def update_comment(
         self, comment_id: CommentId, new_content: Content

@@ -1,14 +1,15 @@
 import abc
 from typing import Protocol
 
-from .entity import AggregateRoot
+from .entity import CommentEntity
 from .event import Event
+from .value_objects import CommentId, Content, FeatureId, TaskId
 
 
-class ICommentRepository[Content, CommentId, Entity: AggregateRoot](Protocol):
+class ICommentRepository(Protocol):
 
     @abc.abstractmethod
-    async def save(self, entity: Entity) -> Entity | None:
+    async def save(self, entity: CommentEntity) -> CommentEntity | None:
         """
         Сохранить комментарий в базе данных
         :param entity: Сущность комментария для сохранения
@@ -17,7 +18,7 @@ class ICommentRepository[Content, CommentId, Entity: AggregateRoot](Protocol):
         pass
 
     @abc.abstractmethod
-    async def fetch_by_id(self, comment_id: CommentId) -> Entity | None:
+    async def fetch_by_id(self, comment_id: CommentId) -> CommentEntity | None:
         """
         Получить комментарий по его ID
         :param comment_id: Идентификатор комментария
@@ -26,7 +27,7 @@ class ICommentRepository[Content, CommentId, Entity: AggregateRoot](Protocol):
         pass
 
     @abc.abstractmethod
-    async def fetch_all(self, page: int, page_size: int) -> list[Entity]:
+    async def fetch_all(self, page: int, page_size: int) -> list[CommentEntity]:
         """
         Получить список всех комментариев
         :return: Список сущностей комментариев
@@ -34,7 +35,7 @@ class ICommentRepository[Content, CommentId, Entity: AggregateRoot](Protocol):
         pass
 
     @abc.abstractmethod
-    async def update_comment(self, comment_id: CommentId, new_content: Content) -> Entity:
+    async def update_comment(self, comment_id: CommentId, new_content: Content) -> CommentEntity:
         """
         Обновить данные комментария по его ID
         :param comment_id: Идентификатор комментария
@@ -49,6 +50,32 @@ class ICommentRepository[Content, CommentId, Entity: AggregateRoot](Protocol):
         Удалить комментарий по его ID
         :param comment_id: Идентификатор комментария
         :return: None
+        """
+        pass
+
+    @abc.abstractmethod
+    async def fetch_task_comments(
+        self, task_id: TaskId, page: int, page_size: int
+    ) -> list[CommentEntity]:
+        """
+        Получить список комментариев для задачи
+        :param task_id: Идентификатор задачи
+        :param page: Номер страницы
+        :param page_size: Размер страницы
+        :return: Список сущностей комментариев
+        """
+        pass
+
+    @abc.abstractmethod
+    async def fetch_feature_comments(
+        self, feature_id: FeatureId, page: int, page_size: int
+    ) -> list[CommentEntity]:
+        """
+        Получить список комментариев для фичи
+        :param feature_id: Идентификатор фичи
+        :param page: Номер страницы
+        :param page_size: Размер страницы
+        :return: Список сущностей комментариев
         """
         pass
 

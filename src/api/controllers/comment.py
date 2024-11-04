@@ -13,12 +13,13 @@ from src.api.dtos import (
 from src.apps.comment import (
     AddCommentDto,
     CommentOutDto,
-    CommentPaginationDto,
     DeleteCommentDto,
     FetchCommentDto,
+    FetchTaskCommentDto,
     UpdateCommentDto,
 )
 from src.apps.comment.domain import Interactor
+from src.apps.comment.dtos import FetchFeatureCommentDto
 
 comment_router = APIRouter()
 
@@ -86,19 +87,39 @@ async def get_comment_by_id(
 
 
 @comment_router.get(
-    '/',
+    '/tasks/{task_id}',
     response_model=list[CommentResponseDto],
     response_model_exclude_none=True,
     status_code=status.HTTP_200_OK,
 )
 @inject
-async def get_comments(
-    interactor: FromDishka[Interactor[CommentPaginationDto, list[CommentOutDto]]],
+async def get_task_comments(
+    interactor: FromDishka[Interactor[FetchTaskCommentDto, list[CommentOutDto]]],
+    task_id: Annotated[int, Path()],
     page: int = Query(1, description='Page number', ge=1),
     page_size: int = Query(10, description='Number of comments per page', ge=1, le=100),
 ) -> list[CommentResponseDto]:
     response = await interactor.execute(
-        request=CommentPaginationDto(page=page, page_size=page_size)
+        request=FetchTaskCommentDto(page=page, page_size=page_size, task_id=task_id)
+    )
+    return list_dto_mapper(responses=response)
+
+
+@comment_router.get(
+    '/features/{feature_id}',
+    response_model=list[CommentResponseDto],
+    response_model_exclude_none=True,
+    status_code=status.HTTP_200_OK,
+)
+@inject
+async def get_feature_comments(
+    interactor: FromDishka[Interactor[FetchFeatureCommentDto, list[CommentOutDto]]],
+    feature_id: Annotated[int, Path()],
+    page: int = Query(1, description='Page number', ge=1),
+    page_size: int = Query(10, description='Number of comments per page', ge=1, le=100),
+) -> list[CommentResponseDto]:
+    response = await interactor.execute(
+        request=FetchFeatureCommentDto(feature_id=feature_id, page=page, page_size=page_size),
     )
     return list_dto_mapper(responses=response)
 

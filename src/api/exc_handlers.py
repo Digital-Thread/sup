@@ -21,6 +21,7 @@ async def application_error_handler(
             type(exc),
             status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
     return JSONResponse(
         status_code=status_code,
         content={'message': str(exc)},
