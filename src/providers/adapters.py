@@ -20,7 +20,7 @@ from src.apps.workspace.repositories import (
     IWorkspaceRepository,
 )
 from src.config import Config, DbConfig
-from src.data_access.reposotiries import (
+from src.data_access.repositories import (
     CategoryRepository,
     CommentRepository,
     RoleRepository,
@@ -28,7 +28,7 @@ from src.data_access.reposotiries import (
     WorkspaceInviteRepository,
     WorkspaceRepository,
 )
-from src.data_access.reposotiries.project_repository import ProjectRepository
+from src.data_access.repositories.project_repository import ProjectRepository
 
 
 class SqlalchemyProvider(Provider):
