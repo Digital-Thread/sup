@@ -18,6 +18,12 @@ from src.apps.comment import (
     UpdateCommentInteractor,
 )
 from src.apps.comment.domain import Interactor
+from src.apps.project.use_cases import (
+    CreateProjectUseCase,
+    DeleteProjectUseCase,
+    GetProjectByWorkspaceUseCase,
+    UpdateProjectUseCase,
+)
 from src.apps.workspace.use_cases.category_use_cases import (
     CreateCategoryUseCase,
     DeleteCategoryUseCase,
@@ -52,12 +58,6 @@ from src.apps.workspace.use_cases.workspace_use_cases import (
     GetWorkspaceByIdUseCase,
     GetWorkspaceByMemberUseCase,
     UpdateWorkspaceUseCase,
-)
-from src.apps.project.use_cases import (
-    CreateProjectUseCase,
-    DeleteProjectUseCase,
-    GetProjectByWorkspaceUseCase,
-    UpdateProjectUseCase,
 )
 
 

@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from src.apps.comment.domain import ICommentRepository
-from src.config import Config, DbConfig
+from src.apps.project.i_project_repository import IProjectRepository
 from src.apps.workspace.repositories import (
     ICategoryRepository,
     IRoleRepository,
@@ -19,22 +19,15 @@ from src.apps.workspace.repositories import (
     IWorkspaceInviteRepository,
     IWorkspaceRepository,
 )
-from src.apps.comment.domain import (
-    CommentEntity,
-    CommentId,
-    Content,
-    ICommentRepository,
-)
+from src.config import Config, DbConfig
 from src.data_access.reposotiries import (
     CategoryRepository,
+    CommentRepository,
     RoleRepository,
     TagRepository,
     WorkspaceInviteRepository,
     WorkspaceRepository,
 )
-from src.data_access.reposotiries import CommentRepository
-from src.apps.project.i_project_repository import IProjectRepository
-from src.config import Config, DbConfig
 from src.data_access.reposotiries.project_repository import ProjectRepository
 
 
@@ -74,7 +67,7 @@ class ConfigProvider(Provider):
 
 class RepositoriesProvider(Provider):
     scope = Scope.REQUEST
-    
+
     comment_repo = provide(CommentRepository, provides=ICommentRepository)
     workspace_repository = provide(WorkspaceRepository, provides=IWorkspaceRepository)
     workspace_invite_repository = provide(
@@ -83,7 +76,5 @@ class RepositoriesProvider(Provider):
     category_repository = provide(CategoryRepository, provides=ICategoryRepository)
     role_repository = provide(RoleRepository, provides=IRoleRepository)
     tag_repository = provide(TagRepository, provides=ITagRepository)
-    comment_repo = provide(
-        CommentRepository, provides=ICommentRepository[Content, CommentId, CommentEntity]
-    )
+    comment_repo = provide(CommentRepository, provides=ICommentRepository)
     project_repository = provide(ProjectRepository, provides=IProjectRepository)

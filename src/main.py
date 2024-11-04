@@ -17,15 +17,14 @@ from src.providers.adapters import (
     SqlalchemyProvider,
 )
 from src.providers.usecases import (
-    InteractorProvider,
     CategoryUseCaseProvider,
+    InteractorProvider,
+    ProjectUseCaseProvider,
     RoleUseCaseProvider,
     TagUseCaseProvider,
     WorkspaceInviteUseCaseProvider,
     WorkspaceUseCaseProvider,
-    ProjectUseCaseProvider,
 )
-
 from src.utils import log
 
 logger = structlog.stdlib.get_logger()
