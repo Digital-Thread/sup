@@ -1,15 +1,11 @@
-import uuid
 from datetime import datetime
 from typing import Annotated
 
 from sqlalchemy import TIMESTAMP, func
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 pk = Annotated[int, mapped_column(primary_key=True, autoincrement=True, unique=True)]
-pk_uuid = Annotated[
-    uuid.UUID, mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True)
-]
 
 
 class IntIdPkMixin:
@@ -17,8 +13,11 @@ class IntIdPkMixin:
 
 
 class UUIDPkMixin:
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True
+    id: Mapped[UUID] = mapped_column(
+        PostgreSQLUUID(as_uuid=True),
+        primary_key=True,
+        default=uuid4,
+        server_default=func.uuid_generate_v4(),
     )
 
 
