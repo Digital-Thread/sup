@@ -6,7 +6,7 @@ from fastapi import Request, Response
 async def update_tokens_middleware(
     request: Request, call_next: Callable[[Request], Response]
 ) -> Response:
-    response: Response = await call_next(request)
+    response: Response = call_next(request)
     access_token = getattr(request.state, 'new_access_token', None)
     refresh_token = getattr(request.state, 'new_refresh_token', None)
     max_age_access = getattr(request.state, 'max_age_access', None)

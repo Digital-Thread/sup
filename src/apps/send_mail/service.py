@@ -22,9 +22,11 @@ class SendMailService:
         )
 
     @staticmethod
-    async def send_login_email(smtp_config: SMTPConfig, email: str, password: str) -> None:
+    async def send_login_email(
+        smtp_config: SMTPConfig, email: str, password: str, token: str
+    ) -> None:
         await send_login_and_activate_email_task(
-            smtp_config=smtp_config, email=email, password=password
+            smtp_config=smtp_config, email=email, password=password, token=token
         )
 
     @staticmethod

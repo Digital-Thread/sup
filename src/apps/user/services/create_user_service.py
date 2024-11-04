@@ -3,8 +3,9 @@ import string
 import uuid
 from dataclasses import asdict
 from datetime import timedelta
+from typing import Optional
 
-import redis.asyncio as redis  # type: ignore
+import redis.asyncio as redis
 from passlib.context import CryptContext
 
 from src.apps.user.domain.entities import User
@@ -74,17 +75,16 @@ class CreateUserService:
         return user
 
     async def create_user_by_invite(self, dto: UserCreateDTO, token: str) -> tuple[User, uuid.UUID]:
-        invite_token = await self.redis_client.get(f'invite_token:{dto.email}')
+        invite_token: Optional[bytes] = await self.redis_client.get(f'invite_token:{dto.email}')
         if invite_token is None:
             raise TokenActivationExpire()
-        invite_token = invite_token.decode('utf-8')
-        comparison_token = invite_token.split('_')[0]
-        print(comparison_token)
+        invite_token_str: str = invite_token.decode('utf-8')
+        comparison_token = invite_token_str.split('_')[0]
 
         if comparison_token != token:
             raise UserPermissionError()
 
-        inviter_email = invite_token.split('_')[1]
+        inviter_email = invite_token_str.split('_')[1]
 
         inviter_user = await self.repository.find_by_email(inviter_email)
         inviter_user_id = inviter_user.id
@@ -122,6 +122,7 @@ class CreateUserService:
                 smtp_config=self.smtp_config,
                 email=user.email,
                 password=password,
+                token=activation_token,
             )
 
         return user.email, password

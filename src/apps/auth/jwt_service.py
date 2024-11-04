@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import Optional, Union
 
 import jwt
-import redis.asyncio as redis  # type: ignore
+import redis.asyncio as redis
 
 from src.apps.auth.dto import AccessTokenDTO, RefreshTokenDTO
 from src.apps.auth.exceptions import (
@@ -25,7 +25,7 @@ class JWTService:
         dsn = redis_config.construct_redis_dsn
         self.redis_client = redis.StrictRedis.from_url(dsn)
 
-    async def create_access_token(self, email: str) -> tuple[AccessTokenDTO, int]:
+    async def create_access_token(self, email: str) -> tuple[str, int]:
         expiration_access = datetime.now(timezone.utc) + self.access_token_lifetime
         max_age_access = int(expiration_access.timestamp()) - int(time.time())
         access_token = jwt.encode(
@@ -33,7 +33,7 @@ class JWTService:
         )
         return access_token, max_age_access
 
-    async def create_refresh_token(self, email: str) -> tuple[RefreshTokenDTO, int]:
+    async def create_refresh_token(self, email: str) -> tuple[str, int]:
         expiration_refresh = datetime.now(timezone.utc) + self.refresh_token_lifetime
         max_age_refresh = int(expiration_refresh.timestamp()) - int(time.time())
         refresh_token = jwt.encode(
@@ -41,9 +41,10 @@ class JWTService:
         )
         return refresh_token, max_age_refresh
 
-    async def decode_access_token(self, token: AccessTokenDTO) -> Optional[str]:
+    async def decode_access_token(self, token: str) -> str | bytes:
         try:
-            payload = jwt.decode(token, self.secret_key, algorithms=self.algorithm)
+            algorithms = [self.algorithm] if isinstance(self.algorithm, str) else self.algorithm
+            payload = jwt.decode(token, self.secret_key, algorithms=algorithms)
             email = payload['email']
             return email
         except jwt.ExpiredSignatureError:
@@ -51,9 +52,10 @@ class JWTService:
         except jwt.InvalidTokenError:
             return None
 
-    async def decode_refresh_token(self, token: RefreshTokenDTO) -> str | None:
+    async def decode_refresh_token(self, token: str) -> str | bytes:
         try:
-            payload = jwt.decode(token, self.secret_key, algorithms=self.algorithm)
+            algorithms = [self.algorithm] if isinstance(self.algorithm, str) else self.algorithm
+            payload = jwt.decode(token, self.secret_key, algorithms=algorithms)
             email = payload['email']
             return email
         except jwt.ExpiredSignatureError:
@@ -61,9 +63,7 @@ class JWTService:
         except jwt.InvalidTokenError:
             raise InvalidTokenError()
 
-    async def creating_tokens(
-        self, email: str, user_agent: str
-    ) -> tuple[AccessTokenDTO, int, RefreshTokenDTO, int]:
+    async def creating_tokens(self, email: str, user_agent: str) -> tuple[str, int, str, int]:
         access_token, access_max_age = await self.create_access_token(email)
         refresh_token, refresh_max_age = await self.create_refresh_token(email)
 
@@ -83,13 +83,15 @@ class JWTService:
     async def access_token_protected_resource(
         self, email: str, access_token_client: str, user_agent: str
     ) -> Union[bool, RefreshTokenDTO]:
-        access_token = await self.redis_client.get(f'access_token:{email}/{user_agent}')
-        if access_token is not None:
-            access_token = access_token.decode('utf-8')
-        if access_token == access_token_client:
-            decoded = await self.decode_access_token(access_token)
-            if decoded:
-                return True
+        access_token: Optional[bytes] = await self.redis_client.get(
+            f'access_token:{email}/{user_agent}'
+        )
+        if access_token is not None and isinstance(access_token, bytes):
+            access_token_str: str = access_token.decode('utf-8')
+            if access_token_str == access_token_client:
+                decoded = await self.decode_access_token(access_token_str)
+                if decoded:
+                    return True
         return False
 
     async def refresh_token_protected_resource(
@@ -97,9 +99,9 @@ class JWTService:
     ) -> bool:
         refresh_token = await self.redis_client.get(f'refresh_token:{email}/{user_agent}')
         if refresh_token is not None:
-            refresh_token = refresh_token.decode('utf-8')
-        if refresh_token == refresh_token_client:
-            return True
+            refresh_token_str: str = refresh_token.decode('utf-8')
+            if refresh_token_str == refresh_token_client:
+                return True
         raise TokenRefreshExpireError()
 
     async def delete_tokens_user(self, email: str) -> None:

@@ -52,7 +52,9 @@ class SendMailServiceProtocol(Protocol):
     ) -> None:
         pass
 
-    async def send_login_email(self, smtp_config: SMTPConfig, email: str, password: str) -> None:
+    async def send_login_email(
+        self, smtp_config: SMTPConfig, email: str, password: str, token: str
+    ) -> None:
         pass
 
     async def password_reset_email(

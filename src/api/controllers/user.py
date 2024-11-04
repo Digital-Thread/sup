@@ -4,17 +4,16 @@ from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Path, Query, Request, Response
 
 from src.api.dependencies.auth_helpers import authenticate_and_create_tokens
-from src.api.dtos.user import (  # UserCreateDTO,
+from src.api.dtos.user import RegistrationResponseDTO, UserResponseDTO
+from src.apps.auth import JWTService
+from src.apps.user.dtos import (
     AdminCreateUserDTO,
     AdminPasswordUpdateDTO,
     AuthDTO,
-    RegistrationResponseDTO,
+    UserCreateDTO,
     UserPasswordUpdateDTO,
-    UserResponseDTO,
     UserUpdateDTO,
 )
-from src.apps.auth import JWTService
-from src.apps.user.dtos import UserCreateDTO
 from src.apps.user.services import (
     AuthenticateUserService,
     AuthorizeUserService,
@@ -61,6 +60,8 @@ async def logout_user(
     else:
         refresh_token = request.cookies.get('sup_refresh_token')
         email = await token_service.decode_refresh_token(refresh_token)
+    if isinstance(email, bytes):
+        email = email.decode('utf-8')
     await token_service.removing_tokens(email=email, user_agent=user_agent)
     response.delete_cookie('sup_access_token')
     response.delete_cookie('sup_refresh_token')
