@@ -1,23 +1,14 @@
-from apps.feature import (
-    Feature,
-    FeatureId,
-    FeatureListQuery,
-    IFeatureRepository,
-    TagId,
-    UserId,
-    WorkspaceId,
-)
 from asyncpg import ForeignKeyViolationError
-from data_access.models import (  # пока нет по указанному пути
-    FeatureModel,
-    TagModel,
-    UserModel,
-)
-from data_access.reposotiries.feature import DataBaseError, FeatureMapper
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+
+from src.apps.feature.domain import Feature, FeatureId, TagId, UserId, WorkspaceId
+from src.apps.feature.exceptions import RepositoryError
+from src.apps.feature.repositories import FeatureListQuery, IFeatureRepository
+from src.data_access.models import FeatureModel, TagModel, UserModel
+from src.data_access.reposotiries.feature import FeatureMapper
 
 
 class FeatureRepository(IFeatureRepository):

@@ -1,7 +1,7 @@
 from typing import Any, Tuple
 
-from apps import ApplicationException
-from apps.feature.domain.aliases import FeatureId
+from src.apps import ApplicationException
+from src.apps.feature.domain import FeatureId
 
 
 class FeatureError(ApplicationException):
