@@ -19,7 +19,7 @@ class FeatureRepository(IFeatureRepository):
         self.mapper = FeatureMapper()
 
     async def _get_m2m_objects(
-            self, list_ids: list[TagId | UserId] | None, model: TagModel | UserModel
+        self, list_ids: list[TagId | UserId] | None, model: TagModel | UserModel
     ) -> list[TagModel | UserModel] | None:
         if list_ids:
             query = select(model).where(model.id.in_(list_ids))
@@ -40,8 +40,8 @@ class FeatureRepository(IFeatureRepository):
         except IntegrityError as e:
             orig_exception = e.orig.__cause__
             if isinstance(orig_exception, ForeignKeyViolationError):
-                detail_message = orig_exception.detail  # noqa
-                raise DataBaseError(f'Ошибка создания фичи: {detail_message}')
+                detail_message = orig_exception.detail
+                raise RepositoryError(detail_message)
             else:
                 raise
 
@@ -77,8 +77,8 @@ class FeatureRepository(IFeatureRepository):
             except IntegrityError as e:
                 orig_exception = e.orig.__cause__
                 if isinstance(orig_exception, ForeignKeyViolationError):
-                    detail_message = orig_exception.detail  # noqa
-                    raise DataBaseError(f'Ошибка обновления фичи: {detail_message}')
+                    detail_message = orig_exception.detail
+                    raise RepositoryError(detail_message)
                 else:
                     raise
 
@@ -86,10 +86,12 @@ class FeatureRepository(IFeatureRepository):
         feature_model = await self._session.get(self.model, feature_id)
         if feature_model:
             await self._session.delete(feature_model)
+        else:
+            raise RepositoryError(message=f'Не найдена фича с id: {feature_id}')
 
     async def get_list(
-            self, workspace_id: WorkspaceId, query: FeatureListQuery
-    ) -> list[tuple[FeatureId, Feature]]:
+        self, workspace_id: WorkspaceId, query: FeatureListQuery
+    ) -> list[tuple[FeatureId, Feature]] | None:
         filters = {k: v for k, v in (query.filters or {}).items() if v is not None}
         stmt = (
             select(self.model)
@@ -100,9 +102,9 @@ class FeatureRepository(IFeatureRepository):
                 if query.order_by.order == 'ASC'
                 else getattr(self.model, str(query.order_by.field)).desc()
             )
-            .limit(query.limit_by)
-            .offset(query.offset)
+            .limit(query.paginate_by.limit_by)
+            .offset(query.paginate_by.offset)
         )
         result = await self._session.execute(stmt)
         features = result.scalars().all()
-        return [self.mapper.map_model_to_entity(f) for f in features] if features else []
+        return [self.mapper.map_model_to_entity(f) for f in features] if features else None
