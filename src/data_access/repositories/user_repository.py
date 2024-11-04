@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.apps.user.domain.entities import User
 from src.apps.user.repositories import IUserRepository
-from src.data_access.models import User as UserModel
+from src.data_access.models import UserModel
 
 
 def domain_to_model(user: User) -> UserModel:

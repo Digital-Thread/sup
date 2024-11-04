@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Annotated
+from uuid import uuid4, UUID
 
 from sqlalchemy import TIMESTAMP, func
 from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID

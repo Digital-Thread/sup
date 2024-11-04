@@ -1,11 +1,9 @@
 from sqlalchemy import Boolean, String
-from sqlalchemy.orm import Mapped, mapped_column
 from typing import TYPE_CHECKING
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
-from .mixins import DatetimeFieldsMixin, UUIDPkMixin
 from .mixins import DatetimeFieldsMixin, UUIDPkMixin
 
 if TYPE_CHECKING:
@@ -15,7 +13,7 @@ if TYPE_CHECKING:
     from src.data_access.models.workspace_models.workspace import WorkspaceModel
 
 
-class User(Base, DatetimeFieldsMixin, UUIDPkMixin):
+class UserModel(Base, DatetimeFieldsMixin, UUIDPkMixin):
     __tablename__ = 'users'
 
     first_name: Mapped[str] = mapped_column(String(20), nullable=False)
