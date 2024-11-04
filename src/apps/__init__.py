@@ -1,3 +1,3 @@
-from .base_exception import ApplicationError
+from .base_exception import ApplicationException
 
-__all__ = ('ApplicationError',)
+__all__ = ('ApplicationException',)

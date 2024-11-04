@@ -189,7 +189,7 @@ class Miscellaneous:
 
     @staticmethod
     def from_env(env: Env) -> 'Miscellaneous':
-        pass
+        return Miscellaneous()
 
 
 @dataclasses.dataclass(frozen=True, slots=True)

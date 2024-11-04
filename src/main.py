@@ -16,6 +16,15 @@ from src.providers.adapters import (
     RepositoriesProvider,
     SqlalchemyProvider,
 )
+from src.providers.usecases import (
+    CategoryUseCaseProvider,
+    InteractorProvider,
+    ProjectUseCaseProvider,
+    RoleUseCaseProvider,
+    TagUseCaseProvider,
+    WorkspaceInviteUseCaseProvider,
+    WorkspaceUseCaseProvider,
+)
 from src.utils import log
 
 logger = structlog.stdlib.get_logger()
@@ -33,6 +42,13 @@ def container_factory() -> AsyncContainer:
         SqlalchemyProvider(),
         ConfigProvider(),
         RepositoriesProvider(),
+        ProjectUseCaseProvider(),
+        InteractorProvider(),
+        WorkspaceUseCaseProvider(),
+        RoleUseCaseProvider(),
+        TagUseCaseProvider(),
+        CategoryUseCaseProvider(),
+        WorkspaceInviteUseCaseProvider(),
     )
 
 
@@ -66,6 +82,7 @@ def create_app() -> FastAPI:
         version='0.1.0',
         swagger_ui_parameters={'syntaxHighlight.theme': 'obsidian'},
         lifespan=lifespan,
+        docs_url='/',
     )
     init_services(app)
     init_di(app)
