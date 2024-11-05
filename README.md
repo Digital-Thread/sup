@@ -57,4 +57,3 @@ Find the instructions for contributing in the [Contributing Guide](CONTRIBUTING.
 Distributed under the GPL-2.0 license. See [LICENSE](LICENSE) for more information.
 
 <h3 align="center">Works on Open Source ✨</h3>
-
