@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import (
 
 from src.apps.feature.repositories import IFeatureRepository
 from src.config import Config, DbConfig
-from src.data_access.reposotiries import FeatureRepository
+from src.data_access.repositories import FeatureRepository
 
 
 class SqlalchemyProvider(Provider):
