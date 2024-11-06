@@ -2,19 +2,17 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Self
 
-from apps.feature.domain.aliases import (
+from src.apps.feature.domain import (
+    Feature,
     FeatureId,
+    OptionalFeatureUpdateFields,
     OwnerId,
+    Priority,
     ProjectId,
+    Status,
     TagId,
     UserId,
     WorkspaceId,
-)
-from apps.feature.domain.entities.feature import (
-    Feature,
-    OptionalFeatureUpdateFields,
-    Priority,
-    Status,
 )
 
 

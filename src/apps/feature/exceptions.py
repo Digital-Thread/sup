@@ -1,7 +1,7 @@
 from typing import Any, Tuple
 
-from apps import ApplicationException
-from apps.feature.domain.aliases import FeatureId
+from src.apps import ApplicationException
+from src.apps.feature.domain import FeatureId
 
 
 class FeatureError(ApplicationException):
@@ -27,6 +27,10 @@ class FeatureUpdateError(FeatureError):
     DEFAULT_MESSAGE = 'Ошибка при обновлении фичи.'
 
 
+class FeatureDeleteError(FeatureError):
+    DEFAULT_MESSAGE = 'Ошибка во время удаления фичи.'
+
+
 class FeatureDoesNotExistError(FeatureError):
     DEFAULT_MESSAGE = 'Фича не найдена.'
 
@@ -37,3 +41,7 @@ class FeatureDoesNotExistError(FeatureError):
         super().__init__(context=context, message=custom_message or self.DEFAULT_MESSAGE)
         self.feature_id = feature_id
         self.args = (self.feature_id, self.context, self.message)
+
+
+class RepositoryError(FeatureError):
+    """Ошибка при работе с репозиторием"""

@@ -7,7 +7,7 @@ from sqlalchemy import UUID as SQL_UUID
 from sqlalchemy import Column, ForeignKey, Index, Integer, String, Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.apps.feature import Priority, Status
+from src.apps.feature.domain import Priority, Status
 from src.data_access.models import Base
 
 # пока нет по указанным путям

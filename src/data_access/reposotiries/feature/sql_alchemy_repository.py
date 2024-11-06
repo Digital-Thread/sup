@@ -1,23 +1,14 @@
-from apps.feature import (
-    Feature,
-    FeatureId,
-    FeatureListQuery,
-    IFeatureRepository,
-    TagId,
-    UserId,
-    WorkspaceId,
-)
 from asyncpg import ForeignKeyViolationError
-from data_access.models import (  # пока нет по указанному пути
-    FeatureModel,
-    TagModel,
-    UserModel,
-)
-from data_access.reposotiries.feature import DataBaseError, FeatureMapper
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
+
+from src.apps.feature.domain import Feature, FeatureId, TagId, UserId, WorkspaceId
+from src.apps.feature.exceptions import RepositoryError
+from src.apps.feature.repositories import FeatureListQuery, IFeatureRepository
+from src.data_access.models import FeatureModel, TagModel, UserModel
+from src.data_access.reposotiries.feature import FeatureMapper
 
 
 class FeatureRepository(IFeatureRepository):
@@ -28,7 +19,7 @@ class FeatureRepository(IFeatureRepository):
         self.mapper = FeatureMapper()
 
     async def _get_m2m_objects(
-            self, list_ids: list[TagId | UserId] | None, model: TagModel | UserModel
+        self, list_ids: list[TagId | UserId] | None, model: TagModel | UserModel
     ) -> list[TagModel | UserModel] | None:
         if list_ids:
             query = select(model).where(model.id.in_(list_ids))
@@ -49,8 +40,8 @@ class FeatureRepository(IFeatureRepository):
         except IntegrityError as e:
             orig_exception = e.orig.__cause__
             if isinstance(orig_exception, ForeignKeyViolationError):
-                detail_message = orig_exception.detail  # noqa
-                raise DataBaseError(f'Ошибка создания фичи: {detail_message}')
+                detail_message = orig_exception.detail
+                raise RepositoryError(detail_message)
             else:
                 raise
 
@@ -86,8 +77,8 @@ class FeatureRepository(IFeatureRepository):
             except IntegrityError as e:
                 orig_exception = e.orig.__cause__
                 if isinstance(orig_exception, ForeignKeyViolationError):
-                    detail_message = orig_exception.detail  # noqa
-                    raise DataBaseError(f'Ошибка обновления фичи: {detail_message}')
+                    detail_message = orig_exception.detail
+                    raise RepositoryError(detail_message)
                 else:
                     raise
 
@@ -95,10 +86,12 @@ class FeatureRepository(IFeatureRepository):
         feature_model = await self._session.get(self.model, feature_id)
         if feature_model:
             await self._session.delete(feature_model)
+        else:
+            raise RepositoryError(message=f'Не найдена фича с id: {feature_id}')
 
     async def get_list(
-            self, workspace_id: WorkspaceId, query: FeatureListQuery
-    ) -> list[tuple[FeatureId, Feature]]:
+        self, workspace_id: WorkspaceId, query: FeatureListQuery
+    ) -> list[tuple[FeatureId, Feature]] | None:
         filters = {k: v for k, v in (query.filters or {}).items() if v is not None}
         stmt = (
             select(self.model)
@@ -109,9 +102,9 @@ class FeatureRepository(IFeatureRepository):
                 if query.order_by.order == 'ASC'
                 else getattr(self.model, str(query.order_by.field)).desc()
             )
-            .limit(query.limit_by)
-            .offset(query.offset)
+            .limit(query.paginate_by.limit_by)
+            .offset(query.paginate_by.offset)
         )
         result = await self._session.execute(stmt)
         features = result.scalars().all()
-        return [self.mapper.map_model_to_entity(f) for f in features] if features else []
+        return [self.mapper.map_model_to_entity(f) for f in features] if features else None

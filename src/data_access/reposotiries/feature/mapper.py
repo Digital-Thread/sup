@@ -1,5 +1,5 @@
-from apps.feature import Feature, OwnerId, ProjectId, UserId, WorkspaceId
-from data_access.models import FeatureModel
+from src.apps.feature.domain import Feature, OwnerId, ProjectId, UserId, WorkspaceId
+from src.data_access.models import FeatureModel
 
 
 class FeatureMapper:

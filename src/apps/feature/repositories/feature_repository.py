@@ -3,8 +3,14 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Literal, NamedTuple, TypedDict
 
-from src.apps.feature import FeatureId, ProjectId, TagId, UserId, WorkspaceId
-from src.apps.feature import Feature
+from src.apps.feature.domain import (
+    Feature,
+    FeatureId,
+    ProjectId,
+    TagId,
+    UserId,
+    WorkspaceId,
+)
 
 
 class OrderByField(Enum):
@@ -21,24 +27,28 @@ class SortOrder(Enum):
     DESC = 'DESC'
 
 
-class SortBy(NamedTuple):
+class OrderBy(NamedTuple):
     field: OrderByField
     order: SortOrder
 
 
 class FilterField(TypedDict, total=False):
-    member: list[UserId]
-    tag: list[TagId]
-    status: list[int]
-    project: list[ProjectId]
+    members: list[UserId]
+    tags: list[TagId]
+    statuses: list[int]
+    projects: list[ProjectId]
+
+
+class PaginateParams(NamedTuple):
+    offset: int
+    limit_by: Literal[5, 10, None]
 
 
 @dataclass
 class FeatureListQuery:
     filters: FilterField | None = None
-    order_by: SortBy | None = SortBy(OrderByField.PRIORITY, SortOrder.DESC)
-    limit_by: Literal[5, 10] | None = 10
-    offset: int = 0
+    order_by: OrderBy | None = OrderBy(OrderByField.PRIORITY, SortOrder.DESC)
+    paginate_by: PaginateParams = PaginateParams(offset=0, limit_by=10)
 
 
 class IFeatureRepository(ABC):
