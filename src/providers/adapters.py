@@ -41,9 +41,11 @@ from src.data_access.repositories import (
     TagRepository,
     WorkspaceInviteRepository,
     WorkspaceRepository,
+    FeatureRepository,
 )
 from src.data_access.repositories.project_repository import ProjectRepository
 from src.data_access.repositories.user_repository import UserRepository
+from src.apps.feature.repositories import IFeatureRepository
 
 
 class SqlalchemyProvider(Provider):
@@ -98,6 +100,7 @@ class ConfigProvider(Provider):
 class RepositoriesProvider(Provider):
     scope = Scope.REQUEST
 
+    feature_repository = provide(FeatureRepository, provides=IFeatureRepository)
     comment_repo = provide(CommentRepository, provides=ICommentRepository)
     workspace_repository = provide(WorkspaceRepository, provides=IWorkspaceRepository)
     workspace_invite_repository = provide(
@@ -106,7 +109,6 @@ class RepositoriesProvider(Provider):
     category_repository = provide(CategoryRepository, provides=ICategoryRepository)
     role_repository = provide(RoleRepository, provides=IRoleRepository)
     tag_repository = provide(TagRepository, provides=ITagRepository)
-    comment_repo = provide(CommentRepository, provides=ICommentRepository)
     project_repository = provide(ProjectRepository, provides=IProjectRepository)
 
     @provide(scope=scope, provides=SendMailServiceProtocol)

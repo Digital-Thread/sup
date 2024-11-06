@@ -59,6 +59,13 @@ from src.apps.workspace.use_cases.workspace_use_cases import (
     GetWorkspaceByMemberUseCase,
     UpdateWorkspaceUseCase,
 )
+from src.apps.feature import (
+    CreateFeatureInteractor,
+    DeleteFeatureInteractor,
+    GetAllFeaturesInteractor,
+    GetFeatureInteractor,
+    UpdateFeatureInteractor,
+)
 
 
 class InteractorProvider(Provider):
@@ -142,3 +149,13 @@ class ProjectUseCaseProvider(Provider):
     get_project_by_workspace = provide(GetProjectByWorkspaceUseCase)
     update_project = provide(UpdateProjectUseCase)
     delete_project = provide(DeleteProjectUseCase)
+
+
+class FeatureInteractorProvider(Provider):
+    scope = Scope.REQUEST
+
+    create_feature = provide(CreateFeatureInteractor)
+    get_feature_by_id = provide(GetFeatureInteractor)
+    get_features = provide(GetAllFeaturesInteractor)
+    update_feature = provide(UpdateFeatureInteractor)
+    delete_feature = provide(DeleteFeatureInteractor)

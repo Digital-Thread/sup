@@ -9,6 +9,7 @@ from .workspace_models.user_workspace_role import UserWorkspaceRoleModel
 from .workspace_models.workspace import WorkspaceModel
 from .workspace_models.workspace_invite import WorkspaceInviteModel
 from .workspace_models.workspace_members import WorkspaceMemberModel
+from .feature import FeatureModel
 
 __all__ = (
     'Base',
@@ -21,4 +22,5 @@ __all__ = (
     'WorkspaceMemberModel',
     'UserModel',
     'CommentModel',
+    'FeatureModel',
 )
