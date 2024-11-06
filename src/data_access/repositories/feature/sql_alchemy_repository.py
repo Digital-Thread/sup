@@ -8,7 +8,7 @@ from src.apps.feature.domain import Feature, FeatureId, TagId, UserId, Workspace
 from src.apps.feature.exceptions import RepositoryError
 from src.apps.feature.repositories import FeatureListQuery, IFeatureRepository
 from src.data_access.models import FeatureModel, TagModel, UserModel
-from src.data_access.repositories.feature import FeatureMapper
+from src.data_access.repositories.feature.mapper import FeatureMapper
 
 
 class FeatureRepository(IFeatureRepository):
