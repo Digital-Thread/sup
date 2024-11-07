@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import StrEnum
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from pydantic_core.core_schema import FieldValidationInfo
@@ -15,7 +15,8 @@ from src.apps.feature.domain import (
     UserId,
     WorkspaceId,
 )
-from src.apps.feature.repositories import OrderByField, SortOrder
+from src.apps.feature.exceptions import FeatureUpdateError
+from src.apps.feature.repositories import FilterField, OrderByField, SortOrder
 
 
 class SuccessResponse(BaseModel):
@@ -46,9 +47,11 @@ class UpdateFeatureRequestDTO(BaseModel):
     members: list[UserId] | None = None
 
     @field_validator('name', 'project_id', 'priority', 'status')
-    def fields_cannot_be_none(cls, value, info: FieldValidationInfo):
+    def fields_cannot_be_none(cls, value: Any, info: FieldValidationInfo) -> Any:
         if value is None:
-            raise ValueError(f"The '{info.field_name}' field cannot be set to None.")
+            raise FeatureUpdateError(
+                message=f"Для поля '{info.field_name}' не может быть установлено значение None."
+            )
         return value
 
 
@@ -85,6 +88,8 @@ class PageLimits(StrEnum):
         elif self == self.TEN:
             return 10
 
+        return None
+
 
 class QueryParams(BaseModel):
     workspace_id: WorkspaceId
@@ -107,8 +112,8 @@ class QueryParams(BaseModel):
         return (self.page - 1) * self.per_page.limit_by
 
     @property
-    def filters(self) -> dict | None:
-        filter = {}
+    def filters(self) -> FilterField | None:
+        filter = FilterField()
         if self.filter_by_members is not None:
             filter['members'] = self.filter_by_members
         if self.filter_by_tags is not None:

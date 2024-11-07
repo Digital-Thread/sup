@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from src.apps.feature.domain import Feature, FeatureId, TagId, UserId, WorkspaceId
+from src.apps.feature.domain import Feature, FeatureId, WorkspaceId
 from src.apps.feature.exceptions import RepositoryError
 from src.apps.feature.repositories import FeatureListQuery, IFeatureRepository
 from src.data_access.models import FeatureModel, TagModel, UserModel
@@ -18,9 +18,7 @@ class FeatureRepository(IFeatureRepository):
         self.model = FeatureModel
         self.mapper = FeatureMapper()
 
-    async def _get_m2m_objects(
-        self, list_ids: list[TagId | UserId] | None, model: TagModel | UserModel
-    ) -> list[TagModel | UserModel] | None:
+    async def _get_m2m_objects[M, ID](self, list_ids: list[ID] | None, model: type[M]) -> list[M]:
         if list_ids:
             query = select(model).where(model.id.in_(list_ids))
             result = await self._session.execute(query)
@@ -107,7 +105,9 @@ class FeatureRepository(IFeatureRepository):
                 conditions.append(self.model.tags.any(TagModel.id.in_(filters['tags'])))
 
             if 'status' in filters:
-                conditions.append(self.model.status.in_([status.value for status in filters['status']]))
+                conditions.append(
+                    self.model.status.in_([status.value for status in filters['status']])
+                )
 
             if 'project' in filters:
                 conditions.append(self.model.project_id.in_(filters['project']))
@@ -127,4 +127,8 @@ class FeatureRepository(IFeatureRepository):
 
         result = await self._session.execute(stmt)
         features = result.scalars().all()
-        return [(FeatureId(f.id), self.mapper.map_model_to_entity(f)) for f in features] if features else None
+        return (
+            [(FeatureId(f.id), self.mapper.map_model_to_entity(f)) for f in features]
+            if features
+            else None
+        )

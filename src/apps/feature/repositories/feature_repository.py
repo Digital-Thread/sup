@@ -7,6 +7,7 @@ from src.apps.feature.domain import (
     Feature,
     FeatureId,
     ProjectId,
+    Status,
     TagId,
     UserId,
     WorkspaceId,
@@ -35,7 +36,7 @@ class OrderBy(NamedTuple):
 class FilterField(TypedDict, total=False):
     members: list[UserId]
     tags: list[TagId]
-    status: list[int]
+    status: list[Status]
     project: list[ProjectId]
 
 

@@ -1,4 +1,11 @@
-from src.apps.feature.domain import Feature, OwnerId, ProjectId, UserId, WorkspaceId
+from src.apps.feature.domain import (
+    Feature,
+    OwnerId,
+    ProjectId,
+    TagId,
+    UserId,
+    WorkspaceId,
+)
 from src.data_access.models import FeatureModel
 
 
@@ -33,8 +40,12 @@ class FeatureMapper:
             description=feature_model.description,
             priority=feature_model.priority,
             status=feature_model.status,
-            tags=[tag.id for tag in feature_model.tags] if feature_model.tags else None,
-            members=[user.id for user in feature_model.members] if feature_model.members else None,
+            tags=[TagId(tag.id) for tag in feature_model.tags] if feature_model.tags else None,
+            members=(
+                [UserId(user.id) for user in feature_model.members]
+                if feature_model.members
+                else None
+            ),
         )
         feature.created_at = feature_model.created_at
         feature.updated_at = feature_model.updated_at
