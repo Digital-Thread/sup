@@ -18,6 +18,13 @@ from src.apps.comment import (
     UpdateCommentInteractor,
 )
 from src.apps.comment.domain import Interactor
+from src.apps.feature import (
+    CreateFeatureInteractor,
+    DeleteFeatureInteractor,
+    GetAllFeaturesInteractor,
+    GetFeatureInteractor,
+    UpdateFeatureInteractor,
+)
 from src.apps.project.use_cases import (
     CreateProjectUseCase,
     DeleteProjectUseCase,
@@ -58,13 +65,6 @@ from src.apps.workspace.use_cases.workspace_use_cases import (
     GetWorkspaceByIdUseCase,
     GetWorkspaceByMemberUseCase,
     UpdateWorkspaceUseCase,
-)
-from src.apps.feature import (
-    CreateFeatureInteractor,
-    DeleteFeatureInteractor,
-    GetAllFeaturesInteractor,
-    GetFeatureInteractor,
-    UpdateFeatureInteractor,
 )
 
 

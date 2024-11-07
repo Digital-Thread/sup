@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import (
 
 from src.apps.auth import JWTService
 from src.apps.comment.domain import ICommentRepository
+from src.apps.feature.repositories import IFeatureRepository
 from src.apps.project.i_project_repository import IProjectRepository
 from src.apps.send_mail.service import SendMailService
 from src.apps.user.protocols import JWTServiceProtocol, SendMailServiceProtocol
@@ -37,15 +38,14 @@ from src.config import Config, DbConfig, JWTConfig, RedisConfig, SMTPConfig
 from src.data_access.repositories import (
     CategoryRepository,
     CommentRepository,
+    FeatureRepository,
     RoleRepository,
     TagRepository,
     WorkspaceInviteRepository,
     WorkspaceRepository,
-    FeatureRepository,
 )
 from src.data_access.repositories.project_repository import ProjectRepository
 from src.data_access.repositories.user_repository import UserRepository
-from src.apps.feature.repositories import IFeatureRepository
 
 
 class SqlalchemyProvider(Provider):

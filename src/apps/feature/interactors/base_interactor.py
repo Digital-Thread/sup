@@ -8,5 +8,4 @@ class BaseInteractor(ABC):
         self._repository = feature_repository
 
     @abstractmethod
-    async def execute(self, *args):
-        ...
+    async def execute(self, *args): ...
