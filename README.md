@@ -42,7 +42,7 @@ Trello and restrictions on the use of similar resources. Management of teams and
 
 ### :hammer: Development
 
-Find instructions for running the app & tests locally in the [Development Guide](docs).
+Find instructions for running the app & tests locally in the [Development Guide](DEVELOPMENT.md).
 
 <!-- CONTRIBUTING -->
 
@@ -54,6 +54,6 @@ Find the instructions for contributing in the [Contributing Guide](CONTRIBUTING.
 
 ### :page_facing_up: License
 
-Distributed under the GPL-2.0 license. See [LICENSE](LICENSE) for more information.
+Distributed under the MIT license. See [LICENSE](LICENSE) for more information.
 
 <h3 align="center">Works on Open Source ✨</h3>
