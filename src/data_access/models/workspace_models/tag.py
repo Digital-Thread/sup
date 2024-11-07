@@ -9,7 +9,7 @@ from src.data_access.models.base import Base
 from src.data_access.models.mixins import IntIdPkMixin
 
 if TYPE_CHECKING:
-    from src.data_access.models.stubs import FeatureModel
+    from src.data_access.models.feature import FeatureModel
     from src.data_access.models.workspace_models.workspace import WorkspaceModel
 
 
@@ -23,6 +23,8 @@ class TagModel(Base, IntIdPkMixin):
     )
 
     workspace: Mapped['WorkspaceModel'] = relationship('WorkspaceModel', back_populates='tags')
-    features: Mapped[list['FeatureModel']] = relationship('FeatureModel', back_populates='tag')
+    features: Mapped[list['FeatureModel']] = relationship(
+        'FeatureModel', secondary='feature_tag', back_populates='tags'
+    )
 
     __table_args__ = (UniqueConstraint('name', 'workspace_id', name='uix_name_workspace_id_tags'),)

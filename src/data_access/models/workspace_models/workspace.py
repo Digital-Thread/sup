@@ -10,7 +10,9 @@ from src.data_access.models.base import Base
 from src.data_access.models.mixins import UUIDPkMixin
 
 if TYPE_CHECKING:
-    from src.data_access.models.stubs import MeetModel, ProjectModel, UserModel
+    from src.data_access.models.feature import FeatureModel
+    from src.data_access.models.project import ProjectModel
+    from src.data_access.models.user import UserModel
     from src.data_access.models.workspace_models.category import CategoryModel
     from src.data_access.models.workspace_models.role import RoleModel
     from src.data_access.models.workspace_models.tag import TagModel
@@ -37,9 +39,9 @@ class WorkspaceModel(Base, UUIDPkMixin):
     projects: Mapped[list['ProjectModel']] = relationship(
         'ProjectModel', back_populates='workspace', cascade='all, delete-orphan'
     )
-    meets: Mapped[list['MeetModel']] = relationship(
-        'MeetModel', back_populates='workspace', cascade='all, delete-orphan'
-    )
+    # meets: Mapped[list['MeetModel']] = relationship(
+    #     'MeetModel', back_populates='workspace', cascade='all, delete-orphan'
+    # )
     roles: Mapped[list['RoleModel']] = relationship(
         'RoleModel', back_populates='workspace', cascade='all, delete-orphan'
     )
@@ -51,4 +53,7 @@ class WorkspaceModel(Base, UUIDPkMixin):
     )
     invites: Mapped[list['WorkspaceInviteModel']] = relationship(
         'WorkspaceInviteModel', back_populates='workspace', cascade='all, delete-orphan'
+    )
+    features: Mapped[list['FeatureModel']] = relationship(
+        'FeatureModel', back_populates='workspace'
     )

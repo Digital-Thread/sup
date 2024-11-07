@@ -5,9 +5,10 @@ from src.apps.feature.repositories import FeatureListQuery
 
 
 class GetAllFeaturesInteractor(BaseInteractor):
-    async def execute(self,
-                      workspace_id: WorkspaceId,
-                      query: FeatureListQuery
-                      ) -> list[FeatureOutputDTO] | None:
+    async def execute(
+        self, workspace_id: WorkspaceId, query: FeatureListQuery
+    ) -> list[FeatureOutputDTO] | None:
         features = await self._repository.get_list(workspace_id=workspace_id, query=query)
-        return [FeatureOutputDTO.from_entity(*feature) for feature in features] if features else None
+        return (
+            [FeatureOutputDTO.from_entity(*feature) for feature in features] if features else None
+        )

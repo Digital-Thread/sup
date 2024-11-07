@@ -7,10 +7,9 @@ from .base import Base
 from .mixins import DatetimeFieldsMixin, UUIDPkMixin
 
 if TYPE_CHECKING:
-    from src.data_access.models.workspace_models.user_workspace_role import (
-        UserWorkspaceRoleModel,
-    )
-    from src.data_access.models.workspace_models.workspace import WorkspaceModel
+    from .feature import FeatureModel
+    from .workspace_models.user_workspace_role import UserWorkspaceRoleModel
+    from .workspace_models.workspace import WorkspaceModel
 
 
 class UserModel(Base, DatetimeFieldsMixin, UUIDPkMixin):
@@ -37,4 +36,14 @@ class UserModel(Base, DatetimeFieldsMixin, UUIDPkMixin):
     )
     workspaces_roles: Mapped[list['UserWorkspaceRoleModel']] = relationship(
         'UserWorkspaceRoleModel', back_populates='user', cascade='all, delete-orphan'
+    )
+
+    owned_features: Mapped[list['FeatureModel']] = relationship(
+        'FeatureModel', back_populates='owner', foreign_keys='FeatureModel.owner_id'
+    )
+    member_features: Mapped[list['FeatureModel']] = relationship(
+        'FeatureModel', secondary='feature_user', back_populates='members'
+    )
+    assigned_features: Mapped[list['FeatureModel']] = relationship(
+        'FeatureModel', back_populates='assigned_to', foreign_keys='FeatureModel.assigned_to_id'
     )

@@ -10,9 +10,9 @@ from .base import Base
 from .mixins import IntIdPkMixin
 
 if TYPE_CHECKING:
-    # from src.data_access.models.feature import FeatureModel
-    from src.data_access.models.project_participants import ProjectParticipantsModel
-    from src.data_access.models.stubs import WorkspaceModel
+    from .feature import FeatureModel
+    from .project_participants import ProjectParticipantsModel
+    from .workspace_models.workspace import WorkspaceModel
 
 
 class ProjectModel(Base, IntIdPkMixin):
@@ -31,9 +31,9 @@ class ProjectModel(Base, IntIdPkMixin):
     )
     owner_id: Mapped[UUID] = mapped_column(PostgreSQLUUID(as_uuid=True), ForeignKey('users.id'))
 
-    # features: Mapped[list['FeatureModel']] = relationship(
-    #     'FeatureModel', back_populates='project', cascade='all, delete-orphan'
-    # )
+    features: Mapped[list['FeatureModel']] = relationship(
+        'FeatureModel', back_populates='project', cascade='all, delete-orphan'
+    )
     workspace: Mapped['WorkspaceModel'] = relationship('WorkspaceModel', back_populates='projects')
     participants: Mapped[list['ProjectParticipantsModel']] = relationship(
         'ProjectParticipantsModel', back_populates='project'

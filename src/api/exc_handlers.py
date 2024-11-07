@@ -7,6 +7,12 @@ from src.apps.auth.exceptions import (
     TokenExpireError,
     TokenRefreshExpireError,
 )
+from src.apps.feature.exceptions import (
+    FeatureCreateError,
+    FeatureDeleteError,
+    FeatureDoesNotExistError,
+    FeatureUpdateError,
+)
 from src.apps.user.exceptions import (
     InvalidEmailFormatError,
     InvalidNameError,
@@ -28,12 +34,6 @@ from src.apps.user.exceptions import (
     UserPermissionError,
     ValidateEmptyLengthError,
     ValidateLengthError,
-)
-from src.apps.feature.exceptions import (
-    FeatureCreateError,
-    FeatureDeleteError,
-    FeatureDoesNotExistError,
-    FeatureUpdateError,
 )
 
 __all__ = ('init_exception_handlers',)

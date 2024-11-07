@@ -10,12 +10,11 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.apps.feature.domain import Priority, Status
 from src.data_access.models import Base
 
-# пока нет по указанным путям
 if TYPE_CHECKING:
     from .project import ProjectModel
-    from .tag import TagModel
     from .user import UserModel
-    from .workspace import WorkspaceModel
+    from .workspace_models.tag import TagModel
+    from .workspace_models.workspace import WorkspaceModel
 
 feature_tag = Table(
     'feature_tag',
@@ -70,9 +69,13 @@ class FeatureModel(Base):
         back_populates='features',
     )
 
-    owner: Mapped['UserModel'] = relationship(back_populates='owned_features')
+    owner: Mapped['UserModel'] = relationship(
+        back_populates='owned_features', foreign_keys=[owner_id]
+    )
 
-    assigned_to: Mapped['UserModel'] = relationship(back_populates='assigned_features')
+    assigned_to: Mapped['UserModel'] = relationship(
+        back_populates='assigned_features', foreign_keys=[assigned_to_id]
+    )
 
     tags: Mapped[list['TagModel'] | None] = relationship(
         secondary=feature_tag,
@@ -82,6 +85,6 @@ class FeatureModel(Base):
 
     members: Mapped[list['UserModel'] | None] = relationship(
         secondary=feature_member,
-        back_populates='features',
+        back_populates='member_features',
         passive_deletes=True,
     )
