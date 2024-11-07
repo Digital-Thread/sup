@@ -13,7 +13,7 @@ class FeatureMapper:
             owner_id=feature_entity.owner_id,
             created_at=feature_entity.created_at,
             updated_at=feature_entity.updated_at,
-            assigned_to=feature_entity.assigned_to,
+            assigned_to_id=feature_entity.assigned_to,
             description=feature_entity.description,
             priority=feature_entity.priority,
             status=feature_entity.status,

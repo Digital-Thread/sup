@@ -44,4 +44,4 @@ class FeatureDoesNotExistError(FeatureError):
 
 
 class RepositoryError(FeatureError):
-    """Ошибка при работе с репозиторием"""
+    DEFAULT_MESSAGE = 'Ошибка репозитория.'

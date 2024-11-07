@@ -114,8 +114,8 @@ class QueryParams(BaseModel):
         if self.filter_by_tags is not None:
             filter['tags'] = self.filter_by_tags
         if self.filter_by_statuses is not None:
-            filter['statuses'] = self.filter_by_statuses
+            filter['status'] = self.filter_by_statuses
         if self.filter_by_projects is not None:
-            filter['projects'] = self.filter_by_projects
+            filter['project'] = self.filter_by_projects
 
         return filter if filter else None
