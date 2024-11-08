@@ -3,10 +3,10 @@ from fastapi import FastAPI
 from .category import category_router
 from .comment import comment_router
 from .health_check import router
-from .user import router as user_router
 from .project import project_router
 from .role import role_router
 from .tag import tag_router
+from .user import router as user_router
 from .workspace import workspace_router
 from .workspace_invite import workspace_invite_router
 

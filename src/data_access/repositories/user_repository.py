@@ -57,7 +57,6 @@ class UserRepository(IUserRepository):
         user._created_at = datetime.datetime.now(datetime.timezone.utc)
         user._updated_at = datetime.datetime.now(datetime.timezone.utc)
         self._session.add(sql_user)
-        await self._session.commit()
 
     async def find_by_email(self, email: str) -> Optional[User]:
         query = select(self.model).where(self.model.email == email.lower())
@@ -87,7 +86,6 @@ class UserRepository(IUserRepository):
         model = result.scalar_one_or_none()
         if model:
             await self._session.delete(model)
-            await self._session.commit()
 
     async def update(self, user: User) -> None:
         query = (
@@ -109,4 +107,3 @@ class UserRepository(IUserRepository):
             )
         )
         await self._session.execute(query)
-        await self._session.commit()
