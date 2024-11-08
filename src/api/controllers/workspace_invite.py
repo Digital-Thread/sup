@@ -51,7 +51,8 @@ async def get_invites_by_workspace_id(
     else:
         return [
             ResponseWorkspaceInviteDTO(
-                **invite.__dict__, url=f'{request.url_for('create_user_by_invite', invite_token=invite.code)}'
+                **invite.__dict__,
+                url=f'{request.url_for('create_user_by_invite', invite_token=invite.code)}',
             )
             for invite in response
         ]

@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from src.apps.workspace.domain.types_ids import WorkspaceId, MemberId
+from src.apps.workspace.domain.types_ids import MemberId, WorkspaceId
 from src.apps.workspace.repositories import IWorkspaceRepository
 
 

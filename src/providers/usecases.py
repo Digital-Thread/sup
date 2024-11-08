@@ -67,11 +67,12 @@ from src.apps.workspace.use_cases.workspace_invite_use_cases import (
     UpdateWorkspaceInviteUseCase,
 )
 from src.apps.workspace.use_cases.workspace_use_cases import (
+    AddMemberInWorkspaceUseCase,
     CreateWorkspaceUseCase,
     DeleteWorkspaceUseCase,
     GetWorkspaceByIdUseCase,
     GetWorkspaceByMemberUseCase,
-    UpdateWorkspaceUseCase, AddMemberInWorkspaceUseCase,
+    UpdateWorkspaceUseCase,
 )
 
 

@@ -1,5 +1,5 @@
-from uuid import UUID
 from typing import TYPE_CHECKING
+from uuid import UUID
 
 from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID
