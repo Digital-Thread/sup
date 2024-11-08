@@ -23,7 +23,7 @@ jobs:
 
     - name: Install poetry
       run: |
-        python -m pip install --upgrade pip poetry pre-commit
+        python -m pip install --upgrade pip==24.2 poetry pre-commit
         poetry config virtualenvs.create false --local
     - name: Install dependencies
       run: poetry install --all-extras
