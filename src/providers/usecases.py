@@ -55,7 +55,7 @@ from src.apps.workspace.use_cases.tag_use_cases import (
 from src.apps.workspace.use_cases.workspace_invite_use_cases import (
     CreateWorkspaceInviteUseCase,
     DeleteWorkspaceInviteUseCase,
-    GetWorkspaceInviteByIdUseCase,
+    GetWorkspaceIdByInviteCodeUseCase,
     GetWorkspaceInviteByWorkspaceUseCase,
     UpdateWorkspaceInviteUseCase,
 )
@@ -64,7 +64,7 @@ from src.apps.workspace.use_cases.workspace_use_cases import (
     DeleteWorkspaceUseCase,
     GetWorkspaceByIdUseCase,
     GetWorkspaceByMemberUseCase,
-    UpdateWorkspaceUseCase,
+    UpdateWorkspaceUseCase, AddMemberInWorkspaceUseCase,
 )
 
 
@@ -100,6 +100,7 @@ class WorkspaceUseCaseProvider(Provider):
     get_workspace_by_owner_id = provide(GetWorkspaceByMemberUseCase)
     update_workspace = provide(UpdateWorkspaceUseCase)
     delete_workspace = provide(DeleteWorkspaceUseCase)
+    add_member = provide(AddMemberInWorkspaceUseCase)
 
 
 class RoleUseCaseProvider(Provider):
@@ -136,7 +137,7 @@ class WorkspaceInviteUseCaseProvider(Provider):
     scope = Scope.REQUEST
 
     create_workspace_invite = provide(CreateWorkspaceInviteUseCase)
-    get_workspace_invite_by_id = provide(GetWorkspaceInviteByIdUseCase)
+    get_workspace_invite_by_id = provide(GetWorkspaceIdByInviteCodeUseCase)
     get_workspace_invite_by_workspace = provide(GetWorkspaceInviteByWorkspaceUseCase)
     update_workspace_invite = provide(UpdateWorkspaceInviteUseCase)
     delete_workspace_invite = provide(DeleteWorkspaceInviteUseCase)

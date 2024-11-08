@@ -2,6 +2,7 @@ from .base import Base
 from .comment import CommentModel
 from .feature import FeatureModel
 from .project import ProjectModel
+from .project_participants import ProjectParticipantsModel
 from .user import UserModel
 from .workspace_models.category import CategoryModel
 from .workspace_models.role import RoleModel
@@ -23,4 +24,6 @@ __all__ = (
     'UserModel',
     'CommentModel',
     'FeatureModel',
+    'ProjectModel',
+    'ProjectParticipantsModel'
 )
