@@ -1,4 +1,5 @@
 from uuid import UUID
+from typing import TYPE_CHECKING
 
 from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID
@@ -6,6 +7,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 from .mixins import IntIdPkMixin
+
+if TYPE_CHECKING:
+    from .project import ProjectModel
 
 
 class ProjectParticipantsModel(Base, IntIdPkMixin):
@@ -19,7 +23,7 @@ class ProjectParticipantsModel(Base, IntIdPkMixin):
     )
     project_id: Mapped[int] = mapped_column(ForeignKey('projects.id', ondelete='CASCADE'))
 
-    project: Mapped[int] = relationship('ProjectModel', back_populates='participants')
+    project: Mapped['ProjectModel'] = relationship('ProjectModel', back_populates='participants')
 
     __table_args__ = (
         UniqueConstraint(
