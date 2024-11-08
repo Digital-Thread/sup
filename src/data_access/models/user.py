@@ -8,6 +8,7 @@ from .mixins import DatetimeFieldsMixin, UUIDPkMixin
 
 if TYPE_CHECKING:
     from .feature import FeatureModel
+    from .task import TaskModel
     from .workspace_models.user_workspace_role import UserWorkspaceRoleModel
     from .workspace_models.workspace import WorkspaceModel
 
@@ -46,4 +47,10 @@ class UserModel(Base, DatetimeFieldsMixin, UUIDPkMixin):
     )
     assigned_features: Mapped[list['FeatureModel']] = relationship(
         'FeatureModel', back_populates='assigned_to', foreign_keys='FeatureModel.assigned_to_id'
+    )
+    owned_tasks: Mapped[list['TaskModel']] = relationship(
+        'TaskModel', back_populates='owner', foreign_keys='TaskModel.owner_id'
+    )
+    assigned_tasks: Mapped[list['TaskModel']] = relationship(
+        'TaskModel', back_populates='assigned_to', foreign_keys='TaskModel.assigned_to_id'
     )

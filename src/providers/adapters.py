@@ -16,6 +16,7 @@ from src.apps.comment.domain import ICommentRepository
 from src.apps.feature.repositories import IFeatureRepository
 from src.apps.project.i_project_repository import IProjectRepository
 from src.apps.send_mail.service import SendMailService
+from src.apps.task.repositories import ITaskRepository
 from src.apps.user.protocols import JWTServiceProtocol, SendMailServiceProtocol
 from src.apps.user.repositories import IUserRepository
 from src.apps.user.services import (
@@ -41,6 +42,7 @@ from src.data_access.repositories import (
     FeatureRepository,
     RoleRepository,
     TagRepository,
+    TaskRepository,
     WorkspaceInviteRepository,
     WorkspaceRepository,
 )
@@ -101,6 +103,7 @@ class RepositoriesProvider(Provider):
     scope = Scope.REQUEST
 
     feature_repository = provide(FeatureRepository, provides=IFeatureRepository)
+    task_repository = provide(TaskRepository, provides=ITaskRepository)
     comment_repo = provide(CommentRepository, provides=ICommentRepository)
     workspace_repository = provide(WorkspaceRepository, provides=IWorkspaceRepository)
     workspace_invite_repository = provide(

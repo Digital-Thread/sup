@@ -7,6 +7,7 @@ from .health_check import router
 from .project import project_router
 from .role import role_router
 from .tag import tag_router
+from .task import task_router
 from .user import router as user_router
 from .workspace import workspace_router
 from .workspace_invite import workspace_invite_router
@@ -36,6 +37,7 @@ def init_routes(app: FastAPI) -> None:
     app.include_router(router=comment_router, prefix=f'{prefix}/comments', tags=['Comment'])
     app.include_router(router=project_router, prefix=f'{prefix}/projects', tags=['Project'])
     app.include_router(router=feature_router, prefix=f'{prefix}/features', tags=['Feature'])
+    app.include_router(router=task_router, prefix=f'{prefix}/tasks', tags=['Task'])
 
 
 __all__ = ('init_routes',)

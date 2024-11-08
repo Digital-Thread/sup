@@ -13,6 +13,12 @@ from src.apps.feature.exceptions import (
     FeatureDoesNotExistError,
     FeatureUpdateError,
 )
+from src.apps.task.exceptions import (
+    TaskCreateError,
+    TaskDeleteError,
+    TaskDoesNotExistError,
+    TaskUpdateError,
+)
 from src.apps.user.exceptions import (
     InvalidEmailFormatError,
     InvalidNameError,
@@ -43,6 +49,10 @@ exception_status_codes = {
     FeatureDeleteError: status.HTTP_400_BAD_REQUEST,
     FeatureDoesNotExistError: status.HTTP_404_NOT_FOUND,
     FeatureUpdateError: status.HTTP_400_BAD_REQUEST,
+    TaskCreateError: status.HTTP_400_BAD_REQUEST,
+    TaskDeleteError: status.HTTP_400_BAD_REQUEST,
+    TaskDoesNotExistError: status.HTTP_404_NOT_FOUND,
+    TaskUpdateError: status.HTTP_400_BAD_REQUEST,
     ApplicationException: status.HTTP_500_INTERNAL_SERVER_ERROR,
     UserPasswordException: status.HTTP_401_UNAUTHORIZED,
     UserNotFoundError: status.HTTP_404_NOT_FOUND,

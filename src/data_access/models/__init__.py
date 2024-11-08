@@ -3,6 +3,7 @@ from .comment import CommentModel
 from .feature import FeatureModel
 from .project import ProjectModel
 from .project_participants import ProjectParticipantsModel
+from .task import TaskModel
 from .user import UserModel
 from .workspace_models.category import CategoryModel
 from .workspace_models.role import RoleModel
@@ -25,5 +26,6 @@ __all__ = (
     'CommentModel',
     'FeatureModel',
     'ProjectModel',
-    'ProjectParticipantsModel'
+    'ProjectParticipantsModel',
+    'TaskModel',
 )
