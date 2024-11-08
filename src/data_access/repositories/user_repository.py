@@ -25,6 +25,7 @@ def domain_to_model(user: User) -> UserModel:
         is_active=user.is_active,
         created_at=user.created_at,
         updated_at=user.updated_at,
+        id=user.id,
     )
 
 
@@ -44,6 +45,7 @@ def model_to_domain(user_model: UserModel) -> User:
         is_active=user_model.is_active,
         _created_at=user_model.created_at,
         _updated_at=user_model.updated_at,
+        _id=user_model.id,
     )
 
 
