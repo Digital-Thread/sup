@@ -1,4 +1,5 @@
 from logging import warning
+from uuid import UUID
 
 from sqlalchemy import delete, exists, select, update
 from sqlalchemy.exc import IntegrityError, NoResultFound
@@ -67,6 +68,13 @@ class WorkspaceInviteRepository(IWorkspaceInviteRepository):
             )
 
         return invites
+
+    async def find_by_code(self, code: UUID) -> tuple[WorkspaceId, InviteId]:
+        query = select(WorkspaceInviteModel.workspace_id, WorkspaceInviteModel.id).filter_by(code=code)
+        result = await self._session.execute(query)
+        workspace_and_invite_ids = result.fetchone()
+        return workspace_and_invite_ids[0], workspace_and_invite_ids[1]
+
 
     async def update(self, workspace_invite: WorkspaceInvite) -> None:
         update_data = WorkspaceInviteConverter.entity_to_dict(workspace_invite)
