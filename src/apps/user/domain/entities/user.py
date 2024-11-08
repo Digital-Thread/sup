@@ -24,7 +24,6 @@ class User:
     nick_tg: str = field(metadata={'max_length': 50})
     nick_gmeet: str = field(metadata={'max_length': 50})
     password: str = field(repr=False)
-    _id: uuid.UUID = field()
     nick_gitlab: str = field(default=None, metadata={'max_length': 50})
     nick_github: str = field(default=None, metadata={'max_length': 50})
     avatar: str = field(default=None)
@@ -32,6 +31,7 @@ class User:
     is_active: bool = field(default=False)
     _created_at: datetime.datetime = field(default_factory=datetime.datetime.now)
     _updated_at: datetime.datetime = field(default_factory=datetime.datetime.now)
+    _id: uuid.UUID = field(default_factory=uuid.uuid4)
 
     @property
     def created_at(self) -> datetime.datetime:
