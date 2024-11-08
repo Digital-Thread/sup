@@ -49,7 +49,7 @@ async def get_features(
         paginate_by=PaginateParams(offset=query.offset, limit_by=query.per_page.limit_by),
     )
     features = await interactor.execute(workspace_id=workspace_id, query=query_params)
-    return [FeatureResponseDTO(**asdict(feature)) for feature in features]
+    return [FeatureResponseDTO(**asdict(feature)) for feature in features] if features else []
 
 
 @feature_router.get(

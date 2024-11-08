@@ -7,6 +7,7 @@ from src.apps.feature.domain import (
     Feature,
     FeatureId,
     ProjectId,
+    Status,
     TagId,
     UserId,
     WorkspaceId,
@@ -15,10 +16,10 @@ from src.apps.feature.domain import (
 
 class OrderByField(Enum):
     NAME = 'name'
-    ASSIGNED_TO = 'assigned_to'
+    ASSIGNED_TO = 'assigned_to_id'
     CREATED_AT = 'created_at'
     PRIORITY = 'priority'
-    PROJECT = 'project'
+    PROJECT = 'project_id'
     STATUS = 'status'
 
 
@@ -35,8 +36,8 @@ class OrderBy(NamedTuple):
 class FilterField(TypedDict, total=False):
     members: list[UserId]
     tags: list[TagId]
-    statuses: list[int]
-    projects: list[ProjectId]
+    status: list[Status]
+    project: list[ProjectId]
 
 
 class PaginateParams(NamedTuple):

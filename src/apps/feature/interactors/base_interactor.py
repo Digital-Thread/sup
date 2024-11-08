@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Any
 
 from src.apps.feature.repositories import IFeatureRepository
 
@@ -8,4 +9,4 @@ class BaseInteractor(ABC):
         self._repository = feature_repository
 
     @abstractmethod
-    async def execute(self, *args): ...
+    async def execute(self, *args: Any) -> Any: ...
