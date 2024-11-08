@@ -9,7 +9,7 @@ from src.data_access.models.base import Base
 from src.data_access.models.mixins import IntIdPkMixin
 
 if TYPE_CHECKING:
-    from src.data_access.models.stubs import MeetModel
+    # from src.data_access.models.stubs import MeetModel
     from src.data_access.models.workspace_models.workspace import WorkspaceModel
 
 
@@ -24,7 +24,7 @@ class CategoryModel(Base, IntIdPkMixin):
     workspace: Mapped['WorkspaceModel'] = relationship(
         'WorkspaceModel', back_populates='categories'
     )
-    meets: Mapped[list['MeetModel']] = relationship('MeetModel', back_populates='category')
+    # meets: Mapped[list['MeetModel']] = relationship('MeetModel', back_populates='category')
 
     __table_args__ = (
         UniqueConstraint('name', 'workspace_id', name='uix_name_workspace_id_categories'),

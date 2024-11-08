@@ -1,5 +1,6 @@
 from .category_respository import CategoryRepository
 from .comment import CommentRepository
+from .feature.sql_alchemy_repository import FeatureRepository
 from .role_repository import RoleRepository
 from .tag_repository import TagRepository
 from .workspace_invite_repository import WorkspaceInviteRepository
@@ -12,4 +13,5 @@ __all__ = (
     'WorkspaceRepository',
     'WorkspaceInviteRepository',
     'CommentRepository',
+    'FeatureRepository',
 )

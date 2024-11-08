@@ -7,6 +7,12 @@ from src.apps.auth.exceptions import (
     TokenExpireError,
     TokenRefreshExpireError,
 )
+from src.apps.feature.exceptions import (
+    FeatureCreateError,
+    FeatureDeleteError,
+    FeatureDoesNotExistError,
+    FeatureUpdateError,
+)
 from src.apps.user.exceptions import (
     InvalidEmailFormatError,
     InvalidNameError,
@@ -33,6 +39,10 @@ from src.apps.user.exceptions import (
 __all__ = ('init_exception_handlers',)
 
 exception_status_codes = {
+    FeatureCreateError: status.HTTP_400_BAD_REQUEST,
+    FeatureDeleteError: status.HTTP_400_BAD_REQUEST,
+    FeatureDoesNotExistError: status.HTTP_404_NOT_FOUND,
+    FeatureUpdateError: status.HTTP_400_BAD_REQUEST,
     ApplicationException: status.HTTP_500_INTERNAL_SERVER_ERROR,
     UserPasswordException: status.HTTP_401_UNAUTHORIZED,
     UserNotFoundError: status.HTTP_404_NOT_FOUND,

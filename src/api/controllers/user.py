@@ -1,10 +1,11 @@
 from typing import Any, Dict, Optional
+from uuid import UUID
 
 from dishka.integrations.fastapi import DishkaRoute, FromDishka
 from fastapi import APIRouter, Path, Query, Request, Response
 
 from src.api.dependencies.auth_helpers import authenticate_and_create_tokens
-from src.api.dtos.user import RegistrationResponseDTO, UserResponseDTO
+from src.api.dtos.user import UserResponseDTO
 from src.apps.auth import JWTService
 from src.apps.user.dtos import (
     AdminCreateUserDTO,
@@ -23,6 +24,13 @@ from src.apps.user.services import (
 )
 from src.apps.user.services.password_reset_user_service import PasswordResetUserService
 from src.apps.user.services.remove_user_service import RemoveUserService
+from src.apps.workspace.domain.entities.workspace_invite import StatusInvite
+from src.apps.workspace.dtos.workspace_dtos import CreateWorkspaceAppDTO
+from src.apps.workspace.dtos.workspace_invite_dtos import UpdateWorkspaceInviteAppDTO
+from src.apps.workspace.use_cases.workspace_invite_use_cases import GetWorkspaceIdByInviteCodeUseCase, \
+    UpdateWorkspaceInviteUseCase
+from src.apps.workspace.use_cases.workspace_use_cases import CreateWorkspaceUseCase
+from src.apps.workspace.use_cases.workspace_use_cases.add_member_in_workspace import AddMemberInWorkspaceUseCase
 
 router = APIRouter(route_class=DishkaRoute)
 
@@ -169,27 +177,48 @@ async def create_user_by_admin(
     return {'detail': f'Пользователь зарегистрирован email: {user_email} пароль: {user_password}'}
 
 
-@router.post('/registration/{invite_token}', response_model=RegistrationResponseDTO)
+@router.post('/registration/{invite_token}', response_model=UserResponseDTO)
 async def create_user_by_invite(
     create_user_dto: UserCreateDTO,
     create_user_service: FromDishka[CreateUserService],
-    invite_token: str = Path(...),
-) -> RegistrationResponseDTO:
-    new_user, inviter_user_id = await create_user_service.create_user_by_invite(
-        dto=create_user_dto, token=invite_token
+    workspace_invite_use_case: FromDishka[GetWorkspaceIdByInviteCodeUseCase],
+    workspace_use_case: FromDishka[CreateWorkspaceUseCase],
+    add_member_use_case: FromDishka[AddMemberInWorkspaceUseCase],
+    update_status_invite_use_case: FromDishka[UpdateWorkspaceInviteUseCase],
+    invite_token: UUID = Path(...),
+) -> UserResponseDTO:
+    workspace_id_for_invite = await workspace_invite_use_case.execute(invite_token)
+    new_user = await create_user_service.create_user(dto=create_user_dto)
+
+    await workspace_use_case.execute(
+        CreateWorkspaceAppDTO(
+            name=f'{new_user.first_name} {new_user.last_name}',
+            owner_id=new_user.id,
+        )
     )
-    return RegistrationResponseDTO(
-        new_user=UserResponseDTO.model_validate(new_user),
-        inviter_user_id=inviter_user_id,
+    await add_member_use_case.execute(workspace_id_for_invite[0], new_user.id)
+    await update_status_invite_use_case.execute(
+        workspace_id_for_invite[1],
+        workspace_id_for_invite[0],
+        UpdateWorkspaceInviteAppDTO(status=StatusInvite.USED)
     )
+
+    return UserResponseDTO.model_validate(new_user)
 
 
 @router.post('/registration', response_model=UserResponseDTO)
-async def create_user(
+async def create_user_with_workspace(
     create_user_dto: UserCreateDTO,
     create_user_service: FromDishka[CreateUserService],
+    workspace_use_case: FromDishka[CreateWorkspaceUseCase],
 ) -> UserResponseDTO:
     new_user = await create_user_service.create_user(dto=create_user_dto)
+    await workspace_use_case.execute(
+        CreateWorkspaceAppDTO(
+            name=f'{new_user.first_name} {new_user.last_name}',
+            owner_id=new_user.id,
+        )
+    )
     return UserResponseDTO.model_validate(new_user)
 
 

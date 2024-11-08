@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import (
 
 from src.apps.auth import JWTService
 from src.apps.comment.domain import ICommentRepository
+from src.apps.feature.repositories import IFeatureRepository
 from src.apps.project.i_project_repository import IProjectRepository
 from src.apps.send_mail.service import SendMailService
 from src.apps.user.protocols import JWTServiceProtocol, SendMailServiceProtocol
@@ -37,6 +38,7 @@ from src.config import Config, DbConfig, JWTConfig, RedisConfig, SMTPConfig
 from src.data_access.repositories import (
     CategoryRepository,
     CommentRepository,
+    FeatureRepository,
     RoleRepository,
     TagRepository,
     WorkspaceInviteRepository,
@@ -98,6 +100,7 @@ class ConfigProvider(Provider):
 class RepositoriesProvider(Provider):
     scope = Scope.REQUEST
 
+    feature_repository = provide(FeatureRepository, provides=IFeatureRepository)
     comment_repo = provide(CommentRepository, provides=ICommentRepository)
     workspace_repository = provide(WorkspaceRepository, provides=IWorkspaceRepository)
     workspace_invite_repository = provide(
@@ -106,7 +109,6 @@ class RepositoriesProvider(Provider):
     category_repository = provide(CategoryRepository, provides=ICategoryRepository)
     role_repository = provide(RoleRepository, provides=IRoleRepository)
     tag_repository = provide(TagRepository, provides=ITagRepository)
-    comment_repo = provide(CommentRepository, provides=ICommentRepository)
     project_repository = provide(ProjectRepository, provides=IProjectRepository)
 
     @provide(scope=scope, provides=SendMailServiceProtocol)
