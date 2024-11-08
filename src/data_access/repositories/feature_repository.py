@@ -7,8 +7,8 @@ from sqlalchemy.orm import selectinload
 from src.apps.feature.domain import Feature, FeatureId, WorkspaceId
 from src.apps.feature.exceptions import RepositoryError
 from src.apps.feature.repositories import FeatureListQuery, IFeatureRepository
+from src.data_access.converters.feature_converter import FeatureConverter
 from src.data_access.models import FeatureModel, TagModel, UserModel
-from src.data_access.repositories.feature.mapper import FeatureMapper
 
 
 class FeatureRepository(IFeatureRepository):
@@ -16,7 +16,7 @@ class FeatureRepository(IFeatureRepository):
     def __init__(self, session: AsyncSession):
         self._session = session
         self.model = FeatureModel
-        self.mapper = FeatureMapper()
+        self.converter = FeatureConverter()
 
     async def _get_m2m_objects[M, ID](self, list_ids: list[ID] | None, model: type[M]) -> list[M]:
         if list_ids:
@@ -39,7 +39,7 @@ class FeatureRepository(IFeatureRepository):
         return feature_model
 
     async def save(self, feature: Feature) -> None:
-        feature_model = await self.mapper.map_entity_to_model(feature)
+        feature_model = await self.converter.map_entity_to_model(feature)
         feature_model.tags = await self._get_m2m_objects(feature.tags, TagModel)
         feature_model.members = await self._get_m2m_objects(feature.members, UserModel)
 
@@ -57,7 +57,7 @@ class FeatureRepository(IFeatureRepository):
     async def get_by_id(self, feature_id: FeatureId) -> Feature | None:
         feature_model = await self.get_model(feature_id=feature_id)
         if feature_model:
-            return self.mapper.map_model_to_entity(feature_model)
+            return self.converter.map_model_to_entity(feature_model)
         else:
             return None
 
@@ -128,7 +128,7 @@ class FeatureRepository(IFeatureRepository):
         result = await self._session.execute(stmt)
         features = result.scalars().all()
         return (
-            [(FeatureId(f.id), self.mapper.map_model_to_entity(f)) for f in features]
+            [(FeatureId(f.id), self.converter.map_model_to_entity(f)) for f in features]
             if features
             else None
         )
