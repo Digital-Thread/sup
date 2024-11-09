@@ -24,7 +24,7 @@ class PasswordResetUserService:
         if not verify:
             raise UserPasswordException()
         else:
-            User.validate_new_password(password=dto.new_password)
+            User.validate_password(password=dto.new_password)
             user.password = self.create_service.get_password_hash(dto.new_password)
             await self.repository.update(user)
         return user
@@ -39,7 +39,7 @@ class PasswordResetUserService:
                 password_sent = True
             else:
                 password_sent = False
-                User.validate_new_password(password=dto.new_password)
+                User.validate_password(password=dto.new_password)
             password = dto.new_password
             user.password = self.create_service.get_password_hash(dto.new_password)
             await self.repository.update(user)

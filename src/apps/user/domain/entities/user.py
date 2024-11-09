@@ -49,10 +49,10 @@ class User:
         self.first_name = self.first_name.capitalize()
         self.last_name = self.last_name.capitalize()
         self.email = self.email.lower()
-        self._validate_all_fields()
-        self._validate_password(password=self.password)
+        self.validate_all_fields()
+        self.validate_password(password=self.password)
 
-    def _validate_all_fields(self) -> None:
+    def validate_all_fields(self) -> None:
         for field_name in [
             'first_name',
             'last_name',
@@ -62,20 +62,22 @@ class User:
             'nick_gmeet',
         ]:
             value = getattr(self, field_name)
-            self._validate_length(value, field_name)
+            self.validate_length(value, field_name)
 
             if field_name in ['first_name', 'last_name']:
-                self._validate_name(value)
+                self.validate_name(value)
+            if field_name in ['email']:
+                self.validate_email(value)
 
         if not (self.nick_gitlab or self.nick_github):
             raise OneOfTheExpire()
 
         if self.nick_gitlab:
-            self._validate_length(self.nick_gitlab, 'nick_gitlab')
+            self.validate_length(self.nick_gitlab, 'nick_gitlab')
         if self.nick_github:
-            self._validate_length(self.nick_github, 'nick_github')
+            self.validate_length(self.nick_github, 'nick_github')
 
-    def _validate_length(self, value: str, field_name: str) -> None:
+    def validate_length(self, value: str, field_name: str) -> None:
         if value is None or value.strip() == '':
             raise ValidateEmptyLengthError(field_name)
         max_length = self.__dataclass_fields__[field_name].metadata['max_length']
@@ -83,33 +85,25 @@ class User:
             raise ValidateLengthError(field_name, max_length)
 
     @staticmethod
-    def _validate_name(name: str) -> None:
+    def validate_name(name: str) -> None:
         pattern = r'^[a-zA-Zа-яА-ЯёЁ]+$'
         if not re.match(pattern, name):
             raise InvalidNameError()
 
     @staticmethod
-    def _validate_email(email: str) -> None:
+    def validate_email(email: str) -> None:
         pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
         if not re.match(pattern, email):
             raise InvalidEmailFormatError()
 
     @staticmethod
-    def _validate_password(password: str) -> str:
-        return validate_new_password_func(password)
-
-    @staticmethod
-    def validate_new_password(password: str) -> str:
-        return validate_new_password_func(password)
-
-
-def validate_new_password_func(password: str) -> str:
-    if password is None:
+    def validate_password(password: str) -> str:
+        if password is None:
+            return password
+        if not re.search(r'[A-Z]', password):
+            raise MissingUppercaseLetterError()
+        if not re.search(r'\d', password):
+            raise MissingDigitError()
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+            raise MissingSpecialCharacterError()
         return password
-    if not re.search(r'[A-Z]', password):
-        raise MissingUppercaseLetterError()
-    if not re.search(r'\d', password):
-        raise MissingDigitError()
-    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
-        raise MissingSpecialCharacterError()
-    return password
