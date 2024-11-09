@@ -25,6 +25,7 @@ def domain_to_model(user: User) -> UserModel:
         is_active=user.is_active,
         created_at=user.created_at,
         updated_at=user.updated_at,
+        id=user.id,
     )
 
 
@@ -44,6 +45,7 @@ def model_to_domain(user_model: UserModel) -> User:
         is_active=user_model.is_active,
         _created_at=user_model.created_at,
         _updated_at=user_model.updated_at,
+        _id=user_model.id,
     )
 
 
@@ -57,7 +59,6 @@ class UserRepository(IUserRepository):
         user._created_at = datetime.datetime.now(datetime.timezone.utc)
         user._updated_at = datetime.datetime.now(datetime.timezone.utc)
         self._session.add(sql_user)
-        await self._session.commit()
 
     async def find_by_email(self, email: str) -> Optional[User]:
         query = select(self.model).where(self.model.email == email.lower())
@@ -87,7 +88,6 @@ class UserRepository(IUserRepository):
         model = result.scalar_one_or_none()
         if model:
             await self._session.delete(model)
-            await self._session.commit()
 
     async def update(self, user: User) -> None:
         query = (
@@ -109,4 +109,3 @@ class UserRepository(IUserRepository):
             )
         )
         await self._session.execute(query)
-        await self._session.commit()
