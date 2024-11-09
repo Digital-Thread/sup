@@ -38,6 +38,8 @@ from src.apps.user.exceptions import (
 
 __all__ = ('init_exception_handlers',)
 
+from src.apps.workspace.exceptions.workspace_exceptions import WorkspaceException
+
 exception_status_codes = {
     FeatureCreateError: status.HTTP_400_BAD_REQUEST,
     FeatureDeleteError: status.HTTP_400_BAD_REQUEST,
@@ -67,6 +69,7 @@ exception_status_codes = {
     MissingDigitError: status.HTTP_400_BAD_REQUEST,
     MissingSpecialCharacterError: status.HTTP_400_BAD_REQUEST,
     OneOfTheExpire: status.HTTP_400_BAD_REQUEST,
+    WorkspaceException: status.HTTP_400_BAD_REQUEST
 }
 
 
