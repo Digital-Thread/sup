@@ -9,7 +9,7 @@ from src.apps.feature.domain import (
 from src.data_access.models import FeatureModel
 
 
-class FeatureMapper:
+class FeatureConverter:
     MODEL = FeatureModel
 
     async def map_entity_to_model(self, feature_entity: Feature) -> FeatureModel:

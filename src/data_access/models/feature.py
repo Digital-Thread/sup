@@ -11,6 +11,7 @@ from src.apps.feature.domain import Priority, Status
 from src.data_access.models import Base
 
 if TYPE_CHECKING:
+    from . import TaskModel
     from .project import ProjectModel
     from .user import UserModel
     from .workspace_models.tag import TagModel
@@ -88,3 +89,5 @@ class FeatureModel(Base):
         back_populates='member_features',
         passive_deletes=True,
     )
+
+    tasks: Mapped[list['TaskModel']] = relationship('TaskModel', back_populates='feature')

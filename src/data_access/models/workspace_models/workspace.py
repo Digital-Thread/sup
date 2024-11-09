@@ -10,6 +10,7 @@ from src.data_access.models.base import Base
 from src.data_access.models.mixins import UUIDPkMixin
 
 if TYPE_CHECKING:
+    from src.data_access.models import TaskModel
     from src.data_access.models.feature import FeatureModel
     from src.data_access.models.project import ProjectModel
     from src.data_access.models.user import UserModel
@@ -57,3 +58,4 @@ class WorkspaceModel(Base, UUIDPkMixin):
     features: Mapped[list['FeatureModel']] = relationship(
         'FeatureModel', back_populates='workspace'
     )
+    tasks: Mapped[list['TaskModel']] = relationship('TaskModel', back_populates='workspace')

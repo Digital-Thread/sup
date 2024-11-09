@@ -23,6 +23,7 @@ from src.providers.usecases import (
     ProjectUseCaseProvider,
     RoleUseCaseProvider,
     TagUseCaseProvider,
+    TaskInteractorProvider,
     WorkspaceInviteUseCaseProvider,
     WorkspaceUseCaseProvider,
 )
@@ -51,6 +52,7 @@ def container_factory() -> AsyncContainer:
         CategoryUseCaseProvider(),
         WorkspaceInviteUseCaseProvider(),
         FeatureInteractorProvider(),
+        TaskInteractorProvider(),
     )
 
 

@@ -10,6 +10,7 @@ from src.data_access.models.mixins import IntIdPkMixin
 
 if TYPE_CHECKING:
     from src.data_access.models.feature import FeatureModel
+    from src.data_access.models.task import TaskModel
     from src.data_access.models.workspace_models.workspace import WorkspaceModel
 
 
@@ -25,6 +26,9 @@ class TagModel(Base, IntIdPkMixin):
     workspace: Mapped['WorkspaceModel'] = relationship('WorkspaceModel', back_populates='tags')
     features: Mapped[list['FeatureModel']] = relationship(
         'FeatureModel', secondary='feature_tag', back_populates='tags'
+    )
+    tasks: Mapped[list['TaskModel']] = relationship(
+        'TaskModel', secondary='task_tag', back_populates='tags'
     )
 
     __table_args__ = (UniqueConstraint('name', 'workspace_id', name='uix_name_workspace_id_tags'),)

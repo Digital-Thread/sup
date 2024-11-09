@@ -31,6 +31,13 @@ from src.apps.project.use_cases import (
     GetProjectByWorkspaceUseCase,
     UpdateProjectUseCase,
 )
+from src.apps.task import (
+    CreateTaskInteractor,
+    DeleteTaskInteractor,
+    GetAllTasksInteractor,
+    GetTaskInteractor,
+    UpdateTaskInteractor,
+)
 from src.apps.workspace.use_cases.category_use_cases import (
     CreateCategoryUseCase,
     DeleteCategoryUseCase,
@@ -161,3 +168,13 @@ class FeatureInteractorProvider(Provider):
     get_features = provide(GetAllFeaturesInteractor)
     update_feature = provide(UpdateFeatureInteractor)
     delete_feature = provide(DeleteFeatureInteractor)
+
+
+class TaskInteractorProvider(Provider):
+    scope = Scope.REQUEST
+
+    create_task = provide(CreateTaskInteractor)
+    get_task_by_id = provide(GetTaskInteractor)
+    get_tasks = provide(GetAllTasksInteractor)
+    update_task = provide(UpdateTaskInteractor)
+    delete_task = provide(DeleteTaskInteractor)
