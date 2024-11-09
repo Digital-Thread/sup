@@ -69,7 +69,7 @@ exception_status_codes = {
     MissingDigitError: status.HTTP_400_BAD_REQUEST,
     MissingSpecialCharacterError: status.HTTP_400_BAD_REQUEST,
     OneOfTheExpire: status.HTTP_400_BAD_REQUEST,
-    WorkspaceException: status.HTTP_400_BAD_REQUEST
+    WorkspaceException: status.HTTP_400_BAD_REQUEST,
 }
 
 

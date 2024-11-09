@@ -25,5 +25,5 @@ __all__ = (
     'CommentModel',
     'FeatureModel',
     'ProjectModel',
-    'ProjectParticipantsModel'
+    'ProjectParticipantsModel',
 )

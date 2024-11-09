@@ -1,7 +1,9 @@
 import asyncio
 import re
+
 from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
 from data_access.repositories.user_repository import UserRepository
 from src.data_access.models.user import UserModel as User
 from src.providers.adapters import ConfigProvider
@@ -45,12 +47,14 @@ class CreateUserAdmin:
         await self.repository._session.commit()
         print('Администратор успешно создан.')
 
-def validate_email(email: str) -> None:
+
+def validate_email(email: str) -> bool:
     pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
     if not re.match(pattern, email):
         print('Некорректный формат электронной почты.')
         return False
     return True
+
 
 def validate_new_password_func(password: str) -> bool:
     if password is None or len(password) == 0:

@@ -27,10 +27,14 @@ from src.apps.user.services.remove_user_service import RemoveUserService
 from src.apps.workspace.domain.entities.workspace_invite import StatusInvite
 from src.apps.workspace.dtos.workspace_dtos import CreateWorkspaceAppDTO
 from src.apps.workspace.dtos.workspace_invite_dtos import UpdateWorkspaceInviteAppDTO
-from src.apps.workspace.use_cases.workspace_invite_use_cases import GetWorkspaceIdByInviteCodeUseCase, \
-    UpdateWorkspaceInviteUseCase
+from src.apps.workspace.use_cases.workspace_invite_use_cases import (
+    GetWorkspaceIdByInviteCodeUseCase,
+    UpdateWorkspaceInviteUseCase,
+)
 from src.apps.workspace.use_cases.workspace_use_cases import CreateWorkspaceUseCase
-from src.apps.workspace.use_cases.workspace_use_cases.add_member_in_workspace import AddMemberInWorkspaceUseCase
+from src.apps.workspace.use_cases.workspace_use_cases.add_member_in_workspace import (
+    AddMemberInWorkspaceUseCase,
+)
 
 router = APIRouter(route_class=DishkaRoute)
 
@@ -200,7 +204,7 @@ async def create_user_by_invite(
     await update_status_invite_use_case.execute(
         workspace_id_for_invite[1],
         workspace_id_for_invite[0],
-        UpdateWorkspaceInviteAppDTO(status=StatusInvite.USED)
+        UpdateWorkspaceInviteAppDTO(status=StatusInvite.USED),
     )
 
     return UserResponseDTO.model_validate(new_user)
