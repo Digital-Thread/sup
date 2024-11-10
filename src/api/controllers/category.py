@@ -24,7 +24,7 @@ from src.apps.workspace.use_cases.category_use_cases import (
 category_router = APIRouter(route_class=DishkaRoute)
 
 
-@category_router.post('/create_category', status_code=status.HTTP_201_CREATED)
+@category_router.post('', status_code=status.HTTP_201_CREATED)
 async def create_category(
     body: CreateCategoryDTO, use_case: FromDishka[CreateCategoryUseCase]
 ) -> dict[str, str]:

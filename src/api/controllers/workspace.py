@@ -26,7 +26,7 @@ workspace_router = APIRouter(route_class=DishkaRoute)
 
 
 @workspace_router.post(
-    '/create_workspace',
+    '',
     status_code=status.HTTP_201_CREATED,
 )
 async def create_workspace(

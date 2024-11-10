@@ -17,7 +17,7 @@ from src.apps.workspace.use_cases.tag_use_cases import (
 tag_router = APIRouter(route_class=DishkaRoute)
 
 
-@tag_router.post('/create_tag', status_code=status.HTTP_201_CREATED)
+@tag_router.post('', status_code=status.HTTP_201_CREATED)
 async def create_tag(body: CreateTagDTO, use_case: FromDishka[CreateTagUseCase]) -> dict[str, str]:
     request = CreateTagAppDTO(**body.model_dump())
     try:

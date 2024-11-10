@@ -21,7 +21,7 @@ from src.apps.project.use_cases import (
 project_router = APIRouter(route_class=DishkaRoute)
 
 
-@project_router.post('/create_project', status_code=status.HTTP_201_CREATED)
+@project_router.post('', status_code=status.HTTP_201_CREATED)
 async def create_project(
     body: CreateProjectDTO, use_case: FromDishka[CreateProjectUseCase]
 ) -> dict[str, str]:

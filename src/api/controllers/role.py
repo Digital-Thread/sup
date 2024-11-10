@@ -21,7 +21,7 @@ from src.apps.workspace.use_cases.role_use_cases import (
 role_router = APIRouter(route_class=DishkaRoute)
 
 
-@role_router.post('/create_role', status_code=status.HTTP_201_CREATED)
+@role_router.post('', status_code=status.HTTP_201_CREATED)
 async def create_role(
     body: CreateRoleDTO, use_case: FromDishka[CreateRoleUseCase]
 ) -> dict[str, str]:
