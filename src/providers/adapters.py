@@ -14,6 +14,8 @@ from sqlalchemy.ext.asyncio import (
 from src.apps.auth import JWTService
 from src.apps.comment.domain import ICommentRepository
 from src.apps.feature.repositories import IFeatureRepository
+from src.apps.meet import IMeetRepository, IParticipantRepository, MeetService
+from src.apps.meet.protocols import WorkspaceService, WorkspaceServiceProtocol
 from src.apps.project.i_project_repository import IProjectRepository
 from src.apps.send_mail.service import SendMailService
 from src.apps.task.repositories import ITaskRepository
@@ -46,6 +48,8 @@ from src.data_access.repositories import (
     WorkspaceInviteRepository,
     WorkspaceRepository,
 )
+from src.data_access.repositories.meet import MeetRepository
+from src.data_access.repositories.meet_participant import ParticipantRepository
 from src.data_access.repositories.project_repository import ProjectRepository
 from src.data_access.repositories.user_repository import UserRepository
 
@@ -204,4 +208,29 @@ class RepositoriesProvider(Provider):
             repository=repository,
             authenticate_service=authenticate_service,
             create_service=create_service,
+        )
+
+    @provide(scope=scope)
+    def provide_meet_repository(self, session: AsyncSession) -> IMeetRepository:
+        return MeetRepository(session)
+
+    @provide(scope=scope)
+    def provide_participant_repository(self, session: AsyncSession) -> IParticipantRepository:
+        return ParticipantRepository(session)
+
+    @provide(scope=scope)
+    def provide_temp_workspace_service(self) -> WorkspaceServiceProtocol:
+        return WorkspaceService()
+
+    @provide(scope=scope)
+    def provide_meet_service(
+        self,
+        meet_repository: IMeetRepository,
+        participant_repository: IParticipantRepository,
+        workspace_service: WorkspaceServiceProtocol,
+    ) -> MeetService:
+        return MeetService(
+            meet_repository=meet_repository,
+            participant_repository=participant_repository,
+            workspace_service=workspace_service,
         )

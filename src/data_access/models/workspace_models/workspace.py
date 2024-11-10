@@ -12,6 +12,7 @@ from src.data_access.models.mixins import UUIDPkMixin
 if TYPE_CHECKING:
     from src.data_access.models import TaskModel
     from src.data_access.models.feature import FeatureModel
+    from src.data_access.models.meet import MeetModel
     from src.data_access.models.project import ProjectModel
     from src.data_access.models.user import UserModel
     from src.data_access.models.workspace_models.category import CategoryModel
@@ -40,9 +41,9 @@ class WorkspaceModel(Base, UUIDPkMixin):
     projects: Mapped[list['ProjectModel']] = relationship(
         'ProjectModel', back_populates='workspace', cascade='all, delete-orphan'
     )
-    # meets: Mapped[list['MeetModel']] = relationship(
-    #     'MeetModel', back_populates='workspace', cascade='all, delete-orphan'
-    # )
+    meets: Mapped[list['MeetModel']] = relationship(
+        'MeetModel', back_populates='workspace', cascade='all, delete-orphan'
+    )
     roles: Mapped[list['RoleModel']] = relationship(
         'RoleModel', back_populates='workspace', cascade='all, delete-orphan'
     )
