@@ -57,11 +57,14 @@ class UserModel(Base, DatetimeFieldsMixin, UUIDPkMixin):
     )
 
     owned_meetings: Mapped[list['MeetModel']] = relationship(
-        'Meet', foreign_keys='Meet.owner_id', back_populates='owner', lazy='raise_on_sql'
+        'MeetModel', foreign_keys='MeetModel.owner_id', back_populates='owner', lazy='raise_on_sql'
     )
     assigned_meetings: Mapped[list['MeetModel']] = relationship(
-        'Meet', foreign_keys='Meet.assigned_to', back_populates='assigned', lazy='raise_on_sql'
+        'MeetModel',
+        foreign_keys='MeetModel.assigned_to',
+        back_populates='assigned',
+        lazy='raise_on_sql',
     )
     participations: Mapped[list['ParticipantModel']] = relationship(
-        'Participant', back_populates='user', lazy='raise_on_sql'
+        'ParticipantModel', back_populates='user', lazy='raise_on_sql'
     )

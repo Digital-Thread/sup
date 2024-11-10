@@ -39,11 +39,11 @@ R = TypeVar('R')
 
 
 def check_access(
-    method: Callable[Concatenate[Any, UUID, int, P], Awaitable[R]],
-) -> Callable[Concatenate[Any, UUID, int, P], Awaitable[R]]:
+    method: Callable[Concatenate[Any, UUID, UUID, P], Awaitable[R]],
+) -> Callable[Concatenate[Any, UUID, UUID, P], Awaitable[R]]:
     @wraps(method)
     async def wrapper(
-        self: Any, user_id: UUID, workspace_id: int, *args: P.args, **kwargs: P.kwargs
+        self: Any, user_id: UUID, workspace_id: UUID, *args: P.args, **kwargs: P.kwargs
     ) -> R:
         has_access = await self.workspace_service.user_has_access(user_id, workspace_id)
         if not has_access:
@@ -65,7 +65,7 @@ class MeetService:
         self.workspace_service = workspace_service
 
     @check_access
-    async def create_meet(self, owner_id: UUID, workspace_id: int, dto: MeetCreateDTO) -> None:
+    async def create_meet(self, owner_id: UUID, workspace_id: UUID, dto: MeetCreateDTO) -> None:
         """
         Create a new meet
 

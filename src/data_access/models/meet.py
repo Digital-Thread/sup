@@ -25,23 +25,23 @@ class MeetModel(Base, IntIdPkMixin, DatetimeFieldsMixin):
     assigned_to: Mapped[UUID] = mapped_column(ForeignKey('users.id'))
 
     participants: Mapped[list['ParticipantModel']] = relationship(
-        cascade='all, delete-orphan', back_populates='meets', lazy='raise_on_sql'
+        cascade='all, delete-orphan', back_populates='meet', lazy='raise_on_sql'
     )
 
     owner: Mapped['UserModel'] = relationship(
-        'User', foreign_keys=[owner_id], back_populates='owned_meetings'
+        'UserModel', foreign_keys=[owner_id], back_populates='owned_meetings'
     )
 
     assigned: Mapped['UserModel'] = relationship(
-        'User', foreign_keys=[assigned_to], back_populates='assigned_meetings'
+        'UserModel', foreign_keys=[assigned_to], back_populates='assigned_meetings'
     )
 
     workspace: Mapped['WorkspaceModel'] = relationship(
-        'Workspace', foreign_keys=[workspace_id], back_populates='meets', lazy='raise_on_sql'
+        'WorkspaceModel', foreign_keys=[workspace_id], back_populates='meets', lazy='raise_on_sql'
     )
 
     category: Mapped['CategoryModel'] = relationship(
-        'Category', back_populates='meets', lazy='joined'
+        'CategoryModel', back_populates='meets', lazy='joined'
     )
 
 
@@ -52,9 +52,11 @@ class ParticipantModel(Base, IntIdPkMixin, DatetimeFieldsMixin):
     user_id: Mapped[UUID] = mapped_column(ForeignKey('users.id'))
     status: Mapped[str]
 
-    user: Mapped['UserModel'] = relationship('User', back_populates='participations', lazy='joined')
+    user: Mapped['UserModel'] = relationship(
+        'UserModel', back_populates='participations', lazy='joined'
+    )
     meet: Mapped['MeetModel'] = relationship(
-        'Meet', back_populates='participants', lazy='raise_on_sql'
+        'MeetModel', back_populates='participants', lazy='raise_on_sql'
     )
 
     __table_args__ = (UniqueConstraint('meet_id', 'user_id'),)
