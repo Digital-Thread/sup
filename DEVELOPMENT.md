@@ -62,7 +62,7 @@ $ python -V
 If Python is installed, clone the repository:
 
 ```sh
-$ git clone https://github.com/DavidRomanovizc/DatingBot.git
+$ git clone https://github.com/Digital-Thread/sup.git
 ```
 
 Create a virtual environment:
@@ -99,7 +99,3 @@ Run the following commands to make migrations:
 ```sh
 $ alembic upgrade heads
 ```
-
-## :test_tube: Tests
-
-Звук сверчков и перекати-поле...

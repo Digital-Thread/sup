@@ -23,7 +23,7 @@ from src.apps.workspace.use_cases.workspace_invite_use_cases import (
 workspace_invite_router = APIRouter(route_class=DishkaRoute)
 
 
-@workspace_invite_router.post('/create_category', status_code=status.HTTP_201_CREATED)
+@workspace_invite_router.post('', status_code=status.HTTP_201_CREATED)
 async def create_category(
     workspace_id: Annotated[UUID, Body(embed=True)],
     use_case: FromDishka[CreateWorkspaceInviteUseCase],

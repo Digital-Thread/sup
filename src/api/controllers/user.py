@@ -48,9 +48,12 @@ async def login_user(
 ) -> dict[str, str]:
     user = await auth_service.authenticate_user(dto=auth_dto)
     user_agent = request.headers.get('User-Agent')
-    access_token, max_age_access, refresh_token, max_age_refresh = (
-        await jwt_service.creating_tokens(email=user.email, user_agent=user_agent)
-    )
+    (
+        access_token,
+        max_age_access,
+        refresh_token,
+        max_age_refresh,
+    ) = await jwt_service.creating_tokens(email=user.email, user_agent=user_agent)
     if access_token and refresh_token:
         request.state.new_access_token = access_token
         request.state.new_refresh_token = refresh_token
@@ -130,18 +133,18 @@ async def about_me(
     return UserResponseDTO.model_validate(user)
 
 
-@router.get('/invite_link')
-async def invite_link(
-    request: Request,
-    get_user_service: FromDishka[GetUserService],
-    create_user_service: FromDishka[CreateUserService],
-    email: str = Query(...),
-) -> dict[str, str]:
-    user = await authenticate_and_create_tokens(request, get_user_service)
+# @router.get('/invite_link')
+# async def invite_link(
+#     request: Request,
+#     get_user_service: FromDishka[GetUserService],
+#     create_user_service: FromDishka[CreateUserService],
+#     email: str = Query(...),
+# ) -> dict[str, str]:
+#     user = await authenticate_and_create_tokens(request, get_user_service)
 
-    await create_user_service.send_invite_link(from_email=user.email, to_email=email)
+#     await create_user_service.send_invite_link(from_email=user.email, to_email=email)
 
-    return {'detail': f'Инвайт отправлен на почту {email}'}
+#     return {'detail': f'Инвайт отправлен на почту {email}'}
 
 
 @router.patch('/activate/{activation_token}')
@@ -150,7 +153,7 @@ async def activate_user(
     activation_token: str = Path(...),
 ) -> dict[str, str]:
     await create_user_service.activate_user_by_token(token=activation_token)
-    return {'detail': f'Ваш аккаунт успешно активирован'}
+    return {'detail': 'Ваш аккаунт успешно активирован'}
 
 
 @router.patch('/admin/activate_user')
@@ -253,7 +256,7 @@ async def reset_password(
     user = await authenticate_and_create_tokens(request, get_user_service)
     await password_reset_service.password_reset_user(user.email, dto)
 
-    return {'detail': f'Пароль обновлен'}
+    return {'detail': 'Пароль обновлен'}
 
 
 @router.post('/admin/reset_password')
@@ -269,7 +272,7 @@ async def reset_password_by_admin(
     await authorize_service.get_access_admin(user)
     await password_reset_service.password_reset_user_by_admin(email, dto)
 
-    return {'detail': f'Пароль обновлен'}
+    return {'detail': 'Пароль обновлен'}
 
 
 @router.delete('/remove')
