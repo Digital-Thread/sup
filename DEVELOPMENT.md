@@ -41,7 +41,7 @@ If the application is running in Docker, `DB_PORT` should be set to `5432`
 First clone the repository
 
 ```shell
-$ git clone https://github.com/DavidRomanovizc/DatingBot.git
+$ git clone https://github.com/Digital-Thread/sup.git
 ```
 
 Once done, run the following command:
