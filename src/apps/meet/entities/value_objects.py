@@ -3,7 +3,7 @@ from uuid import UUID
 
 MeetId = NewType('MeetId', int)
 ParticipantId = NewType('ParticipantId', int)
-WorkspaceId = NewType('WorkspaceId', int)
+WorkspaceId = NewType('WorkspaceId', UUID)
 OwnerId = NewType('OwnerId', UUID)
 AssignedId = NewType('AssignedId', UUID)
 CategoryId = NewType('CategoryId', int)

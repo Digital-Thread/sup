@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 
 class MeetModel(Base, IntIdPkMixin, DatetimeFieldsMixin):
-    __table_name__ = 'meets'
+    __tablename__ = 'meets'
 
     name: Mapped[str]
     meet_at: Mapped[datetime]
@@ -47,7 +47,7 @@ class MeetModel(Base, IntIdPkMixin, DatetimeFieldsMixin):
 
 
 class ParticipantModel(Base, IntIdPkMixin, DatetimeFieldsMixin):
-    __table_name__ = 'participants'
+    __tablename__ = 'participants'
 
     meet_id: Mapped[int] = mapped_column(ForeignKey('meets.id'))
     user_id: Mapped[UUID] = mapped_column(ForeignKey('users.id'))

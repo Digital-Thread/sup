@@ -8,6 +8,7 @@ from .mixins import DatetimeFieldsMixin, UUIDPkMixin
 
 if TYPE_CHECKING:
     from .feature import FeatureModel
+    from .meet import MeetModel, ParticipantModel
     from .task import TaskModel
     from .workspace_models.user_workspace_role import UserWorkspaceRoleModel
     from .workspace_models.workspace import WorkspaceModel
@@ -53,4 +54,14 @@ class UserModel(Base, DatetimeFieldsMixin, UUIDPkMixin):
     )
     assigned_tasks: Mapped[list['TaskModel']] = relationship(
         'TaskModel', back_populates='assigned_to', foreign_keys='TaskModel.assigned_to_id'
+    )
+
+    owned_meetings: Mapped[list['MeetModel']] = relationship(
+        'Meet', foreign_keys='Meet.owner_id', back_populates='owner', lazy='raise_on_sql'
+    )
+    assigned_meetings: Mapped[list['MeetModel']] = relationship(
+        'Meet', foreign_keys='Meet.assigned_to', back_populates='assigned', lazy='raise_on_sql'
+    )
+    participations: Mapped[list['ParticipantModel']] = relationship(
+        'Participant', back_populates='user', lazy='raise_on_sql'
     )
