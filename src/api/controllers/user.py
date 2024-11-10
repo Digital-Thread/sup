@@ -174,10 +174,15 @@ async def create_user_by_admin(
     get_user_service: FromDishka[GetUserService],
     authorize_service: FromDishka[AuthorizeUserService],
     create_user_service: FromDishka[CreateUserService],
+    create_workspace_use_case: FromDishka[CreateWorkspaceUseCase],
 ) -> dict[str, str]:
     user = await authenticate_and_create_tokens(request, get_user_service)
     await authorize_service.get_access_admin(user)
-    user_email, user_password = await create_user_service.create_user_by_admin(create_user_dto)
+    user_id, username, user_email, user_password = await create_user_service.create_user_by_admin(create_user_dto)
+    await create_workspace_use_case.execute(CreateWorkspaceAppDTO(
+        owner_id=user_id,
+        name=username
+    ))
     return {'detail': f'Пользователь зарегистрирован email: {user_email} пароль: {user_password}'}
 
 
