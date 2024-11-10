@@ -2,6 +2,7 @@ from typing import AsyncIterable
 
 from dishka import Provider, Scope, provide
 from environs import Env
+from passlib.context import CryptContext
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -10,7 +11,47 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from src.config import Config, DbConfig
+from src.apps.auth import JWTService
+from src.apps.comment.domain import ICommentRepository
+from src.apps.feature.repositories import IFeatureRepository
+from src.apps.meet import IMeetRepository, IParticipantRepository, MeetService
+from src.apps.meet.protocols import WorkspaceService, WorkspaceServiceProtocol
+from src.apps.project.i_project_repository import IProjectRepository
+from src.apps.send_mail.service import SendMailService
+from src.apps.task.repositories import ITaskRepository
+from src.apps.user.protocols import JWTServiceProtocol, SendMailServiceProtocol
+from src.apps.user.repositories import IUserRepository
+from src.apps.user.services import (
+    AuthenticateUserService,
+    AuthorizeUserService,
+    CreateUserService,
+    GetUserService,
+    UpdateUserService,
+)
+from src.apps.user.services.password_reset_user_service import PasswordResetUserService
+from src.apps.user.services.remove_user_service import RemoveUserService
+from src.apps.workspace.repositories import (
+    ICategoryRepository,
+    IRoleRepository,
+    ITagRepository,
+    IWorkspaceInviteRepository,
+    IWorkspaceRepository,
+)
+from src.config import Config, DbConfig, JWTConfig, RedisConfig, SMTPConfig
+from src.data_access.repositories import (
+    CategoryRepository,
+    CommentRepository,
+    FeatureRepository,
+    RoleRepository,
+    TagRepository,
+    TaskRepository,
+    WorkspaceInviteRepository,
+    WorkspaceRepository,
+)
+from src.data_access.repositories.meet import MeetRepository
+from src.data_access.repositories.meet_participant import ParticipantRepository
+from src.data_access.repositories.project_repository import ProjectRepository
+from src.data_access.repositories.user_repository import UserRepository
 
 
 class SqlalchemyProvider(Provider):
@@ -32,7 +73,6 @@ class SqlalchemyProvider(Provider):
                 await session.commit()
             except SQLAlchemyError:
                 await session.rollback()
-                raise
             finally:
                 await session.close()
 
@@ -45,8 +85,152 @@ class ConfigProvider(Provider):
 
         return Config(
             db=DbConfig.from_env(env),
+            smtp=SMTPConfig.from_env(env),
+            redis=RedisConfig.from_env(env),
+            jwt=JWTConfig.from_env(env),
         )
+
+    @provide(scope=Scope.APP)
+    def provide_smtp_config(self, config: Config) -> SMTPConfig:
+        return config.smtp
+
+    @provide(scope=Scope.APP)
+    def provide_redis_config(self, config: Config) -> RedisConfig:
+        return config.redis
+
+    @provide(scope=Scope.APP)
+    def provide_jwt_config(self, config: Config) -> JWTConfig:
+        return config.jwt
 
 
 class RepositoriesProvider(Provider):
     scope = Scope.REQUEST
+
+    feature_repository = provide(FeatureRepository, provides=IFeatureRepository)
+    task_repository = provide(TaskRepository, provides=ITaskRepository)
+    comment_repo = provide(CommentRepository, provides=ICommentRepository)
+    workspace_repository = provide(WorkspaceRepository, provides=IWorkspaceRepository)
+    workspace_invite_repository = provide(
+        WorkspaceInviteRepository, provides=IWorkspaceInviteRepository
+    )
+    category_repository = provide(CategoryRepository, provides=ICategoryRepository)
+    role_repository = provide(RoleRepository, provides=IRoleRepository)
+    tag_repository = provide(TagRepository, provides=ITagRepository)
+    project_repository = provide(ProjectRepository, provides=IProjectRepository)
+
+    @provide(scope=scope, provides=SendMailServiceProtocol)
+    def provide_send_mail_service(self) -> SendMailService:
+        return SendMailService()
+
+    @provide(scope=scope, provides=JWTServiceProtocol)
+    def provide_jwt_protocol_service(
+        self, jwt_config: JWTConfig, redis_config: RedisConfig
+    ) -> JWTService:
+        return JWTService(jwt_config, redis_config)
+
+    @provide(scope=scope)
+    def provide_jwt__service(self, jwt_config: JWTConfig, redis_config: RedisConfig) -> JWTService:
+        return JWTService(jwt_config, redis_config)
+
+    @provide(scope=scope, provides=IUserRepository)
+    def provide_user_repository(self, session: AsyncSession) -> UserRepository:
+        return UserRepository(session)
+
+    @provide(scope=scope)
+    def provide_pwd_context(self) -> CryptContext:
+        return CryptContext(schemes=['bcrypt'], deprecated='auto')
+
+    @provide(scope=scope)
+    def provide_create_user_service(
+        self,
+        pwd_context: CryptContext,
+        send_mail_service: SendMailServiceProtocol,
+        repository: IUserRepository,
+        redis_config: RedisConfig,
+        smtp_config: SMTPConfig,
+    ) -> CreateUserService:
+        return CreateUserService(
+            pwd_context=pwd_context,
+            send_mail_service=send_mail_service,
+            repository=repository,
+            redis_config=redis_config,
+            smtp_config=smtp_config,
+        )
+
+    @provide(scope=scope)
+    def provide_get_user_service(
+        self, repository: IUserRepository, token_service: JWTServiceProtocol
+    ) -> GetUserService:
+        return GetUserService(repository=repository, token_service=token_service)
+
+    @provide(scope=scope)
+    def provide_authenticate_user_service(
+        self,
+        repository: IUserRepository,
+        pwd_context: CryptContext,
+        get_user_service: GetUserService,
+    ) -> AuthenticateUserService:
+        return AuthenticateUserService(
+            repository=repository, pwd_context=pwd_context, get_user_service=get_user_service
+        )
+
+    @provide(scope=scope)
+    def provide_authorize_user_service(
+        self,
+        repository: IUserRepository,
+        get_user_service: GetUserService,
+    ) -> AuthorizeUserService:
+        return AuthorizeUserService(repository=repository, get_user_service=get_user_service)
+
+    @provide(scope=scope)
+    def provide_update_user_service(
+        self,
+        repository: IUserRepository,
+        token_service: JWTServiceProtocol,
+    ) -> UpdateUserService:
+        return UpdateUserService(repository=repository, token_service=token_service)
+
+    @provide(scope=scope)
+    def provide_remove_user_service(
+        self,
+        repository: IUserRepository,
+    ) -> RemoveUserService:
+        return RemoveUserService(repository=repository)
+
+    @provide(scope=scope)
+    def provide_reset_password_user_service(
+        self,
+        repository: IUserRepository,
+        authenticate_service: AuthenticateUserService,
+        create_service: CreateUserService,
+    ) -> PasswordResetUserService:
+        return PasswordResetUserService(
+            repository=repository,
+            authenticate_service=authenticate_service,
+            create_service=create_service,
+        )
+
+    @provide(scope=scope)
+    def provide_meet_repository(self, session: AsyncSession) -> IMeetRepository:
+        return MeetRepository(session)
+
+    @provide(scope=scope)
+    def provide_participant_repository(self, session: AsyncSession) -> IParticipantRepository:
+        return ParticipantRepository(session)
+
+    @provide(scope=scope)
+    def provide_temp_workspace_service(self) -> WorkspaceServiceProtocol:
+        return WorkspaceService()
+
+    @provide(scope=scope)
+    def provide_meet_service(
+        self,
+        meet_repository: IMeetRepository,
+        participant_repository: IParticipantRepository,
+        workspace_service: WorkspaceServiceProtocol,
+    ) -> MeetService:
+        return MeetService(
+            meet_repository=meet_repository,
+            participant_repository=participant_repository,
+            workspace_service=workspace_service,
+        )

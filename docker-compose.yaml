@@ -40,7 +40,7 @@ services:
     networks:
       - custom
     command: alembic upgrade head
-  backend:
+  sup_backend:
     build:
       context: .
       dockerfile: Dockerfile
