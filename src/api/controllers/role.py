@@ -1,8 +1,9 @@
+from typing import Annotated
 from uuid import UUID
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Body
 
 from src.api.dtos.role_dtos import (
     CreateRoleDTO,
@@ -15,8 +16,10 @@ from src.apps.workspace.use_cases.role_use_cases import (
     CreateRoleUseCase,
     DeleteRoleUseCase,
     GetRoleByWorkspaceUseCase,
-    UpdateRoleUseCase,
+    UpdateRoleUseCase, AssignRoleToWorkspaceMemberUseCase,
 )
+from src.apps.workspace.use_cases.role_use_cases.remove_role_from_workspace_member import \
+    RemoveRoleFromWorkspaceMemberUseCase
 
 role_router = APIRouter(route_class=DishkaRoute)
 
@@ -70,3 +73,19 @@ async def delete_role_by_id(
     except RoleException as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
     return {'redirect_url': '/'}
+
+
+@role_router.post('/{role_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def assign_role_to_workspace_member(role_id: int, workspace_id: Annotated[UUID, Body()], member_id: Annotated[UUID, Body()], use_case: FromDishka[AssignRoleToWorkspaceMemberUseCase]) -> None:
+    try:
+        await use_case.execute(workspace_id, member_id, role_id)
+    except RoleException as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
+
+
+@role_router.delete('/', status_code=status.HTTP_204_NO_CONTENT)
+async def remove_role_from_workspace_member(workspace_id: Annotated[UUID, Body()], member_id: Annotated[UUID, Body()], use_case: FromDishka[RemoveRoleFromWorkspaceMemberUseCase]) -> None:
+    try:
+        await use_case.execute(workspace_id, member_id)
+    except RoleException as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
