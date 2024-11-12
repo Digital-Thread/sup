@@ -14,7 +14,7 @@ class UserWorkspaceRoleRepository(IUserWorkspaceRoleRepository):
 
     async def assign_role_to_workspace_member(
             self, workspace_id: WorkspaceId, member_id: MemberId, role_id: RoleId
-    ):
+    ) -> None:
         await self._check_exists_workspace(workspace_id)
         await self._check_member_in_workspace(workspace_id, member_id)
         await self._check_exists_role_in_workspace(role_id, workspace_id)

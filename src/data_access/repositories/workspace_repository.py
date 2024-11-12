@@ -102,3 +102,7 @@ class WorkspaceRepository(IWorkspaceRepository):
             await self._session.flush()
         except IntegrityError as error:
             warning(error)
+            if isinstance(error.orig.__cause__, ForeignKeyViolationError):
+                raise MemberWorkspaceNotFound(f'Участник с id={user_id} не существует')
+
+            raise WorkspaceNotFound(f'Рабочее пространство с id={workspace_id} не найдено')
