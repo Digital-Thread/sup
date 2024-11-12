@@ -51,6 +51,8 @@ from src.apps.workspace.use_cases.role_use_cases import (
     GetRoleByIdUseCase,
     GetRoleByWorkspaceUseCase,
     UpdateRoleUseCase,
+    AssignRoleToWorkspaceMemberUseCase,
+    RemoveRoleFromWorkspaceMemberUseCase
 )
 from src.apps.workspace.use_cases.tag_use_cases import (
     CreateTagUseCase,
@@ -119,6 +121,8 @@ class RoleUseCaseProvider(Provider):
     get_role_by_workspace = provide(GetRoleByWorkspaceUseCase)
     update_role = provide(UpdateRoleUseCase)
     delete_role = provide(DeleteRoleUseCase)
+    assign_role_to_user = provide(AssignRoleToWorkspaceMemberUseCase)
+    remove_role_from_member = provide(RemoveRoleFromWorkspaceMemberUseCase)
 
 
 class TagUseCaseProvider(Provider):
