@@ -22,6 +22,13 @@ class Tag(NameValidatorMixin, ColorValidatorMixin):
     def id(self) -> TagId | None:
         return self._id
 
+    @id.setter
+    def id(self, new_id: TagId) -> None:
+        if self._id is not None:
+            raise AttributeError('Идентификатор тега уже установлен')
+
+        self._id = new_id
+
     @property
     def workspace_id(self) -> WorkspaceId:
         return self._workspace_id
