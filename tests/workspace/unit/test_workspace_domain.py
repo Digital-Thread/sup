@@ -1,75 +1,68 @@
 from datetime import datetime, timezone
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pytest
 
 from src.apps.workspace.domain.entities.workspace import Workspace
-from src.apps.workspace.domain.types_ids import OwnerId
-
-OWNER_ID = uuid4()
-WORKSPACE_ID = uuid4()
-MEMBER_1_ID = uuid4()
-MEMBER_2_ID = uuid4()
+from src.apps.workspace.domain.types_ids import (
+    InviteId,
+    MeetId,
+    MemberId,
+    OwnerId,
+    ProjectId,
+    RoleId,
+    TagId,
+    WorkspaceId,
+)
+from tests.fixtures.workspace_fixtures import owner_id, two_member_ids, workspace_id
 
 
 @pytest.fixture()
-def workspace_minimal():
-    return Workspace(owner_id=OwnerId(uuid4()), _name='Minimal Workspace')
+def workspace_minimal(owner_id: OwnerId) -> Workspace:
+    return Workspace(owner_id=owner_id, _name='Minimal Workspace')
 
 
-@pytest.fixture(
-    params=[
-        {
-            'name': 'Full Workspace',
-            'owner_id': OWNER_ID,
-            'id': WORKSPACE_ID,
-            'description': 'Full Workspace description',
-            'logo': 'workspace_logo.png',
-            'created_at': datetime.now(timezone.utc),
-            'invite_ids': [1, 2, 3, 4, 5],
-            'project_ids': [6, 7, 8, 9, 10],
-            'meet_ids': [11, 12, 13, 14, 15],
-            'tag_ids': [16, 17, 18, 19, 20],
-            'role_ids': [21, 22, 23, 24, 25],
-            'member_ids': [MEMBER_1_ID, MEMBER_2_ID],
-        }
-    ]
-)
-def workspace_full(request) -> Workspace:
-    params = request.param
+@pytest.fixture()
+def workspace_full(
+    owner_id: OwnerId, workspace_id: WorkspaceId, two_member_ids: list[MemberId]
+) -> Workspace:
     return Workspace(
-        owner_id=params['owner_id'],
-        _name=params['name'],
-        _id=params.get('id'),
-        _description=params.get('description'),
-        logo=params.get('logo'),
-        invite_ids=params.get('invite_ids'),
-        project_ids=params.get('project_ids'),
-        meet_ids=params.get('meet_ids'),
-        tag_ids=params.get('tag_ids'),
-        role_ids=params.get('role_ids'),
-        member_ids=params.get('member_ids'),
+        owner_id=owner_id,
+        _name='Full Workspace',
+        _id=workspace_id,
+        _description='Full Workspace description',
+        logo='workspace_logo.png',
+        invite_ids=[InviteId(1), InviteId(2), InviteId(3)],
+        project_ids=[ProjectId(4), ProjectId(5), ProjectId(6)],
+        meet_ids=[MeetId(7), MeetId(8), MeetId(9), MeetId(10)],
+        tag_ids=[TagId(11), TagId(12), TagId(13), TagId(14)],
+        role_ids=[RoleId(15), RoleId(16), RoleId(17), RoleId(18)],
+        member_ids=two_member_ids,
     )
 
 
 class TestWorkspaceCreation:
 
-    def test_workspace_creation_with_required_data(self, workspace_minimal):
+    def test_workspace_creation_with_required_data(
+        self, workspace_minimal: Workspace, owner_id: OwnerId
+    ) -> None:
         assert workspace_minimal.name == 'Minimal Workspace'
-        assert isinstance(workspace_minimal.owner_id, UUID)
+        assert workspace_minimal.owner_id == owner_id
 
-    def test_workspace_creation_with_full_data(self, workspace_full):
+    def test_workspace_creation_with_full_data(
+        self, workspace_full: Workspace, two_member_ids: list[MemberId]
+    ) -> None:
         assert workspace_full.name == 'Full Workspace'
         assert workspace_full.description == 'Full Workspace description'
         assert workspace_full.logo == 'workspace_logo.png'
-        assert workspace_full.invite_ids == [1, 2, 3, 4, 5]
-        assert workspace_full.project_ids == [6, 7, 8, 9, 10]
-        assert workspace_full.meet_ids == [11, 12, 13, 14, 15]
-        assert workspace_full.tag_ids == [16, 17, 18, 19, 20]
-        assert workspace_full.role_ids == [21, 22, 23, 24, 25]
-        assert workspace_full.member_ids == [MEMBER_1_ID, MEMBER_2_ID]
+        assert workspace_full.invite_ids == [InviteId(1), InviteId(2), InviteId(3)]
+        assert workspace_full.project_ids == [ProjectId(4), ProjectId(5), ProjectId(6)]
+        assert workspace_full.meet_ids == [MeetId(7), MeetId(8), MeetId(9), MeetId(10)]
+        assert workspace_full.tag_ids == [TagId(11), TagId(12), TagId(13), TagId(14)]
+        assert workspace_full.role_ids == [RoleId(15), RoleId(16), RoleId(17), RoleId(18)]
+        assert workspace_full.member_ids == two_member_ids
 
-    def test_workspace_has_correct_default_values(self, workspace_minimal):
+    def test_workspace_has_correct_default_values(self, workspace_minimal: Workspace) -> None:
         assert workspace_minimal.description is None
         assert workspace_minimal.id is None
         assert workspace_minimal.logo is None
@@ -82,18 +75,18 @@ class TestWorkspaceCreation:
         assert workspace_minimal.role_ids == []
         assert workspace_minimal.member_ids == []
 
-    def test_workspace_creation_missing_required_fields(self):
+    def test_workspace_creation_missing_required_fields(self) -> None:
         with pytest.raises(TypeError):
             Workspace()
 
 
 class TestWorkspaceValidation:
 
-    def test_valid_workspace_name(self, workspace_minimal):
+    def test_valid_workspace_name(self, workspace_minimal: Workspace) -> None:
         workspace_minimal.name = 'Another Valid Workspace'
         assert workspace_minimal.name == 'Another Valid Workspace'
 
-    def test_valid_workspace_description(self, workspace_minimal):
+    def test_valid_workspace_description(self, workspace_minimal: Workspace):
         workspace_minimal.description = 'This is a valid workspace description.'
         assert workspace_minimal.description == 'This is a valid workspace description.'
 
@@ -105,7 +98,9 @@ class TestWorkspaceValidation:
             ('Full Workspace@#$%^&*()+', 'Неверный формат названия рабочего пространства'),
         ],
     )
-    def test_invalid_workspace_name(self, workspace_minimal, name, expected_error_message):
+    def test_invalid_workspace_name(
+        self, workspace_minimal: Workspace, name: str, expected_error_message: str
+    ) -> None:
 
         with pytest.raises(ValueError, match=expected_error_message):
             workspace_minimal.name = name
@@ -118,7 +113,7 @@ class TestWorkspaceValidation:
         ):
             workspace_minimal.description = 'Full Workspace@#$%^&*()+'
 
-    def test_max_workspace_name_length(self, workspace_minimal):
+    def test_max_workspace_name_length(self, workspace_minimal: Workspace) -> None:
         valid_name = 'n' * 50
         workspace_minimal.name = valid_name
         assert workspace_minimal.name == valid_name
@@ -126,7 +121,7 @@ class TestWorkspaceValidation:
         with pytest.raises(ValueError, match=f'Неверный формат названия рабочего пространства'):
             workspace_minimal.name = 'n' * 51
 
-    def test_max_workspace_description_length(self, workspace_minimal):
+    def test_max_workspace_description_length(self, workspace_minimal: Workspace) -> None:
         valid_description = 'n' * 500
         workspace_minimal.description = valid_description
         assert workspace_minimal.description == valid_description
@@ -138,7 +133,7 @@ class TestWorkspaceValidation:
         ):
             workspace_minimal.description = 'n' * 501
 
-    def test_workspace_id_set_once_only(self, workspace_full):
+    def test_workspace_id_set_once_only(self, workspace_full: Workspace) -> None:
         with pytest.raises(
             AttributeError, match='Идентификатор рабочего пространства уже установлен'
         ):
