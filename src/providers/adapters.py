@@ -2,6 +2,7 @@ from typing import AsyncIterable
 
 from dishka import Provider, Scope, provide
 from environs import Env
+from passlib.context import CryptContext
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -44,6 +45,7 @@ from src.data_access.repositories import (
     WorkspaceInviteRepository,
     WorkspaceRepository,
 )
+from src.data_access.repositories.password_repository import PasswordRepository
 from src.data_access.repositories.project_repository import ProjectRepository
 from src.data_access.repositories.redis_repository import RedisRepository
 from src.data_access.repositories.user_repository import UserRepository
@@ -60,7 +62,7 @@ class SqlalchemyProvider(Provider):
 
     @provide(scope=Scope.REQUEST, provides=AsyncSession)
     async def provide_session(
-        self, sessionmaker: async_sessionmaker[AsyncSession]
+            self, sessionmaker: async_sessionmaker[AsyncSession]
     ) -> AsyncIterable[AsyncSession]:
         async with sessionmaker() as session:
             try:
@@ -114,13 +116,35 @@ class RepositoriesProvider(Provider):
 
     @provide(scope=scope, provides=JWTServiceProtocol)
     def provide_jwt_protocol_service(
-        self, jwt_config: JWTConfig, redis_client: IAuthRedisRepository
+            self, jwt_config: JWTConfig, redis_client: IAuthRedisRepository
     ) -> JWTService:
         return JWTService(jwt_config, redis_client=redis_client)
+
+    @provide(scope=scope)
+    def provide_pwd_context(self) -> CryptContext:
+        return CryptContext(schemes=['bcrypt'], deprecated='auto')
+
+    @provide(scope=scope, provides=IPasswordRepository)
+    def provide_password_protocol_repository(self, pwd_context: CryptContext) -> PasswordRepository:
+        return PasswordRepository(pwd_context=pwd_context)
 
     @provide(scope=scope, provides=PasswordServiceProtocol)
     def provide_password_protocol_service(self, repository: IPasswordRepository) -> PasswordService:
         return PasswordService(repository=repository)
+
+    @provide(scope=scope)
+    def provide_authenticate_user_service(
+            self,
+            repository: IUserRepository,
+            password_service: PasswordServiceProtocol,
+            get_user_service: GetUserService,
+    ) -> AuthenticateUserService:
+        return AuthenticateUserService(
+            repository=repository,
+            get_user_service=get_user_service,
+            password_service=password_service,
+
+        )
 
     @provide(scope=scope, provides=IAuthRedisRepository)
     def provide_auth_redis_repository(self, redis_config: RedisConfig) -> RedisRepository:
@@ -132,7 +156,7 @@ class RepositoriesProvider(Provider):
 
     @provide(scope=scope)
     def provide_jwt__service(
-        self, jwt_config: JWTConfig, redis_client: IAuthRedisRepository
+            self, jwt_config: JWTConfig, redis_client: IAuthRedisRepository
     ) -> JWTService:
         return JWTService(jwt_config, redis_client=redis_client)
 
@@ -142,11 +166,11 @@ class RepositoriesProvider(Provider):
 
     @provide(scope=scope)
     def provide_create_user_service(
-        self,
-        repository: IUserRepository,
-        redis_client: IUserRedisRepository,
-        smtp_config: SMTPConfig,
-        password_service: PasswordServiceProtocol,
+            self,
+            repository: IUserRepository,
+            redis_client: IUserRedisRepository,
+            smtp_config: SMTPConfig,
+            password_service: PasswordServiceProtocol,
     ) -> CreateUserService:
         return CreateUserService(
             repository=repository,
@@ -157,52 +181,39 @@ class RepositoriesProvider(Provider):
 
     @provide(scope=scope)
     def provide_get_user_service(
-        self, repository: IUserRepository, token_service: JWTServiceProtocol
+            self, repository: IUserRepository, token_service: JWTServiceProtocol
     ) -> GetUserService:
         return GetUserService(repository=repository, token_service=token_service)
 
     @provide(scope=scope)
-    def provide_authenticate_user_service(
-        self,
-        repository: IUserRepository,
-        password_service: PasswordServiceProtocol,
-        get_user_service: GetUserService,
-    ) -> AuthenticateUserService:
-        return AuthenticateUserService(
-            repository=repository,
-            password_service=password_service,
-            get_user_service=get_user_service,
-        )
-
-    @provide(scope=scope)
     def provide_authorize_user_service(
-        self,
-        repository: IUserRepository,
-        get_user_service: GetUserService,
+            self,
+            repository: IUserRepository,
+            get_user_service: GetUserService,
     ) -> AuthorizeUserService:
         return AuthorizeUserService(repository=repository, get_user_service=get_user_service)
 
     @provide(scope=scope)
     def provide_update_user_service(
-        self,
-        repository: IUserRepository,
-        token_service: JWTServiceProtocol,
+            self,
+            repository: IUserRepository,
+            token_service: JWTServiceProtocol,
     ) -> UpdateUserService:
         return UpdateUserService(repository=repository, token_service=token_service)
 
     @provide(scope=scope)
     def provide_remove_user_service(
-        self,
-        repository: IUserRepository,
+            self,
+            repository: IUserRepository,
     ) -> RemoveUserService:
         return RemoveUserService(repository=repository)
 
     @provide(scope=scope)
     def provide_reset_password_user_service(
-        self,
-        repository: IUserRepository,
-        authenticate_service: AuthenticateUserService,
-        create_service: CreateUserService,
+            self,
+            repository: IUserRepository,
+            authenticate_service: AuthenticateUserService,
+            create_service: CreateUserService,
     ) -> PasswordResetUserService:
         return PasswordResetUserService(
             repository=repository,
