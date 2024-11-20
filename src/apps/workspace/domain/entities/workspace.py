@@ -33,20 +33,30 @@ class Workspace(DescriptionValidatorMixin):
     member_ids: list[MemberId] = field(default_factory=list)
 
     def __post_init__(self) -> None:
-        self._is_valid_name(self._name, 'рабочего пространства')
+        self._is_valid_name(self._name)
 
         if self._description:
             self._is_valid_description(self._description, 'рабочего пространства')
 
     @staticmethod
-    def _is_valid_name(name: str, attr_name: str) -> None:
+    def _is_valid_name(name: str) -> None:
+        if not name.strip():
+            raise ValueError('Имя рабочего пространства должно содержать хотя бы одну букву')
+
         pattern = r'^[a-zA-Zа-яА-ЯёЁ\s]{1,50}$'
         if not bool(match(pattern, name)):
-            raise ValueError(f'Неверный формат названия {attr_name}')
+            raise ValueError(f'Неверный формат названия рабочего пространства')
 
     @property
     def id(self) -> WorkspaceId | None:
         return self._id
+
+    @id.setter
+    def id(self, new_id: WorkspaceId) -> None:
+        if self._id is not None:
+            raise AttributeError('Идентификатор рабочего пространства уже установлен')
+
+        self._id = new_id
 
     @property
     def name(self) -> str:
@@ -54,11 +64,11 @@ class Workspace(DescriptionValidatorMixin):
 
     @name.setter
     def name(self, new_name: str) -> None:
-        self._is_valid_name(new_name, attr_name='рабочего пространства')
+        self._is_valid_name(new_name)
         self._name = new_name
 
     @property
-    def description(self) -> str:
+    def description(self) -> str | None:
         return self._description
 
     @description.setter

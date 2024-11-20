@@ -17,6 +17,13 @@ class Category(NameValidatorMixin):
     def id(self) -> CategoryId | None:
         return self._id
 
+    @id.setter
+    def id(self, new_id: CategoryId) -> None:
+        if self._id is not None:
+            raise AttributeError('Идентификатор категории уже установлен')
+
+        self._id = new_id
+
     @property
     def workspace_id(self) -> WorkspaceId:
         return self._workspace_id
