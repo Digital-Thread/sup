@@ -5,9 +5,6 @@ from dataclasses import asdict
 from datetime import timedelta
 from typing import Optional
 
-import redis.asyncio as redis
-from passlib.context import CryptContext
-
 from src.apps.user.domain.entities import User
 from src.apps.user.dtos import UserCreateDTO
 from src.apps.user.dtos.dtos import AdminCreateUserDTO
@@ -18,25 +15,29 @@ from src.apps.user.exceptions import (
     UserNotFoundError,
     UserPermissionError,
 )
-from src.apps.user.protocols import SendMailServiceProtocol
+from src.apps.user.protocols import PasswordServiceProtocol
 from src.apps.user.repositories import IUserRepository
-from src.config import RedisConfig, SMTPConfig
+from src.apps.user.repositories.redis_repository import IUserRedisRepository
+from src.apps.user.tasks import (
+    send_activation_email_task,
+    send_invite_email_task,
+    send_login_and_activate_email_task,
+    send_login_email_task,
+)
+from src.config import SMTPConfig
 
 
 class CreateUserService:
     def __init__(
         self,
-        pwd_context: CryptContext,
-        send_mail_service: SendMailServiceProtocol,
         repository: IUserRepository,
-        redis_config: RedisConfig,
+        redis_client: IUserRedisRepository,
         smtp_config: SMTPConfig,
+        password_service: PasswordServiceProtocol,
     ):
         self.repository = repository
-        self.pwd_context = pwd_context or CryptContext(schemes=['bcrypt'], deprecated='auto')
-        self.send_mail_service = send_mail_service
-        dsn = redis_config.construct_redis_dsn
-        self.redis_client = redis.StrictRedis.from_url(dsn)
+        self.redis_client = redis_client
+        self.password_service = password_service
         self.smtp_config = smtp_config
 
     async def create_user(self, dto: UserCreateDTO) -> User:
@@ -62,29 +63,28 @@ class CreateUserService:
             f'activation_token:{activation_token}', user.email, ex=timedelta(days=7)
         )
         if password_sent:
-            await self.send_mail_service.send_login_and_activate_email(
+            await send_login_and_activate_email_task.kiq(
                 smtp_config=self.smtp_config,
                 email=user.email,
                 password=password,
                 token=activation_token,
             )
         else:
-            await self.send_mail_service.send_activation_email(
+            await send_activation_email_task.kiq(
                 smtp_config=self.smtp_config, email=user.email, token=activation_token
             )
         return user
 
     async def create_user_by_invite(self, dto: UserCreateDTO, token: str) -> tuple[User, uuid.UUID]:
-        invite_token: Optional[bytes] = await self.redis_client.get(f'invite_token:{dto.email}')
+        invite_token = await self.redis_client.get(f'invite_token:{dto.email}')
         if invite_token is None:
             raise TokenActivationExpire()
-        invite_token_str: str = invite_token.decode('utf-8')
-        comparison_token = invite_token_str.split('_')[0]
+        comparison_token = invite_token.split('_')[0]
 
         if comparison_token != token:
             raise UserPermissionError()
 
-        inviter_email = invite_token_str.split('_')[1]
+        inviter_email = invite_token.split('_')[1]
 
         inviter_user = await self.repository.find_by_email(inviter_email)
         inviter_user_id = inviter_user.id
@@ -111,18 +111,17 @@ class CreateUserService:
             await self.redis_client.set(
                 f'activation_token:{activation_token}', user.email, ex=timedelta(days=7)
             )
-            await self.send_mail_service.send_login_and_activate_email(
+            await send_login_and_activate_email_task.kiq(
                 smtp_config=self.smtp_config,
                 email=user.email,
                 password=password,
                 token=activation_token,
             )
         if user.is_active and dto.send_mail:
-            await self.send_mail_service.send_login_email(
+            await send_login_email_task.kiq(
                 smtp_config=self.smtp_config,
                 email=user.email,
                 password=password,
-                token=activation_token,
             )
 
         return user.email, password
@@ -139,19 +138,16 @@ class CreateUserService:
         return user
 
     async def activate_user_by_token(self, token: str) -> User:
-        email_bytes = await self.redis_client.get(f'activation_token:{token}')
-        print(email_bytes)
-        if email_bytes is None:
+        email = await self.redis_client.get(f'activation_token:{token}')
+        if email is None:
             raise TokenActivationExpire()
-        email = email_bytes.decode()
-        print(email)
         current_user = await self.repository.find_by_email(email)
         user = await self.activate_user(user=current_user)
         await self.redis_client.delete(f'activation_token:{token}')
         return user
 
     def get_password_hash(self, password: str) -> str:
-        return self.pwd_context.hash(password)
+        return self.password_service.hash_password(password)
 
     @staticmethod
     def generate_uuid_token() -> str:
@@ -163,7 +159,7 @@ class CreateUserService:
             raise UserAlreadyExistsError(to_email)
         invite_token = self.generate_uuid_token() + '_' + from_email
         await self.redis_client.set(f'invite_token:{to_email}', invite_token, ex=timedelta(days=7))
-        return await self.send_mail_service.send_invite_email(
+        await send_invite_email_task.kiq(
             smtp_config=self.smtp_config, email=to_email, token=invite_token
         )
 

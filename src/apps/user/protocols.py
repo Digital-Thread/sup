@@ -39,25 +39,10 @@ class JWTServiceProtocol(Protocol):
 
 
 @dataclass
-class SendMailServiceProtocol(Protocol):
+class PasswordServiceProtocol(Protocol):
 
-    async def send_activation_email(self, smtp_config: SMTPConfig, email: str, token: str) -> None:
+    def hash_password(self, password: str) -> str:
         pass
 
-    async def send_invite_email(self, smtp_config: SMTPConfig, email: str, token: str) -> None:
-        pass
-
-    async def send_login_and_activate_email(
-        self, smtp_config: SMTPConfig, email: str, password: str, token: str
-    ) -> None:
-        pass
-
-    async def send_login_email(
-        self, smtp_config: SMTPConfig, email: str, password: str, token: str
-    ) -> None:
-        pass
-
-    async def password_reset_email(
-        self, smtp_config: SMTPConfig, email: str, password: str
-    ) -> None:
+    def verify_password(self, hashed_password: str, password: str) -> bool:
         pass

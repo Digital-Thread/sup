@@ -3,6 +3,7 @@ from src.apps.user.dtos import AdminPasswordUpdateDTO, UserPasswordUpdateDTO
 from src.apps.user.exceptions import UserNotFoundByEmailException, UserPasswordException
 from src.apps.user.repositories import IUserRepository
 from src.apps.user.services import AuthenticateUserService, CreateUserService
+from src.apps.user.tasks import password_reset_email_task
 
 
 class PasswordResetUserService:
@@ -44,7 +45,7 @@ class PasswordResetUserService:
             user.password = self.create_service.get_password_hash(dto.new_password)
             await self.repository.update(user)
             if password_sent:
-                await self.create_service.send_mail_service.password_reset_email(
+                await password_reset_email_task.kiq(
                     smtp_config=self.create_service.smtp_config,
                     email=user.email,
                     password=password,

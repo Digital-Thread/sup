@@ -2,7 +2,6 @@ from typing import AsyncIterable
 
 from dishka import Provider, Scope, provide
 from environs import Env
-from passlib.context import CryptContext
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -12,12 +11,13 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from src.apps.auth import JWTService
+from src.apps.auth.repositories import IAuthRedisRepository, IPasswordRepository
+from src.apps.auth.security.password_service import PasswordService
 from src.apps.comment.domain import ICommentRepository
 from src.apps.feature.repositories import IFeatureRepository
 from src.apps.project.i_project_repository import IProjectRepository
-from src.apps.send_mail.service import SendMailService
-from src.apps.user.protocols import JWTServiceProtocol, SendMailServiceProtocol
-from src.apps.user.repositories import IUserRepository
+from src.apps.user.protocols import JWTServiceProtocol, PasswordServiceProtocol
+from src.apps.user.repositories import IUserRedisRepository, IUserRepository
 from src.apps.user.services import (
     AuthenticateUserService,
     AuthorizeUserService,
@@ -45,6 +45,7 @@ from src.data_access.repositories import (
     WorkspaceRepository,
 )
 from src.data_access.repositories.project_repository import ProjectRepository
+from src.data_access.repositories.redis_repository import RedisRepository
 from src.data_access.repositories.user_repository import UserRepository
 
 
@@ -111,42 +112,46 @@ class RepositoriesProvider(Provider):
     tag_repository = provide(TagRepository, provides=ITagRepository)
     project_repository = provide(ProjectRepository, provides=IProjectRepository)
 
-    @provide(scope=scope, provides=SendMailServiceProtocol)
-    def provide_send_mail_service(self) -> SendMailService:
-        return SendMailService()
-
     @provide(scope=scope, provides=JWTServiceProtocol)
     def provide_jwt_protocol_service(
-        self, jwt_config: JWTConfig, redis_config: RedisConfig
+        self, jwt_config: JWTConfig, redis_client: IAuthRedisRepository
     ) -> JWTService:
-        return JWTService(jwt_config, redis_config)
+        return JWTService(jwt_config, redis_client=redis_client)
+
+    @provide(scope=scope, provides=PasswordServiceProtocol)
+    def provide_password_protocol_service(self, repository: IPasswordRepository) -> PasswordService:
+        return PasswordService(repository=repository)
+
+    @provide(scope=scope, provides=IAuthRedisRepository)
+    def provide_auth_redis_repository(self, redis_config: RedisConfig) -> RedisRepository:
+        return RedisRepository(redis_config=redis_config)
+
+    @provide(scope=scope, provides=IUserRedisRepository)
+    def provide_user_redis_repository(self, redis_config: RedisConfig) -> RedisRepository:
+        return RedisRepository(redis_config=redis_config)
 
     @provide(scope=scope)
-    def provide_jwt__service(self, jwt_config: JWTConfig, redis_config: RedisConfig) -> JWTService:
-        return JWTService(jwt_config, redis_config)
+    def provide_jwt__service(
+        self, jwt_config: JWTConfig, redis_client: IAuthRedisRepository
+    ) -> JWTService:
+        return JWTService(jwt_config, redis_client=redis_client)
 
     @provide(scope=scope, provides=IUserRepository)
     def provide_user_repository(self, session: AsyncSession) -> UserRepository:
         return UserRepository(session)
 
     @provide(scope=scope)
-    def provide_pwd_context(self) -> CryptContext:
-        return CryptContext(schemes=['bcrypt'], deprecated='auto')
-
-    @provide(scope=scope)
     def provide_create_user_service(
         self,
-        pwd_context: CryptContext,
-        send_mail_service: SendMailServiceProtocol,
         repository: IUserRepository,
-        redis_config: RedisConfig,
+        redis_client: IUserRedisRepository,
         smtp_config: SMTPConfig,
+        password_service: PasswordServiceProtocol,
     ) -> CreateUserService:
         return CreateUserService(
-            pwd_context=pwd_context,
-            send_mail_service=send_mail_service,
             repository=repository,
-            redis_config=redis_config,
+            redis_client=redis_client,
+            password_service=password_service,
             smtp_config=smtp_config,
         )
 
@@ -160,11 +165,13 @@ class RepositoriesProvider(Provider):
     def provide_authenticate_user_service(
         self,
         repository: IUserRepository,
-        pwd_context: CryptContext,
+        password_service: PasswordServiceProtocol,
         get_user_service: GetUserService,
     ) -> AuthenticateUserService:
         return AuthenticateUserService(
-            repository=repository, pwd_context=pwd_context, get_user_service=get_user_service
+            repository=repository,
+            password_service=password_service,
+            get_user_service=get_user_service,
         )
 
     @provide(scope=scope)

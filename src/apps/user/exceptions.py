@@ -109,3 +109,13 @@ class MissingDigitError(BaseUserError):
 class MissingSpecialCharacterError(BaseUserError):
     def __init__(self, message: str = 'Пароль должен содержать хотя бы один специальный символ.'):
         super().__init__(message)
+
+
+class SendMailException(Exception):
+    def __init__(self, message: str = 'Ошибка отправки'):
+        super().__init__(message)
+
+
+class SendMailActivationException(SendMailException):
+    def __init__(self, message: str = 'Ошибка отправки письма с активацией'):
+        super().__init__(message)
