@@ -21,7 +21,7 @@ class TagMapper(BaseMapper[TagEntity, TagAppDTO]):
     @staticmethod
     def update_data(existing_tag: TagEntity, dto: UpdateTagAppDTO) -> TagEntity:
         for field, value in asdict(dto).items():
-            if value is not None:
+            if value is not None and field in ['name', 'color']:
                 setattr(existing_tag, field, value)
 
         return existing_tag

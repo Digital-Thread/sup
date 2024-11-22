@@ -41,7 +41,7 @@ class WorkspaceMapper(BaseMapper[WorkspaceEntity, WorkspaceAppDTO]):
     @staticmethod
     def update_data(dto: UpdateWorkspaceAppDTO, existing_workspace: WorkspaceEntity) -> WorkspaceEntity:
         for field, value in asdict(dto).items():
-            if value is not None:
+            if value is not None and field != 'id':
                 setattr(existing_workspace, field, value)
 
         return existing_workspace

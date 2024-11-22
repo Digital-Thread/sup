@@ -10,7 +10,8 @@ from src.api.dtos.role_dtos import (
     ResponseRoleWithUserCountDTO,
     UpdateRoleDTO,
 )
-from src.apps.workspace.dtos.role_dtos import CreateRoleAppDTO, UpdateRoleAppDTO
+from src.apps.workspace.dtos.role_dtos import CreateRoleAppDTO, UpdateRoleAppDTO, GetRolesAppDTO, DeleteRoleAppDTO, \
+    AssignRoleToWorkspaceMemberDTO, RemoveRoleFromWorkspaceMemberDTO
 from src.apps.workspace.exceptions.role_exceptions import RoleException
 from src.apps.workspace.interactors.role_interactors import (
     CreateRoleInteractor,
@@ -43,22 +44,22 @@ async def get_roles_by_workspace_id(
     workspace_id: UUID, interactor: FromDishka[GetRoleByWorkspaceInteractor]
 ) -> list[ResponseRoleWithUserCountDTO]:
     try:
-        response = await interactor.execute(workspace_id)
+        response = await interactor.execute(GetRolesAppDTO(workspace_id=workspace_id))
     except RoleException as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
     return [ResponseRoleWithUserCountDTO(**role.__dict__) for role in response]
 
 
-@role_router.patch('/{role_id}', status_code=status.HTTP_200_OK)
+@role_router.patch('/{workspace_id}/{role_id}', status_code=status.HTTP_200_OK)
 async def update_role(
     body: UpdateRoleDTO,
     workspace_id: UUID,
     role_id: int,
     interactor: FromDishka[UpdateRoleInteractor],
 ) -> dict[str, str]:
-    request = UpdateRoleAppDTO(**body.model_dump(exclude_none=True))
+    request = UpdateRoleAppDTO(**body.model_dump(exclude_none=True), id=role_id, workspace_id=workspace_id)
     try:
-        await interactor.execute(role_id, workspace_id, request)
+        await interactor.execute(request)
     except RoleException as error:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
     return {'redirect_url': '/'}
@@ -69,7 +70,7 @@ async def delete_role_by_id(
     role_id: int, workspace_id: UUID, interactor: FromDishka[DeleteRoleInteractor]
 ) -> dict[str, str]:
     try:
-        await interactor.execute(role_id, workspace_id)
+        await interactor.execute(DeleteRoleAppDTO(id=role_id, workspace_id=workspace_id))
     except RoleException as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
     return {'redirect_url': '/'}
@@ -78,7 +79,7 @@ async def delete_role_by_id(
 @role_router.post('/{role_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def assign_role_to_workspace_member(role_id: int, workspace_id: Annotated[UUID, Body()], member_id: Annotated[UUID, Body()], interactor: FromDishka[AssignRoleToWorkspaceMemberInteractor]) -> None:
     try:
-        await interactor.execute(workspace_id, member_id, role_id)
+        await interactor.execute(AssignRoleToWorkspaceMemberDTO(workspace_id=workspace_id, member_id=member_id, id=role_id))
     except RoleException as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
 
@@ -86,6 +87,6 @@ async def assign_role_to_workspace_member(role_id: int, workspace_id: Annotated[
 @role_router.delete('/', status_code=status.HTTP_204_NO_CONTENT)
 async def remove_role_from_workspace_member(workspace_id: Annotated[UUID, Body()], member_id: Annotated[UUID, Body()], interactor: FromDishka[RemoveRoleFromWorkspaceMemberInteractor]) -> None:
     try:
-        await interactor.execute(workspace_id, member_id)
+        await interactor.execute(RemoveRoleFromWorkspaceMemberDTO(workspace_id=workspace_id, member_id=member_id))
     except RoleException as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))

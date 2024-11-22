@@ -11,7 +11,7 @@ class RoleMapper(BaseMapper[RoleEntity, RoleWithUserCountAppDTO]):
     @staticmethod
     def update_data(existing_role: RoleEntity, dto: UpdateRoleAppDTO) -> RoleEntity:
         for field, value in asdict(dto).items():
-            if value is not None:
+            if value is not None and field in ['name', 'color']:
                 setattr(existing_role, field, value)
 
         return existing_role

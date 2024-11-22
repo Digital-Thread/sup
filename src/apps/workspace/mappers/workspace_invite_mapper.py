@@ -15,7 +15,7 @@ class WorkspaceInviteMapper(BaseMapper[WorkspaceInviteEntity, WorkspaceInviteApp
     def dto_to_entity(dto: WorkspaceInviteAppDTO) -> WorkspaceInviteEntity:
 
         return WorkspaceInviteEntity(
-            id=InviteId(dto.id),
+            _id=InviteId(dto.id),
             code=dto.code,
             _status=StatusInvite(dto.status),
             created_at=dto.created_at,

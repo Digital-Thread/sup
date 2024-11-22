@@ -6,9 +6,18 @@ from src.apps.workspace.domain.entities.workspace_invite import StatusInvite
 
 
 @dataclass
-class WorkspaceInviteAppDTO:
-    id: int
+class BaseWorkspaceInviteDto:
     workspace_id: UUID
+
+
+@dataclass
+class CreateWorkspaceInviteDTO(BaseWorkspaceInviteDto):
+    pass
+
+
+@dataclass
+class WorkspaceInviteAppDTO(BaseWorkspaceInviteDto):
+    id: int
     code: UUID
     status: str
     created_at: datetime
@@ -16,5 +25,16 @@ class WorkspaceInviteAppDTO:
 
 
 @dataclass
-class UpdateWorkspaceInviteAppDTO:
+class GetWorkspaceInvitesAppDTO(BaseWorkspaceInviteDto):
+    pass
+
+
+@dataclass
+class UpdateWorkspaceInviteAppDTO(BaseWorkspaceInviteDto):
+    id_: int
     status: StatusInvite | None = None
+
+
+@dataclass
+class DeleteWorkspaceInviteAppDTO(BaseWorkspaceInviteDto):
+    id_: int

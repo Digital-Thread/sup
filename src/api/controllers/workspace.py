@@ -11,7 +11,7 @@ from src.api.dtos.workspace_dtos import (
 )
 from src.apps.workspace.dtos.workspace_dtos import (
     CreateWorkspaceAppDTO,
-    UpdateWorkspaceAppDTO,
+    UpdateWorkspaceAppDTO, GetWorkspaceAppDTO, GetWorkspacesByMemberIdDTO, DeleteWorkspaceAppDTO,
 )
 from src.apps.workspace.exceptions.workspace_exceptions import WorkspaceException
 from src.apps.workspace.interactors.workspace_interactors import (
@@ -48,7 +48,7 @@ async def get_workspace_by_id(
     workspace_id: UUID, interactor: FromDishka[GetWorkspaceByIdInteractor]
 ) -> ResponseWorkspaceDTO:
     try:
-        response = await interactor.execute(workspace_id)
+        response = await interactor.execute(GetWorkspaceAppDTO(id=workspace_id))
     except WorkspaceException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'{str(e)}')
 
@@ -62,7 +62,7 @@ async def get_workspaces_by_member_id(
     member_id: UUID, interactor: FromDishka[GetWorkspaceByMemberInteractor]
 ) -> list[ResponseWorkspaceDTO]:
     try:
-        response = await interactor.execute(member_id)
+        response = await interactor.execute(GetWorkspacesByMemberIdDTO(member_id=member_id))
     except WorkspaceException as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'{str(e)}')
 
@@ -75,9 +75,9 @@ async def update_workspace(
     workspace_id: UUID,
     interactor: FromDishka[UpdateWorkspaceInteractor],
 ) -> dict[str, str]:
-    request = UpdateWorkspaceAppDTO(**body.model_dump(exclude_none=True))
+    request = UpdateWorkspaceAppDTO(**body.model_dump(exclude_none=True), id=workspace_id)
     try:
-        await interactor.execute(workspace_id, request)
+        await interactor.execute(request)
     except WorkspaceException as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'{str(error)}')
 
@@ -89,7 +89,7 @@ async def delete_workspace(
     workspace_id: UUID, owner_id: UUID, interactor: FromDishka[DeleteWorkspaceInteractor]
 ) -> dict[str, str]:
     try:
-        await interactor.execute(workspace_id, owner_id)
+        await interactor.execute(DeleteWorkspaceAppDTO(id=workspace_id, owner_id=owner_id))
     except WorkspaceException as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'{str(error)}')
     return {'redirect_url': '/'}

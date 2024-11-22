@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from src.apps.workspace.domain.entities.tag import TagEntity
 from src.apps.workspace.domain.types_ids import TagId, WorkspaceId
 from src.apps.workspace.dtos.tag_dtos import UpdateTagAppDTO
@@ -16,11 +14,11 @@ class UpdateTagInteractor:
     def __init__(self, tag_repository: ITagRepository):
         self._tag_repository = tag_repository
 
-    async def execute(self, tag_id: int, workspace_id: UUID, update_data: UpdateTagAppDTO) -> None:
+    async def execute(self, request_data: UpdateTagAppDTO) -> None:
         existing_tag = await self._get_existing_tag_in_workspace(
-            TagId(tag_id), WorkspaceId(workspace_id)
+            TagId(request_data.id), WorkspaceId(request_data.workspace_id)
         )
-        updated_tag = self._map_to_update_data(existing_tag, update_data)
+        updated_tag = self._map_to_update_data(existing_tag, request_data)
         try:
             await self._tag_repository.update(updated_tag)
         except TagNotUpdated as error:

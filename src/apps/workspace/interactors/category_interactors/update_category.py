@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from src.apps.workspace.domain.entities.category import CategoryEntity
 from src.apps.workspace.domain.types_ids import CategoryId, WorkspaceId
 from src.apps.workspace.dtos.category_dtos import UpdateCategoryAppDTO
@@ -17,12 +15,12 @@ class UpdateCategoryInteractor:
         self._category_repository = category_repository
 
     async def execute(
-        self, category_id: int, workspace_id: UUID, update_data: UpdateCategoryAppDTO
+        self, request_data: UpdateCategoryAppDTO
     ) -> None:
         existing_category = await self._get_existing_category_in_workspace(
-            CategoryId(category_id), WorkspaceId(workspace_id)
+            CategoryId(request_data.id), WorkspaceId(request_data.workspace_id)
         )
-        updated_category = self._map_to_update_data(existing_category, update_data)
+        updated_category = self._map_to_update_data(existing_category, request_data)
         try:
             await self._category_repository.update(updated_category)
         except CategoryNotUpdated as error:

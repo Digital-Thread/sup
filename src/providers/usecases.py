@@ -41,7 +41,6 @@ from src.apps.task import (
 from src.apps.workspace.interactors.category_interactors import (
     CreateCategoryInteractor,
     DeleteCategoryInteractor,
-    GetCategoryByIdInteractor,
     GetCategoryByWorkspaceInteractor,
     UpdateCategoryInteractor,
 )
@@ -139,7 +138,6 @@ class CategoryUseCaseProvider(Provider):
     scope = Scope.REQUEST
 
     create_category = provide(CreateCategoryInteractor)
-    get_category_by_id = provide(GetCategoryByIdInteractor)
     get_category_by_workspace = provide(GetCategoryByWorkspaceInteractor)
     update_category = provide(UpdateCategoryInteractor)
     delete_category = provide(DeleteCategoryInteractor)

@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from src.apps.workspace.domain.entities.role import RoleEntity
 from src.apps.workspace.domain.types_ids import RoleId, WorkspaceId
 from src.apps.workspace.dtos.role_dtos import UpdateRoleAppDTO
@@ -17,12 +15,12 @@ class UpdateRoleInteractor:
         self._role_repository = role_repository
 
     async def execute(
-        self, role_id: int, workspace_id: UUID, update_data: UpdateRoleAppDTO
+        self, request_data: UpdateRoleAppDTO
     ) -> None:
         existing_role = await self._get_existing_role_in_workspace(
-            RoleId(role_id), WorkspaceId(workspace_id)
+            RoleId(request_data.id), WorkspaceId(request_data.workspace_id)
         )
-        updated_role = self._map_to_update_data(existing_role, update_data)
+        updated_role = self._map_to_update_data(existing_role, request_data)
         try:
             await self._role_repository.update(updated_role)
         except RoleNotUpdated as error:
