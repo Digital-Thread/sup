@@ -12,7 +12,7 @@ from src.apps.workspace.exceptions.role_exceptions import (
     WorkspaceRoleNotFound,
 )
 from src.apps.workspace.repositories.role_repository import IRoleRepository
-from src.data_access.converters.role_converter import RoleConverter
+from src.data_access.mappers.role_mapper import RoleMapper
 from src.data_access.models import UserWorkspaceRoleModel
 from src.data_access.models.workspace_models.role import RoleModel
 
@@ -22,7 +22,7 @@ class RoleRepository(IRoleRepository):
         self._session = session_factory
 
     async def save(self, role: RoleEntity) -> None:
-        stmt = RoleConverter.entity_to_model(role)
+        stmt = RoleMapper.entity_to_model(role)
         self._session.add(stmt)
 
         try:
@@ -42,7 +42,7 @@ class RoleRepository(IRoleRepository):
             warning(error)
             raise RoleNotFound(f'Роль с id={role_id} не найдена')
         else:
-            return RoleConverter.model_to_entity(role_model)
+            return RoleMapper.model_to_entity(role_model)
 
     async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[tuple[RoleEntity, int]]:
         query = (
@@ -54,11 +54,11 @@ class RoleRepository(IRoleRepository):
 
         result = await self._session.execute(query)
         roles_with_user_count = result.all()
-        roles = RoleConverter.list_to_entity(roles_with_user_count)
+        roles = RoleMapper.list_to_entity(roles_with_user_count)
         return roles
 
     async def update(self, role: RoleEntity) -> None:
-        update_data = RoleConverter.entity_to_dict(role)
+        update_data = RoleMapper.entity_to_dict(role)
         stmt = update(RoleModel).filter_by(id=role.id).values(**update_data)
         result = await self._session.execute(stmt)
 

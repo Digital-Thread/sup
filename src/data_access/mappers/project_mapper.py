@@ -11,7 +11,7 @@ from src.data_access.models.project import ProjectModel
 from src.data_access.models.project_participants import ProjectParticipantsModel
 
 
-class ProjectConverter:
+class ProjectMapper:
     @staticmethod
     def model_to_entity(project_model: ProjectModel) -> Project:
         project = Project(

@@ -1,11 +1,9 @@
-from typing import Any
-
 from src.apps.workspace.domain.entities.tag import TagEntity
 from src.apps.workspace.domain.types_ids import TagId, WorkspaceId
 from src.data_access.models.workspace_models.tag import TagModel
 
 
-class TagConverter:
+class TagMapper:
     @staticmethod
     def model_to_entity(tag_model: TagModel) -> TagEntity:
         return TagEntity(

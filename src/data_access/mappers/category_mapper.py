@@ -3,7 +3,7 @@ from src.apps.workspace.domain.types_ids import CategoryId, WorkspaceId
 from src.data_access.models.workspace_models.category import CategoryModel
 
 
-class CategoryConverter:
+class CategoryMapper:
     @staticmethod
     def model_to_entity(category_model: CategoryModel) -> CategoryEntity:
         category = CategoryEntity(

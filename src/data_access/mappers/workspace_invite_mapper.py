@@ -8,11 +8,11 @@ from src.data_access.models.workspace_models.workspace_invite import (
 )
 
 
-class WorkspaceInviteConverter:
+class WorkspaceInviteMapper:
     @staticmethod
     def model_to_entity(workspace_invite_model: WorkspaceInviteModel) -> WorkspaceInviteEntity:
         return WorkspaceInviteEntity(
-            id=InviteId(workspace_invite_model.id),
+            _id=InviteId(workspace_invite_model.id),
             code=workspace_invite_model.code,
             _status=StatusInvite(workspace_invite_model.status),
             _workspace_id=WorkspaceId(workspace_invite_model.workspace_id),

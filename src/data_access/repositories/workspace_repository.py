@@ -14,7 +14,7 @@ from src.apps.workspace.exceptions.workspace_exceptions import (
     WorkspaceNotUpdated,
 )
 from src.apps.workspace.repositories.workspace_repository import IWorkspaceRepository
-from src.data_access.converters.workspace_converter import WorkspaceConverter
+from src.data_access.mappers.workspace_mapper import WorkspaceMapper
 from src.data_access.models import (
     WorkspaceMemberModel,
     WorkspaceModel,
@@ -26,7 +26,7 @@ class WorkspaceRepository(IWorkspaceRepository):
         self._session = session_factory
 
     async def save(self, workspace: WorkspaceEntity) -> None:
-        stmt = WorkspaceConverter.entity_to_model(workspace)
+        stmt = WorkspaceMapper.entity_to_model(workspace)
         self._session.add(stmt)
         try:
             await self._session.flush()
@@ -48,7 +48,7 @@ class WorkspaceRepository(IWorkspaceRepository):
             warning(error)
             raise WorkspaceNotFound(f'Рабочее пространство с id={workspace_id} не найдено')
         else:
-            workspace_entity = WorkspaceConverter.model_to_entity(workspace_model)
+            workspace_entity = WorkspaceMapper.model_to_entity(workspace_model)
             return workspace_entity
 
     async def find_by_member_id(self, member_id: MemberId) -> list[WorkspaceEntity]:
@@ -65,12 +65,12 @@ class WorkspaceRepository(IWorkspaceRepository):
             raise MemberWorkspaceNotFound(f'Участник с id={member_id} не найден.')
         else:
             workspaces = [
-                WorkspaceConverter.model_to_entity(workspace) for workspace in workspace_models
+                WorkspaceMapper.model_to_entity(workspace) for workspace in workspace_models
             ]
             return workspaces
 
     async def update(self, workspace: WorkspaceEntity) -> None:
-        update_data = WorkspaceConverter.entity_to_dict(workspace)
+        update_data = WorkspaceMapper.entity_to_dict(workspace)
         stmt = update(WorkspaceModel).filter_by(id=workspace.id).values(**update_data)
         result = await self._session.execute(stmt)
 

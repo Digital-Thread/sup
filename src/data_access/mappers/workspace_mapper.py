@@ -1,18 +1,12 @@
 from src.apps.workspace.domain.entities.workspace import WorkspaceEntity
 from src.apps.workspace.domain.types_ids import (
-    InviteId,
-    MeetId,
-    MemberId,
     OwnerId,
-    ProjectId,
-    RoleId,
-    TagId,
     WorkspaceId,
 )
 from src.data_access.models.workspace_models.workspace import WorkspaceModel
 
 
-class WorkspaceConverter:
+class WorkspaceMapper:
 
     @staticmethod
     def model_to_entity(workspace_model: WorkspaceModel) -> WorkspaceEntity:

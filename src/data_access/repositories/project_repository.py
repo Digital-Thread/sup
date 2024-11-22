@@ -16,7 +16,7 @@ from src.apps.project.exceptions import (
     WorkspaceForProjectNotFound,
 )
 from src.apps.project.i_project_repository import IProjectRepository
-from src.data_access.converters.project_converter import ProjectConverter
+from src.data_access.mappers.project_mapper import ProjectMapper
 from src.data_access.models.project import ProjectModel
 from src.data_access.models.project_participants import ProjectParticipantsModel
 
@@ -27,7 +27,7 @@ class ProjectRepository(IProjectRepository):
         self._counter = 0
 
     async def save(self, project: Project) -> None:
-        stmt_project = ProjectConverter.entity_to_model(project)
+        stmt_project = ProjectMapper.entity_to_model(project)
         self._session.add(stmt_project)
 
         try:
@@ -58,7 +58,7 @@ class ProjectRepository(IProjectRepository):
                 f'Проект с id={project_id} не найден в указанном рабочем пространстве.'
             )
         else:
-            return ProjectConverter.model_to_entity(project_model)
+            return ProjectMapper.model_to_entity(project_model)
 
     async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[tuple[Project, int]]:
         query = (
@@ -75,7 +75,7 @@ class ProjectRepository(IProjectRepository):
 
         result = await self._session.execute(query)
         list_projects_with_user_count = result.all()
-        projects = ProjectConverter.list_to_entity(list_projects_with_user_count)
+        projects = ProjectMapper.list_to_entity(list_projects_with_user_count)
 
         if not projects:
             raise WorkspaceForProjectNotFound(
@@ -100,7 +100,7 @@ class ProjectRepository(IProjectRepository):
         await self._session.execute(stmt)
 
     async def update_project(self, project: Project) -> None:
-        updated_data = ProjectConverter.entity_to_dict(project)
+        updated_data = ProjectMapper.entity_to_dict(project)
         stmt = (
             update(ProjectModel)
             .where(ProjectModel.id == project.id, ProjectModel.workspace_id == project.workspace_id)

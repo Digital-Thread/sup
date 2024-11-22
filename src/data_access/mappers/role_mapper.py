@@ -2,11 +2,10 @@ from typing import Any, Sequence
 
 from src.apps.workspace.domain.entities.role import RoleEntity
 from src.apps.workspace.domain.types_ids import RoleId, WorkspaceId
-from src.apps.workspace.dtos.role_dtos import RoleWithUserCountAppDTO
 from src.data_access.models.workspace_models.role import RoleModel
 
 
-class RoleConverter:
+class RoleMapper:
     @staticmethod
     def model_to_entity(role_model: RoleModel) -> RoleEntity:
 

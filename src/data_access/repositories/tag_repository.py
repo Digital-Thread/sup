@@ -14,7 +14,7 @@ from src.apps.workspace.exceptions.tag_exceptions import (
     WorkspaceTagNotFound,
 )
 from src.apps.workspace.repositories.tag_repository import ITagRepository
-from src.data_access.converters.tag_converter import TagConverter
+from src.data_access.mappers.tag_mapper import TagMapper
 from src.data_access.models import WorkspaceModel
 from src.data_access.models.workspace_models.tag import TagModel
 
@@ -24,7 +24,7 @@ class TagRepository(ITagRepository):
         self._session = session_factory
 
     async def save(self, tag: TagEntity) -> None:
-        stmt = TagConverter.entity_to_model(tag)
+        stmt = TagMapper.entity_to_model(tag)
         self._session.add(stmt)
 
         try:
@@ -49,12 +49,12 @@ class TagRepository(ITagRepository):
             warning(error)
             raise TagNotFound(f'Тег с id={tag_id} не найден')
         else:
-            return TagConverter.model_to_entity(tag_model)
+            return TagMapper.model_to_entity(tag_model)
 
     async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[TagEntity]:
         query = select(TagModel).filter_by(workspace_id=workspace_id)
         result = await self._session.execute(query)
-        tags = [TagConverter.model_to_entity(tag) for tag in result.scalars().all()]
+        tags = [TagMapper.model_to_entity(tag) for tag in result.scalars().all()]
         if not tags:
             if not await self._session.get(WorkspaceModel, workspace_id):
                 raise WorkspaceTagNotFound(f'Рабочее пространство с id={workspace_id} не найдено')
@@ -62,7 +62,7 @@ class TagRepository(ITagRepository):
         return tags
 
     async def update(self, tag: TagEntity) -> None:
-        update_data = TagConverter.entity_to_dict(tag)
+        update_data = TagMapper.entity_to_dict(tag)
         stmt = update(TagModel).filter_by(id=tag.id).values(**update_data)
         result = await self._session.execute(stmt)
 

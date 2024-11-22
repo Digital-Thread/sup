@@ -14,7 +14,7 @@ from src.apps.workspace.exceptions.category_exceptions import (
     WorkspaceCategoryNotFound,
 )
 from src.apps.workspace.repositories.category_repository import ICategoryRepository
-from src.data_access.converters.category_converter import CategoryConverter
+from src.data_access.mappers.category_mapper import CategoryMapper
 from src.data_access.models.workspace_models.category import CategoryModel
 
 
@@ -23,7 +23,7 @@ class CategoryRepository(ICategoryRepository):
         self._session = session_factory
 
     async def save(self, category: CategoryEntity) -> None:
-        stmt = CategoryConverter.entity_to_model(category)
+        stmt = CategoryMapper.entity_to_model(category)
         self._session.add(stmt)
 
         try:
@@ -52,13 +52,13 @@ class CategoryRepository(ICategoryRepository):
                 f'Категория с id={category_id} не найдена в указанном рабочем пространстве.'
             )
         else:
-            return CategoryConverter.model_to_entity(category_model)
+            return CategoryMapper.model_to_entity(category_model)
 
     async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[CategoryEntity]:
         query = select(CategoryModel).filter_by(workspace_id=workspace_id)
         result = await self._session.execute(query)
         categories = [
-            CategoryConverter.model_to_entity(category) for category in result.scalars().all()
+            CategoryMapper.model_to_entity(category) for category in result.scalars().all()
         ]
         if not categories:
             raise WorkspaceCategoryNotFound(f'Рабочее пространство с id={workspace_id} не найдено')
@@ -66,7 +66,7 @@ class CategoryRepository(ICategoryRepository):
         return categories
 
     async def update(self, category: CategoryEntity) -> None:
-        update_data = CategoryConverter.entity_to_dict(category)
+        update_data = CategoryMapper.entity_to_dict(category)
         stmt = update(CategoryModel).filter_by(id=category.id).values(**update_data)
         result = await self._session.execute(stmt)
 
