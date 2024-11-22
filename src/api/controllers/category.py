@@ -14,11 +14,11 @@ from src.apps.workspace.dtos.category_dtos import (
     UpdateCategoryAppDTO,
 )
 from src.apps.workspace.exceptions.category_exceptions import CategoryException
-from src.apps.workspace.use_cases.category_use_cases import (
-    CreateCategoryUseCase,
-    DeleteCategoryUseCase,
-    GetCategoryByWorkspaceUseCase,
-    UpdateCategoryUseCase,
+from src.apps.workspace.interactors.category_interactors import (
+    CreateCategoryInteractor,
+    DeleteCategoryInteractor,
+    GetCategoryByWorkspaceInteractor,
+    UpdateCategoryInteractor,
 )
 
 category_router = APIRouter(route_class=DishkaRoute)
@@ -26,11 +26,11 @@ category_router = APIRouter(route_class=DishkaRoute)
 
 @category_router.post('', status_code=status.HTTP_201_CREATED)
 async def create_category(
-    body: CreateCategoryDTO, use_case: FromDishka[CreateCategoryUseCase]
+    body: CreateCategoryDTO, interactor: FromDishka[CreateCategoryInteractor]
 ) -> dict[str, str]:
     request = CreateCategoryAppDTO(**body.model_dump())
     try:
-        await use_case.execute(request)
+        await interactor.execute(request)
     except CategoryException as error:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
     return {'redirect': '/'}
@@ -38,10 +38,10 @@ async def create_category(
 
 @category_router.get('/', status_code=status.HTTP_200_OK, response_model=list[ResponseCategoryDTO])
 async def get_categories_by_workspace_id(
-    workspace_id: UUID, use_case: FromDishka[GetCategoryByWorkspaceUseCase]
+    workspace_id: UUID, interactor: FromDishka[GetCategoryByWorkspaceInteractor]
 ) -> list[ResponseCategoryDTO]:
     try:
-        response = await use_case.execute(workspace_id)
+        response = await interactor.execute(workspace_id)
     except CategoryException as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
     return [ResponseCategoryDTO(**category.__dict__) for category in response]
@@ -52,11 +52,11 @@ async def update_category(
     body: UpdateCategoryDTO,
     workspace_id: UUID,
     category_id: int,
-    use_case: FromDishka[UpdateCategoryUseCase],
+    interactor: FromDishka[UpdateCategoryInteractor],
 ) -> dict[str, str]:
     request = UpdateCategoryAppDTO(**body.model_dump(exclude_none=True))
     try:
-        await use_case.execute(category_id, workspace_id, request)
+        await interactor.execute(category_id, workspace_id, request)
     except CategoryException as error:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
     return {'redirect_url': '/'}
@@ -64,10 +64,10 @@ async def update_category(
 
 @category_router.delete('/{category_id}')
 async def delete_category_by_id(
-    category_id: int, workspace_id: UUID, use_case: FromDishka[DeleteCategoryUseCase]
+    category_id: int, workspace_id: UUID, interactor: FromDishka[DeleteCategoryInteractor]
 ) -> dict[str, str]:
     try:
-        await use_case.execute(category_id, workspace_id)
+        await interactor.execute(category_id, workspace_id)
     except CategoryException as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
     return {'redirect_url': '/'}
