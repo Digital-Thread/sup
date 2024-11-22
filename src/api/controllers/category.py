@@ -11,7 +11,9 @@ from src.api.dtos.category_dtos import (
 )
 from src.apps.workspace.dtos.category_dtos import (
     CreateCategoryAppDTO,
-    UpdateCategoryAppDTO, DeleteCategoryAppDTO, GetCategoriesAppDTO,
+    DeleteCategoryAppDTO,
+    GetCategoriesAppDTO,
+    UpdateCategoryAppDTO,
 )
 from src.apps.workspace.exceptions.category_exceptions import CategoryException
 from src.apps.workspace.interactors.category_interactors import (
@@ -54,7 +56,9 @@ async def update_category(
     category_id: int,
     interactor: FromDishka[UpdateCategoryInteractor],
 ) -> dict[str, str]:
-    request = UpdateCategoryAppDTO(**body.model_dump(exclude_none=True), id=category_id, workspace_id=workspace_id)
+    request = UpdateCategoryAppDTO(
+        **body.model_dump(exclude_none=True), id=category_id, workspace_id=workspace_id
+    )
     try:
         await interactor.execute(request)
     except CategoryException as error:

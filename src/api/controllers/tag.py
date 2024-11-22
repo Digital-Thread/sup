@@ -5,7 +5,12 @@ from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter, HTTPException, status
 
 from src.api.dtos.tag_dtos import CreateTagDTO, ResponseTagDTO, UpdateTagDTO
-from src.apps.workspace.dtos.tag_dtos import CreateTagAppDTO, UpdateTagAppDTO, GetTagsAppDTO, DeleteTagAppDTO
+from src.apps.workspace.dtos.tag_dtos import (
+    CreateTagAppDTO,
+    DeleteTagAppDTO,
+    GetTagsAppDTO,
+    UpdateTagAppDTO,
+)
 from src.apps.workspace.exceptions.tag_exceptions import TagException
 from src.apps.workspace.interactors.tag_interactors import (
     CreateTagInteractor,
@@ -18,7 +23,9 @@ tag_router = APIRouter(route_class=DishkaRoute)
 
 
 @tag_router.post('', status_code=status.HTTP_201_CREATED)
-async def create_tag(body: CreateTagDTO, interactor: FromDishka[CreateTagInteractor]) -> dict[str, str]:
+async def create_tag(
+    body: CreateTagDTO, interactor: FromDishka[CreateTagInteractor]
+) -> dict[str, str]:
     request = CreateTagAppDTO(**body.model_dump())
     try:
         await interactor.execute(request)
@@ -45,7 +52,9 @@ async def update_tag(
     tag_id: int,
     interactor: FromDishka[UpdateTagInteractor],
 ) -> dict[str, str]:
-    request = UpdateTagAppDTO(**body.model_dump(exclude_none=True), id=tag_id, workspace_id=workspace_id)
+    request = UpdateTagAppDTO(
+        **body.model_dump(exclude_none=True), id=tag_id, workspace_id=workspace_id
+    )
     try:
         await interactor.execute(request)
     except TagException as error:

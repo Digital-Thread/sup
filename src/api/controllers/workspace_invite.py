@@ -10,10 +10,10 @@ from src.api.dtos.workspace_invite_dtos import (
     UpdateWorkspaceInviteDTO,
 )
 from src.apps.workspace.dtos.workspace_invite_dtos import (
-    UpdateWorkspaceInviteAppDTO,
     CreateWorkspaceInviteDTO,
+    DeleteWorkspaceInviteAppDTO,
     GetWorkspaceInvitesAppDTO,
-    DeleteWorkspaceInviteAppDTO
+    UpdateWorkspaceInviteAppDTO,
 )
 from src.apps.workspace.exceptions.workspace_invite_exceptions import (
     WorkspaceInviteException,
@@ -70,7 +70,9 @@ async def update_status_invite(
     workspace_invite_id: int,
     interactor: FromDishka[UpdateWorkspaceInviteInteractor],
 ) -> dict[str, str]:
-    request = UpdateWorkspaceInviteAppDTO(**body.model_dump(exclude_none=True), id_=workspace_invite_id, workspace_id=workspace_id)
+    request = UpdateWorkspaceInviteAppDTO(
+        **body.model_dump(exclude_none=True), id_=workspace_invite_id, workspace_id=workspace_id
+    )
 
     try:
         await interactor.execute(request)
@@ -80,14 +82,18 @@ async def update_status_invite(
         return {'redirect': '/'}
 
 
-@workspace_invite_router.delete('/{workspace_id}/{workspace_invite_id}', status_code=status.HTTP_200_OK)
+@workspace_invite_router.delete(
+    '/{workspace_id}/{workspace_invite_id}', status_code=status.HTTP_200_OK
+)
 async def delete_category_by_id(
     workspace_invite_id: int,
     workspace_id: UUID,
     interactor: FromDishka[DeleteWorkspaceInviteInteractor],
 ) -> dict[str, str]:
     try:
-        await interactor.execute(DeleteWorkspaceInviteAppDTO(id_=workspace_invite_id, workspace_id=workspace_id))
+        await interactor.execute(
+            DeleteWorkspaceInviteAppDTO(id_=workspace_invite_id, workspace_id=workspace_id)
+        )
     except WorkspaceInviteException as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
     return {'redirect_url': '/'}

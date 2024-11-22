@@ -11,7 +11,10 @@ from src.api.dtos.workspace_dtos import (
 )
 from src.apps.workspace.dtos.workspace_dtos import (
     CreateWorkspaceAppDTO,
-    UpdateWorkspaceAppDTO, GetWorkspaceAppDTO, GetWorkspacesByMemberIdDTO, DeleteWorkspaceAppDTO,
+    DeleteWorkspaceAppDTO,
+    GetWorkspaceAppDTO,
+    GetWorkspacesByMemberIdDTO,
+    UpdateWorkspaceAppDTO,
 )
 from src.apps.workspace.exceptions.workspace_exceptions import WorkspaceException
 from src.apps.workspace.interactors.workspace_interactors import (

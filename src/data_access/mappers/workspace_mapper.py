@@ -1,8 +1,5 @@
 from src.apps.workspace.domain.entities.workspace import WorkspaceEntity
-from src.apps.workspace.domain.types_ids import (
-    OwnerId,
-    WorkspaceId,
-)
+from src.apps.workspace.domain.types_ids import OwnerId, WorkspaceId
 from src.data_access.models.workspace_models.workspace import WorkspaceModel
 
 
