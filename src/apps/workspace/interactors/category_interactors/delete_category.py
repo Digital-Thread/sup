@@ -6,7 +6,7 @@ from src.apps.workspace.exceptions.category_exceptions import (
     CategoryNotFound,
     WorkspaceCategoryNotFound,
 )
-from src.apps.workspace.repositories.i_category_repository import ICategoryRepository
+from src.apps.workspace.repositories.category_repository import ICategoryRepository
 
 
 class DeleteCategoryInteractor:

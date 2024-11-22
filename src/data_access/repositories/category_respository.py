@@ -13,7 +13,7 @@ from src.apps.workspace.exceptions.category_exceptions import (
     CategoryNotUpdated,
     WorkspaceCategoryNotFound,
 )
-from src.apps.workspace.repositories.i_category_repository import ICategoryRepository
+from src.apps.workspace.repositories.category_repository import ICategoryRepository
 from src.data_access.converters.category_converter import CategoryConverter
 from src.data_access.models.workspace_models.category import CategoryModel
 

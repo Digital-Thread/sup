@@ -2,7 +2,7 @@ from src.apps.workspace.domain.types_ids import CategoryId, WorkspaceId
 from src.apps.workspace.dtos.category_dtos import CategoryAppDTO
 from src.apps.workspace.exceptions.category_exceptions import CategoryNotFound
 from src.apps.workspace.mappers.category_mapper import CategoryMapper
-from src.apps.workspace.repositories.i_category_repository import ICategoryRepository
+from src.apps.workspace.repositories.category_repository import ICategoryRepository
 
 
 class GetCategoryByIdInteractor:

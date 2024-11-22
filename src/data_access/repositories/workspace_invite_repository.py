@@ -12,7 +12,7 @@ from src.apps.workspace.exceptions.workspace_invite_exceptions import (
     WorkspaceInviteNotUpdated,
     WorkspaceWorkspaceInviteNotFound,
 )
-from src.apps.workspace.repositories.i_workspace_invite_repository import (
+from src.apps.workspace.repositories.workspace_invite_repository import (
     IWorkspaceInviteRepository,
 )
 from src.data_access.converters.workspace_invite_converter import (

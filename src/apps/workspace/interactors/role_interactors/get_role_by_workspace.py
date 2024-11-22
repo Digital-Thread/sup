@@ -4,7 +4,7 @@ from src.apps.workspace.domain.types_ids import WorkspaceId
 from src.apps.workspace.dtos.role_dtos import RoleWithUserCountAppDTO
 from src.apps.workspace.exceptions.role_exceptions import RoleException, RoleNotFound
 from src.apps.workspace.mappers.role_mapper import RoleMapper
-from src.apps.workspace.repositories.i_role_repository import IRoleRepository
+from src.apps.workspace.repositories.role_repository import IRoleRepository
 
 
 class GetRoleByWorkspaceInteractor:

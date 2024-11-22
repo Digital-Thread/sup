@@ -4,7 +4,7 @@ from src.apps.workspace.domain.types_ids import InviteId, WorkspaceId
 from src.apps.workspace.exceptions.workspace_invite_exceptions import (
     WorkspaceInviteNotFound,
 )
-from src.apps.workspace.repositories.i_workspace_invite_repository import (
+from src.apps.workspace.repositories.workspace_invite_repository import (
     IWorkspaceInviteRepository,
 )
 

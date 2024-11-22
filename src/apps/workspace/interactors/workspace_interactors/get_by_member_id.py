@@ -7,7 +7,7 @@ from src.apps.workspace.exceptions.workspace_exceptions import (
     WorkspaceException,
 )
 from src.apps.workspace.mappers.workspace_mapper import WorkspaceMapper
-from src.apps.workspace.repositories.i_workspace_repository import IWorkspaceRepository
+from src.apps.workspace.repositories.workspace_repository import IWorkspaceRepository
 
 
 class GetWorkspaceByMemberInteractor:

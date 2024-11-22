@@ -11,7 +11,7 @@ from src.apps.workspace.exceptions.role_exceptions import (
     RoleNotUpdated,
     WorkspaceRoleNotFound,
 )
-from src.apps.workspace.repositories.i_role_repository import IRoleRepository
+from src.apps.workspace.repositories.role_repository import IRoleRepository
 from src.data_access.converters.role_converter import RoleConverter
 from src.data_access.models import UserWorkspaceRoleModel
 from src.data_access.models.workspace_models.role import RoleModel

@@ -6,7 +6,7 @@ from src.apps.workspace.exceptions.tag_exceptions import (
     TagNotFound,
     WorkspaceTagNotFound,
 )
-from src.apps.workspace.repositories.i_tag_repository import ITagRepository
+from src.apps.workspace.repositories.tag_repository import ITagRepository
 
 
 class DeleteTagInteractor:

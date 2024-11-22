@@ -10,7 +10,7 @@ from src.apps.workspace.exceptions.workspace_invite_exceptions import (
     WorkspaceWorkspaceInviteNotFound,
 )
 from src.apps.workspace.mappers.workspace_invite_mapper import WorkspaceInviteMapper
-from src.apps.workspace.repositories.i_workspace_invite_repository import (
+from src.apps.workspace.repositories.workspace_invite_repository import (
     IWorkspaceInviteRepository,
 )
 

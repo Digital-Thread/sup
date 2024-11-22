@@ -9,7 +9,7 @@ from src.apps.workspace.exceptions.role_exceptions import (
     RoleNotUpdated,
 )
 from src.apps.workspace.mappers.role_mapper import RoleMapper
-from src.apps.workspace.repositories.i_role_repository import IRoleRepository
+from src.apps.workspace.repositories.role_repository import IRoleRepository
 
 
 class UpdateRoleInteractor:

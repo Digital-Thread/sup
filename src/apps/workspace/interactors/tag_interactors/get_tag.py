@@ -2,7 +2,7 @@ from src.apps.workspace.domain.types_ids import TagId, WorkspaceId
 from src.apps.workspace.dtos.tag_dtos import TagAppDTO
 from src.apps.workspace.exceptions.tag_exceptions import TagNotFound
 from src.apps.workspace.mappers.tag_mapper import TagMapper
-from src.apps.workspace.repositories.i_tag_repository import ITagRepository
+from src.apps.workspace.repositories.tag_repository import ITagRepository
 
 
 class GetTagByIdInteractor:

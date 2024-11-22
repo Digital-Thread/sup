@@ -6,7 +6,7 @@ from src.apps.workspace.exceptions.workspace_invite_exceptions import (
     WorkspaceInviteNotFound,
     WorkspaceWorkspaceInviteNotFound,
 )
-from src.apps.workspace.repositories.i_workspace_invite_repository import (
+from src.apps.workspace.repositories.workspace_invite_repository import (
     IWorkspaceInviteRepository,
 )
 

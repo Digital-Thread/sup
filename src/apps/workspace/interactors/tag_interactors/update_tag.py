@@ -9,7 +9,7 @@ from src.apps.workspace.exceptions.tag_exceptions import (
     TagNotUpdated,
 )
 from src.apps.workspace.mappers.tag_mapper import TagMapper
-from src.apps.workspace.repositories.i_tag_repository import ITagRepository
+from src.apps.workspace.repositories.tag_repository import ITagRepository
 
 
 class UpdateTagInteractor:

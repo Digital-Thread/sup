@@ -5,7 +5,7 @@ from src.apps.workspace.exceptions.workspace_exceptions import (
     WorkspaceException,
     WorkspaceNotFound,
 )
-from src.apps.workspace.repositories.i_workspace_repository import IWorkspaceRepository
+from src.apps.workspace.repositories.workspace_repository import IWorkspaceRepository
 
 
 class DeleteWorkspaceInteractor:

@@ -13,7 +13,7 @@ from src.apps.workspace.exceptions.tag_exceptions import (
     TagNotUpdated,
     WorkspaceTagNotFound,
 )
-from src.apps.workspace.repositories.i_tag_repository import ITagRepository
+from src.apps.workspace.repositories.tag_repository import ITagRepository
 from src.data_access.converters.tag_converter import TagConverter
 from src.data_access.models import WorkspaceModel
 from src.data_access.models.workspace_models.tag import TagModel

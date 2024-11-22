@@ -3,7 +3,7 @@ from uuid import UUID
 from src.apps.workspace.domain.types_ids import WorkspaceId, MemberId
 from src.apps.workspace.exceptions.role_exceptions import RoleException, RoleNotFoundForWorkspaceMember
 from src.apps.workspace.exceptions.workspace_exceptions import WorkspaceNotFound, WorkspaceMemberNotFound
-from src.apps.workspace.repositories.i_user_workspace_role_repository import IUserWorkspaceRoleRepository
+from src.apps.workspace.repositories.user_workspace_role_repository import IUserWorkspaceRoleRepository
 
 
 class RemoveRoleFromWorkspaceMemberInteractor:
