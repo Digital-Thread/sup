@@ -5,7 +5,7 @@ from sqlalchemy import delete, exists, select, update
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.apps.workspace.domain.entities.workspace_invite import WorkspaceInvite
+from src.apps.workspace.domain.entities.workspace_invite import WorkspaceInviteEntity
 from src.apps.workspace.domain.types_ids import InviteId, WorkspaceId
 from src.apps.workspace.exceptions.workspace_invite_exceptions import (
     WorkspaceInviteNotFound,
@@ -27,7 +27,7 @@ class WorkspaceInviteRepository(IWorkspaceInviteRepository):
     def __init__(self, session_factory: AsyncSession):
         self._session = session_factory
 
-    async def save(self, workspace_invite: WorkspaceInvite) -> None:
+    async def save(self, workspace_invite: WorkspaceInviteEntity) -> None:
         stmt = WorkspaceInviteConverter.entity_to_model(workspace_invite)
         self._session.add(stmt)
 
@@ -41,7 +41,7 @@ class WorkspaceInviteRepository(IWorkspaceInviteRepository):
 
     async def find_by_id(
         self, workspace_invite_id: InviteId, workspace_id: WorkspaceId
-    ) -> WorkspaceInvite | None:
+    ) -> WorkspaceInviteEntity | None:
         query = select(WorkspaceInviteModel).filter_by(
             id=workspace_invite_id, workspace_id=workspace_id
         )
@@ -56,7 +56,7 @@ class WorkspaceInviteRepository(IWorkspaceInviteRepository):
         else:
             return WorkspaceInviteConverter.model_to_entity(invite_model)
 
-    async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[WorkspaceInvite]:
+    async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[WorkspaceInviteEntity]:
         query = select(WorkspaceInviteModel).filter_by(workspace_id=workspace_id)
         result = await self._session.execute(query)
         invites = [
@@ -77,7 +77,7 @@ class WorkspaceInviteRepository(IWorkspaceInviteRepository):
         workspace_and_invite_ids = result.fetchone()
         return workspace_and_invite_ids[0], workspace_and_invite_ids[1]
 
-    async def update(self, workspace_invite: WorkspaceInvite) -> None:
+    async def update(self, workspace_invite: WorkspaceInviteEntity) -> None:
         update_data = WorkspaceInviteConverter.entity_to_dict(workspace_invite)
         stmt = update(WorkspaceInviteModel).filter_by(id=workspace_invite.id).values(**update_data)
         result = await self._session.execute(stmt)

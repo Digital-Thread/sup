@@ -13,7 +13,7 @@ class StatusInvite(Enum):
 
 
 @dataclass
-class WorkspaceInvite:
+class WorkspaceInviteEntity:
     EXPIRATION_DAYS = 7
 
     _workspace_id: WorkspaceId

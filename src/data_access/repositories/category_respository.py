@@ -5,7 +5,7 @@ from sqlalchemy import delete, exists, select, update
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.apps.workspace.domain.entities.category import Category
+from src.apps.workspace.domain.entities.category import CategoryEntity
 from src.apps.workspace.domain.types_ids import CategoryId, WorkspaceId
 from src.apps.workspace.exceptions.category_exceptions import (
     CategoryAlreadyExists,
@@ -22,7 +22,7 @@ class CategoryRepository(ICategoryRepository):
     def __init__(self, session_factory: AsyncSession):
         self._session = session_factory
 
-    async def save(self, category: Category) -> None:
+    async def save(self, category: CategoryEntity) -> None:
         stmt = CategoryConverter.entity_to_model(category)
         self._session.add(stmt)
 
@@ -41,7 +41,7 @@ class CategoryRepository(ICategoryRepository):
 
     async def find_by_id(
         self, category_id: CategoryId, workspace_id: WorkspaceId
-    ) -> Category | None:
+    ) -> CategoryEntity | None:
         query = select(CategoryModel).filter_by(id=category_id, workspace_id=workspace_id)
         result = await self._session.execute(query)
         try:
@@ -54,7 +54,7 @@ class CategoryRepository(ICategoryRepository):
         else:
             return CategoryConverter.model_to_entity(category_model)
 
-    async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[Category]:
+    async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[CategoryEntity]:
         query = select(CategoryModel).filter_by(workspace_id=workspace_id)
         result = await self._session.execute(query)
         categories = [
@@ -65,7 +65,7 @@ class CategoryRepository(ICategoryRepository):
 
         return categories
 
-    async def update(self, category: Category) -> None:
+    async def update(self, category: CategoryEntity) -> None:
         update_data = CategoryConverter.entity_to_dict(category)
         stmt = update(CategoryModel).filter_by(id=category.id).values(**update_data)
         result = await self._session.execute(stmt)

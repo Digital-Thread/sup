@@ -1,6 +1,6 @@
 from src.apps.workspace.domain.entities.workspace_invite import (
     StatusInvite,
-    WorkspaceInvite,
+    WorkspaceInviteEntity,
 )
 from src.apps.workspace.domain.types_ids import InviteId, WorkspaceId
 from src.data_access.models.workspace_models.workspace_invite import (
@@ -10,8 +10,8 @@ from src.data_access.models.workspace_models.workspace_invite import (
 
 class WorkspaceInviteConverter:
     @staticmethod
-    def model_to_entity(workspace_invite_model: WorkspaceInviteModel) -> WorkspaceInvite:
-        return WorkspaceInvite(
+    def model_to_entity(workspace_invite_model: WorkspaceInviteModel) -> WorkspaceInviteEntity:
+        return WorkspaceInviteEntity(
             id=InviteId(workspace_invite_model.id),
             code=workspace_invite_model.code,
             _status=StatusInvite(workspace_invite_model.status),
@@ -20,7 +20,7 @@ class WorkspaceInviteConverter:
         )
 
     @staticmethod
-    def entity_to_model(workspace_invite: WorkspaceInvite) -> WorkspaceInviteModel:
+    def entity_to_model(workspace_invite: WorkspaceInviteEntity) -> WorkspaceInviteModel:
         model = WorkspaceInviteModel(
             id=workspace_invite.id,
             code=workspace_invite.code,
@@ -32,7 +32,7 @@ class WorkspaceInviteConverter:
         return model
 
     @staticmethod
-    def entity_to_dict(workspace_invite: WorkspaceInvite) -> dict[str, str]:
+    def entity_to_dict(workspace_invite: WorkspaceInviteEntity) -> dict[str, str]:
         return {
             'status': workspace_invite.status.value,
         }

@@ -5,7 +5,7 @@ from sqlalchemy import delete, exists, select, update
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.apps.workspace.domain.entities.workspace import Workspace
+from src.apps.workspace.domain.entities.workspace import WorkspaceEntity
 from src.apps.workspace.domain.types_ids import MemberId, OwnerId, WorkspaceId
 from src.apps.workspace.exceptions.workspace_exceptions import (
     MemberWorkspaceNotFound,
@@ -25,7 +25,7 @@ class WorkspaceRepository(IWorkspaceRepository):
     def __init__(self, session_factory: AsyncSession):
         self._session = session_factory
 
-    async def save(self, workspace: Workspace) -> None:
+    async def save(self, workspace: WorkspaceEntity) -> None:
         stmt = WorkspaceConverter.entity_to_model(workspace)
         self._session.add(stmt)
         try:
@@ -39,7 +39,7 @@ class WorkspaceRepository(IWorkspaceRepository):
                 f'Рабочее пространство с именем {workspace.name} уже существует'
             )
 
-    async def find_by_id(self, workspace_id: WorkspaceId) -> Workspace | None:
+    async def find_by_id(self, workspace_id: WorkspaceId) -> WorkspaceEntity | None:
         query = select(WorkspaceModel).filter_by(id=workspace_id)
         result = await self._session.execute(query)
         try:
@@ -51,7 +51,7 @@ class WorkspaceRepository(IWorkspaceRepository):
             workspace_entity = WorkspaceConverter.model_to_entity(workspace_model)
             return workspace_entity
 
-    async def find_by_member_id(self, member_id: MemberId) -> list[Workspace]:
+    async def find_by_member_id(self, member_id: MemberId) -> list[WorkspaceEntity]:
         query = (
             select(WorkspaceModel)
             .join(WorkspaceMemberModel, WorkspaceModel.id == WorkspaceMemberModel.workspace_id)
@@ -69,7 +69,7 @@ class WorkspaceRepository(IWorkspaceRepository):
             ]
             return workspaces
 
-    async def update(self, workspace: Workspace) -> None:
+    async def update(self, workspace: WorkspaceEntity) -> None:
         update_data = WorkspaceConverter.entity_to_dict(workspace)
         stmt = update(WorkspaceModel).filter_by(id=workspace.id).values(**update_data)
         result = await self._session.execute(stmt)

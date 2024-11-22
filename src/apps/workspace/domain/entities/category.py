@@ -1,11 +1,11 @@
 from dataclasses import dataclass, field
 
-from src.apps.workspace.domain.entities.validator_mixins import NameValidatorMixin
+from src.apps.workspace.domain.validator_mixins import NameValidatorMixin
 from src.apps.workspace.domain.types_ids import CategoryId, WorkspaceId
 
 
 @dataclass
-class Category(NameValidatorMixin):
+class CategoryEntity(NameValidatorMixin):
     _name: str
     _workspace_id: WorkspaceId
     _id: CategoryId | None = field(default=None)

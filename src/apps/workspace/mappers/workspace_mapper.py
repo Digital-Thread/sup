@@ -1,6 +1,6 @@
 from dataclasses import asdict
 
-from src.apps.workspace.domain.entities.workspace import Workspace
+from src.apps.workspace.domain.entities.workspace import WorkspaceEntity
 from src.apps.workspace.domain.types_ids import (
     InviteId,
     MeetId,
@@ -18,12 +18,12 @@ from src.apps.workspace.dtos.workspace_dtos import (
 from src.apps.workspace.mappers.base_mapper import BaseMapper
 
 
-class WorkspaceMapper(BaseMapper[Workspace, WorkspaceAppDTO]):
+class WorkspaceMapper(BaseMapper[WorkspaceEntity, WorkspaceAppDTO]):
 
     @staticmethod
-    def dto_to_entity(dto: WorkspaceAppDTO) -> Workspace:
+    def dto_to_entity(dto: WorkspaceAppDTO) -> WorkspaceEntity:
 
-        return Workspace(
+        return WorkspaceEntity(
             _id=WorkspaceId(dto.id) if dto.id else None,
             owner_id=OwnerId(dto.owner_id),
             _name=dto.name,
@@ -39,7 +39,7 @@ class WorkspaceMapper(BaseMapper[Workspace, WorkspaceAppDTO]):
         )
 
     @staticmethod
-    def update_data(dto: UpdateWorkspaceAppDTO, existing_workspace: Workspace) -> Workspace:
+    def update_data(dto: UpdateWorkspaceAppDTO, existing_workspace: WorkspaceEntity) -> WorkspaceEntity:
         for field, value in asdict(dto).items():
             if value is not None:
                 setattr(existing_workspace, field, value)

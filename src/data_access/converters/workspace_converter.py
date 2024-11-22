@@ -1,4 +1,4 @@
-from src.apps.workspace.domain.entities.workspace import Workspace
+from src.apps.workspace.domain.entities.workspace import WorkspaceEntity
 from src.apps.workspace.domain.types_ids import (
     InviteId,
     MeetId,
@@ -15,8 +15,8 @@ from src.data_access.models.workspace_models.workspace import WorkspaceModel
 class WorkspaceConverter:
 
     @staticmethod
-    def model_to_entity(workspace_model: WorkspaceModel) -> Workspace:
-        return Workspace(
+    def model_to_entity(workspace_model: WorkspaceModel) -> WorkspaceEntity:
+        return WorkspaceEntity(
             owner_id=OwnerId(workspace_model.owner_id),
             _name=workspace_model.name,
             _id=WorkspaceId(workspace_model.id),
@@ -32,7 +32,7 @@ class WorkspaceConverter:
         )
 
     @staticmethod
-    def entity_to_model(entity: Workspace) -> WorkspaceModel:
+    def entity_to_model(entity: WorkspaceEntity) -> WorkspaceModel:
         model = WorkspaceModel(
             id=entity.id,
             owner_id=entity.owner_id,
@@ -44,7 +44,7 @@ class WorkspaceConverter:
         return model
 
     @staticmethod
-    def entity_to_dict(workspace: Workspace) -> dict[str, str]:
+    def entity_to_dict(workspace: WorkspaceEntity) -> dict[str, str]:
         return {
             'name': workspace.name,
             'description': workspace.description,

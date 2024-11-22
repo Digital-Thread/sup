@@ -1,20 +1,20 @@
 from abc import abstractmethod
 
-from src.apps.workspace.domain.entities.workspace import Workspace
+from src.apps.workspace.domain.entities.workspace import WorkspaceEntity
 from src.apps.workspace.domain.types_ids import MemberId, OwnerId, WorkspaceId
 
 
 class IWorkspaceRepository:
     @abstractmethod
-    async def save(self, workspace: Workspace) -> None:
+    async def save(self, workspace: WorkspaceEntity) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    async def find_by_id(self, workspace_id: WorkspaceId) -> Workspace | None:
+    async def find_by_id(self, workspace_id: WorkspaceId) -> WorkspaceEntity | None:
         raise NotImplementedError
 
     @abstractmethod
-    async def update(self, workspace: Workspace) -> None:
+    async def update(self, workspace: WorkspaceEntity) -> None:
         raise NotImplementedError
 
     @abstractmethod
@@ -22,7 +22,7 @@ class IWorkspaceRepository:
         raise NotImplementedError
 
     @abstractmethod
-    async def find_by_member_id(self, member_id: MemberId) -> list[Workspace]:
+    async def find_by_member_id(self, member_id: MemberId) -> list[WorkspaceEntity]:
         raise NotImplementedError
 
     @abstractmethod

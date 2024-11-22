@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from src.apps.workspace.domain.entities.role import Role
+from src.apps.workspace.domain.entities.role import RoleEntity
 from src.apps.workspace.domain.types_ids import RoleId, WorkspaceId
 from src.apps.workspace.dtos.role_dtos import UpdateRoleAppDTO
 from src.apps.workspace.exceptions.role_exceptions import (
@@ -30,7 +30,7 @@ class UpdateRoleInteractor:
 
     async def _get_existing_role_in_workspace(
         self, role_id: RoleId, workspace_id: WorkspaceId
-    ) -> Role:
+    ) -> RoleEntity:
         try:
             existing_role = await self._role_repository.find_by_id(role_id, workspace_id)
         except RoleNotFound as error:
@@ -39,7 +39,7 @@ class UpdateRoleInteractor:
             return existing_role
 
     @staticmethod
-    def _map_to_update_data(role: Role, update_data: UpdateRoleAppDTO) -> Role:
+    def _map_to_update_data(role: RoleEntity, update_data: UpdateRoleAppDTO) -> RoleEntity:
         try:
             updated_role = RoleMapper.update_data(role, update_data)
         except ValueError as error:

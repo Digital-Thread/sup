@@ -1,4 +1,4 @@
-from src.apps.workspace.domain.entities.tag import Tag
+from src.apps.workspace.domain.entities.tag import TagEntity
 from src.apps.workspace.domain.types_ids import WorkspaceId
 from src.apps.workspace.dtos.tag_dtos import CreateTagAppDTO
 from src.apps.workspace.exceptions.tag_exceptions import (
@@ -17,7 +17,7 @@ class CreateTagInteractor:
 
         try:
             await self._tag_repository.save(
-                Tag(
+                TagEntity(
                     _name=tag_data.name,
                     _color=tag_data.color,
                     _workspace_id=WorkspaceId(tag_data.workspace_id),

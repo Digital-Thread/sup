@@ -3,7 +3,7 @@ from uuid import uuid4
 
 import pytest
 
-from src.apps.workspace.domain.entities.workspace import Workspace
+from src.apps.workspace.domain.entities.workspace import WorkspaceEntity
 from src.apps.workspace.domain.types_ids import (
     InviteId,
     MeetId,
@@ -18,15 +18,15 @@ from tests.fixtures.workspace_fixtures import owner_id, two_member_ids, workspac
 
 
 @pytest.fixture()
-def workspace_minimal(owner_id: OwnerId) -> Workspace:
-    return Workspace(owner_id=owner_id, _name='Minimal Workspace')
+def workspace_minimal(owner_id: OwnerId) -> WorkspaceEntity:
+    return WorkspaceEntity(owner_id=owner_id, _name='Minimal Workspace')
 
 
 @pytest.fixture()
 def workspace_full(
     owner_id: OwnerId, workspace_id: WorkspaceId, two_member_ids: list[MemberId]
-) -> Workspace:
-    return Workspace(
+) -> WorkspaceEntity:
+    return WorkspaceEntity(
         owner_id=owner_id,
         _name='Full Workspace',
         _id=workspace_id,
@@ -44,13 +44,13 @@ def workspace_full(
 class TestWorkspaceCreation:
 
     def test_workspace_creation_with_required_data(
-        self, workspace_minimal: Workspace, owner_id: OwnerId
+        self, workspace_minimal: WorkspaceEntity, owner_id: OwnerId
     ) -> None:
         assert workspace_minimal.name == 'Minimal Workspace'
         assert workspace_minimal.owner_id == owner_id
 
     def test_workspace_creation_with_full_data(
-        self, workspace_full: Workspace, two_member_ids: list[MemberId]
+        self, workspace_full: WorkspaceEntity, two_member_ids: list[MemberId]
     ) -> None:
         assert workspace_full.name == 'Full Workspace'
         assert workspace_full.description == 'Full Workspace description'
@@ -62,7 +62,7 @@ class TestWorkspaceCreation:
         assert workspace_full.role_ids == [RoleId(15), RoleId(16), RoleId(17), RoleId(18)]
         assert workspace_full.member_ids == two_member_ids
 
-    def test_workspace_has_correct_default_values(self, workspace_minimal: Workspace) -> None:
+    def test_workspace_has_correct_default_values(self, workspace_minimal: WorkspaceEntity) -> None:
         assert workspace_minimal.description is None
         assert workspace_minimal.id is None
         assert workspace_minimal.logo is None
@@ -77,16 +77,16 @@ class TestWorkspaceCreation:
 
     def test_workspace_creation_missing_required_fields(self) -> None:
         with pytest.raises(TypeError):
-            Workspace()
+            WorkspaceEntity()
 
 
 class TestWorkspaceValidation:
 
-    def test_valid_workspace_name(self, workspace_minimal: Workspace) -> None:
+    def test_valid_workspace_name(self, workspace_minimal: WorkspaceEntity) -> None:
         workspace_minimal.name = 'Another Valid Workspace'
         assert workspace_minimal.name == 'Another Valid Workspace'
 
-    def test_valid_workspace_description(self, workspace_minimal: Workspace):
+    def test_valid_workspace_description(self, workspace_minimal: WorkspaceEntity):
         workspace_minimal.description = 'This is a valid workspace description.'
         assert workspace_minimal.description == 'This is a valid workspace description.'
 
@@ -99,7 +99,7 @@ class TestWorkspaceValidation:
         ],
     )
     def test_invalid_workspace_name(
-        self, workspace_minimal: Workspace, name: str, expected_error_message: str
+        self, workspace_minimal: WorkspaceEntity, name: str, expected_error_message: str
     ) -> None:
 
         with pytest.raises(ValueError, match=expected_error_message):
@@ -113,7 +113,7 @@ class TestWorkspaceValidation:
         ):
             workspace_minimal.description = 'Full Workspace@#$%^&*()+'
 
-    def test_max_workspace_name_length(self, workspace_minimal: Workspace) -> None:
+    def test_max_workspace_name_length(self, workspace_minimal: WorkspaceEntity) -> None:
         valid_name = 'n' * 50
         workspace_minimal.name = valid_name
         assert workspace_minimal.name == valid_name
@@ -121,7 +121,7 @@ class TestWorkspaceValidation:
         with pytest.raises(ValueError, match=f'Неверный формат названия рабочего пространства'):
             workspace_minimal.name = 'n' * 51
 
-    def test_max_workspace_description_length(self, workspace_minimal: Workspace) -> None:
+    def test_max_workspace_description_length(self, workspace_minimal: WorkspaceEntity) -> None:
         valid_description = 'n' * 500
         workspace_minimal.description = valid_description
         assert workspace_minimal.description == valid_description
@@ -133,7 +133,7 @@ class TestWorkspaceValidation:
         ):
             workspace_minimal.description = 'n' * 501
 
-    def test_workspace_id_set_once_only(self, workspace_full: Workspace) -> None:
+    def test_workspace_id_set_once_only(self, workspace_full: WorkspaceEntity) -> None:
         with pytest.raises(
             AttributeError, match='Идентификатор рабочего пространства уже установлен'
         ):

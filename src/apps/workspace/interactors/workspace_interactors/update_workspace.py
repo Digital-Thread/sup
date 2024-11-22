@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from src.apps.workspace.domain.entities.workspace import Workspace
+from src.apps.workspace.domain.entities.workspace import WorkspaceEntity
 from src.apps.workspace.domain.types_ids import WorkspaceId
 from src.apps.workspace.dtos.workspace_dtos import UpdateWorkspaceAppDTO
 from src.apps.workspace.exceptions.workspace_exceptions import (
@@ -23,7 +23,7 @@ class UpdateWorkspaceInteractor:
         except WorkspaceNotUpdated as error:
             raise WorkspaceException(str(error))
 
-    async def _get_existing_workspace_by_id(self, workspace_id: WorkspaceId) -> Workspace:
+    async def _get_existing_workspace_by_id(self, workspace_id: WorkspaceId) -> WorkspaceEntity:
         try:
             existing_workspace = await self._workspace_repository.find_by_id(workspace_id)
         except WorkspaceNotFound as error:
@@ -33,7 +33,7 @@ class UpdateWorkspaceInteractor:
 
     async def _map_to_update_data(
         self, workspace_id: WorkspaceId, updated_data: UpdateWorkspaceAppDTO
-    ) -> Workspace:
+    ) -> WorkspaceEntity:
         existing_workspace = await self._get_existing_workspace_by_id(workspace_id)
         try:
             updated_workspace = WorkspaceMapper.update_data(updated_data, existing_workspace)

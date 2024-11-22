@@ -5,22 +5,22 @@ import pytest
 
 from src.apps.workspace.domain.entities.workspace_invite import (
     StatusInvite,
-    WorkspaceInvite,
+    WorkspaceInviteEntity,
 )
 from src.apps.workspace.domain.types_ids import InviteId, WorkspaceId
 from tests.fixtures.workspace_fixtures import invite_code, workspace_id
 
 
 @pytest.fixture()
-def workspace_invite_minimal(workspace_id: WorkspaceId) -> WorkspaceInvite:
-    return WorkspaceInvite(
+def workspace_invite_minimal(workspace_id: WorkspaceId) -> WorkspaceInviteEntity:
+    return WorkspaceInviteEntity(
         _workspace_id=workspace_id,
     )
 
 
 @pytest.fixture()
-def workspace_invite_full(workspace_id: WorkspaceId, invite_code: UUID) -> WorkspaceInvite:
-    return WorkspaceInvite(
+def workspace_invite_full(workspace_id: WorkspaceId, invite_code: UUID) -> WorkspaceInviteEntity:
+    return WorkspaceInviteEntity(
         _workspace_id=workspace_id,
         _id=InviteId(1),
         code=invite_code,
@@ -32,12 +32,12 @@ def workspace_invite_full(workspace_id: WorkspaceId, invite_code: UUID) -> Works
 class TestWorkspaceInviteCreation:
 
     def test_workspace_invite_creation_with_required_data(
-        self, workspace_invite_minimal: WorkspaceInvite, workspace_id: WorkspaceId
+        self, workspace_invite_minimal: WorkspaceInviteEntity, workspace_id: WorkspaceId
     ) -> None:
         assert workspace_invite_minimal.workspace_id == workspace_id
 
     def test_workspace_invite_creation_with_full_data(
-        self, workspace_invite_full: WorkspaceInvite, workspace_id: WorkspaceId, invite_code: UUID
+        self, workspace_invite_full: WorkspaceInviteEntity, workspace_id: WorkspaceId, invite_code: UUID
     ) -> None:
         assert workspace_invite_full.workspace_id == workspace_id
         assert workspace_invite_full._id == InviteId(1)
@@ -45,7 +45,7 @@ class TestWorkspaceInviteCreation:
         assert workspace_invite_full.code == invite_code
 
     def test_workspace_invite_has_correct_default_values(
-        self, workspace_invite_minimal: WorkspaceInvite
+        self, workspace_invite_minimal: WorkspaceInviteEntity
     ) -> None:
         assert workspace_invite_minimal.id is None
         assert workspace_invite_minimal.code is not None and isinstance(
@@ -59,18 +59,18 @@ class TestWorkspaceInviteCreation:
         )
         assert (
             workspace_invite_minimal.expired_at
-            == workspace_invite_minimal.created_at + timedelta(days=WorkspaceInvite.EXPIRATION_DAYS)
+            == workspace_invite_minimal.created_at + timedelta(days=WorkspaceInviteEntity.EXPIRATION_DAYS)
         )
 
     def test_workspace_invite_creation_missing_required_fields(self) -> None:
         with pytest.raises(TypeError):
-            WorkspaceInvite()
+            WorkspaceInviteEntity()
 
 
 class TestWorkspaceInviteValidation:
 
     def test_workspace_invite_valid_change_status(
-        self, workspace_invite_minimal: WorkspaceInvite
+        self, workspace_invite_minimal: WorkspaceInviteEntity
     ) -> None:
         workspace_invite_minimal.use()
 
@@ -80,7 +80,7 @@ class TestWorkspaceInviteValidation:
         workspace_invite_minimal.expire()
 
     def test_workspace_invite_invalid_change_status(
-        self, workspace_invite_minimal: WorkspaceInvite
+        self, workspace_invite_minimal: WorkspaceInviteEntity
     ) -> None:
         with pytest.raises(ValueError, match='Статус уже установлен'):
             workspace_invite_minimal.activate()
@@ -89,7 +89,7 @@ class TestWorkspaceInviteValidation:
             workspace_invite_minimal.expire()
 
     def test_workspace_invite_id_set_once_only(
-        self, workspace_invite_full: WorkspaceInvite
+        self, workspace_invite_full: WorkspaceInviteEntity
     ) -> None:
         with pytest.raises(AttributeError, match='Идентификатор ссылки приглашения уже установлен'):
             workspace_invite_full.id = 2

@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from src.apps.workspace.domain.entities.workspace_invite import WorkspaceInvite
+from src.apps.workspace.domain.entities.workspace_invite import WorkspaceInviteEntity
 from src.apps.workspace.domain.types_ids import InviteId, WorkspaceId
 from src.apps.workspace.dtos.workspace_invite_dtos import UpdateWorkspaceInviteAppDTO
 from src.apps.workspace.exceptions.workspace_invite_exceptions import (
@@ -36,7 +36,7 @@ class UpdateWorkspaceInviteInteractor:
 
     async def _get_existing_invite_in_workspace(
         self, invite_id: InviteId, workspace_id: WorkspaceId
-    ) -> WorkspaceInvite:
+    ) -> WorkspaceInviteEntity:
         try:
             existing_invite = await self._workspace_invite_repository.find_by_id(
                 invite_id, workspace_id
@@ -48,8 +48,8 @@ class UpdateWorkspaceInviteInteractor:
 
     @staticmethod
     def _map_to_update_data(
-        invite: WorkspaceInvite, update_data: UpdateWorkspaceInviteAppDTO
-    ) -> WorkspaceInvite:
+        invite: WorkspaceInviteEntity, update_data: UpdateWorkspaceInviteAppDTO
+    ) -> WorkspaceInviteEntity:
         try:
             updated_invite = WorkspaceInviteMapper.update_data(invite, update_data)
         except ValueError as error:

@@ -1,4 +1,4 @@
-from src.apps.workspace.domain.entities.workspace import Workspace
+from src.apps.workspace.domain.entities.workspace import WorkspaceEntity
 from src.apps.workspace.domain.types_ids import MemberId, OwnerId, WorkspaceId
 from src.apps.workspace.dtos.workspace_dtos import CreateWorkspaceAppDTO
 from src.apps.workspace.exceptions.workspace_exceptions import (
@@ -15,7 +15,7 @@ class CreateWorkspaceInteractor:
 
     async def execute(self, workspace_data: CreateWorkspaceAppDTO) -> None:
         try:
-            workspace = Workspace(
+            workspace = WorkspaceEntity(
                 owner_id=OwnerId(workspace_data.owner_id), _name=workspace_data.name
             )
         except ValueError as error:
