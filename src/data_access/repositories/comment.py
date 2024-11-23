@@ -14,7 +14,7 @@ from src.apps.comment.domain import (
     ICommentRepository,
     TaskId,
 )
-from src.data_access.converters import CommentConverter
+from src.data_access.mappers import CommentConverter
 from src.data_access.models import CommentModel
 
 

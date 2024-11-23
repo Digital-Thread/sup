@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.apps.workspace.domain.types_ids import MemberId, RoleId, WorkspaceId
 from src.apps.workspace.exceptions.role_exceptions import RoleNotFound
 from src.apps.workspace.exceptions.workspace_exceptions import WorkspaceMemberNotFound, WorkspaceNotFound
-from src.apps.workspace.repositories.i_user_workspace_role_repository import IUserWorkspaceRoleRepository
+from src.apps.workspace.repositories.user_workspace_role_repository import IUserWorkspaceRoleRepository
 from src.data_access.models.workspace_models import WorkspaceModel, RoleModel, WorkspaceMemberModel, UserWorkspaceRoleModel
 
 

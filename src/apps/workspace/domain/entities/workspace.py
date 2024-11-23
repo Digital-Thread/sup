@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from re import match
 
-from src.apps.workspace.domain.entities.validator_mixins import (
+from src.apps.workspace.domain.validator_mixins import (
     DescriptionValidatorMixin,
 )
 from src.apps.workspace.domain.types_ids import (
@@ -18,7 +18,7 @@ from src.apps.workspace.domain.types_ids import (
 
 
 @dataclass
-class Workspace(DescriptionValidatorMixin):
+class WorkspaceEntity(DescriptionValidatorMixin):
     owner_id: OwnerId
     _name: str
     _id: WorkspaceId | None = field(default=None)

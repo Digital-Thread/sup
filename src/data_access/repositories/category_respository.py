@@ -5,7 +5,7 @@ from sqlalchemy import delete, exists, select, update
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.apps.workspace.domain.entities.category import Category
+from src.apps.workspace.domain.entities.category import CategoryEntity
 from src.apps.workspace.domain.types_ids import CategoryId, WorkspaceId
 from src.apps.workspace.exceptions.category_exceptions import (
     CategoryAlreadyExists,
@@ -13,8 +13,8 @@ from src.apps.workspace.exceptions.category_exceptions import (
     CategoryNotUpdated,
     WorkspaceCategoryNotFound,
 )
-from src.apps.workspace.repositories.i_category_repository import ICategoryRepository
-from src.data_access.converters.category_converter import CategoryConverter
+from src.apps.workspace.repositories.category_repository import ICategoryRepository
+from src.data_access.mappers.category_mapper import CategoryMapper
 from src.data_access.models.workspace_models.category import CategoryModel
 
 
@@ -22,8 +22,8 @@ class CategoryRepository(ICategoryRepository):
     def __init__(self, session_factory: AsyncSession):
         self._session = session_factory
 
-    async def save(self, category: Category) -> None:
-        stmt = CategoryConverter.entity_to_model(category)
+    async def save(self, category: CategoryEntity) -> None:
+        stmt = CategoryMapper.entity_to_model(category)
         self._session.add(stmt)
 
         try:
@@ -41,7 +41,7 @@ class CategoryRepository(ICategoryRepository):
 
     async def find_by_id(
         self, category_id: CategoryId, workspace_id: WorkspaceId
-    ) -> Category | None:
+    ) -> CategoryEntity | None:
         query = select(CategoryModel).filter_by(id=category_id, workspace_id=workspace_id)
         result = await self._session.execute(query)
         try:
@@ -52,21 +52,21 @@ class CategoryRepository(ICategoryRepository):
                 f'Категория с id={category_id} не найдена в указанном рабочем пространстве.'
             )
         else:
-            return CategoryConverter.model_to_entity(category_model)
+            return CategoryMapper.model_to_entity(category_model)
 
-    async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[Category]:
+    async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[CategoryEntity]:
         query = select(CategoryModel).filter_by(workspace_id=workspace_id)
         result = await self._session.execute(query)
         categories = [
-            CategoryConverter.model_to_entity(category) for category in result.scalars().all()
+            CategoryMapper.model_to_entity(category) for category in result.scalars().all()
         ]
         if not categories:
             raise WorkspaceCategoryNotFound(f'Рабочее пространство с id={workspace_id} не найдено')
 
         return categories
 
-    async def update(self, category: Category) -> None:
-        update_data = CategoryConverter.entity_to_dict(category)
+    async def update(self, category: CategoryEntity) -> None:
+        update_data = CategoryMapper.entity_to_dict(category)
         stmt = update(CategoryModel).filter_by(id=category.id).values(**update_data)
         result = await self._session.execute(stmt)
 

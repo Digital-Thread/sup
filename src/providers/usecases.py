@@ -38,43 +38,42 @@ from src.apps.task import (
     GetTaskInteractor,
     UpdateTaskInteractor,
 )
-from src.apps.workspace.use_cases.category_use_cases import (
-    CreateCategoryUseCase,
-    DeleteCategoryUseCase,
-    GetCategoryByIdUseCase,
-    GetCategoryByWorkspaceUseCase,
-    UpdateCategoryUseCase,
+from src.apps.workspace.interactors.category_interactors import (
+    CreateCategoryInteractor,
+    DeleteCategoryInteractor,
+    GetCategoryByWorkspaceInteractor,
+    UpdateCategoryInteractor,
 )
-from src.apps.workspace.use_cases.role_use_cases import (
-    CreateRoleUseCase,
-    DeleteRoleUseCase,
-    GetRoleByIdUseCase,
-    GetRoleByWorkspaceUseCase,
-    UpdateRoleUseCase,
-    AssignRoleToWorkspaceMemberUseCase,
-    RemoveRoleFromWorkspaceMemberUseCase
+from src.apps.workspace.interactors.role_interactors import (
+    CreateRoleInteractor,
+    DeleteRoleInteractor,
+    GetRoleByIdInteractor,
+    GetRoleByWorkspaceInteractor,
+    UpdateRoleInteractor,
+    AssignRoleToWorkspaceMemberInteractor,
+    RemoveRoleFromWorkspaceMemberInteractor
 )
-from src.apps.workspace.use_cases.tag_use_cases import (
-    CreateTagUseCase,
-    DeleteTagUseCase,
-    GetTagByIdUseCase,
-    GetTagByWorkspaceUseCase,
-    UpdateTagUseCase,
+from src.apps.workspace.interactors.tag_interactors import (
+    CreateTagInteractor,
+    DeleteTagInteractor,
+    GetTagByIdInteractor,
+    GetTagByWorkspaceInteractor,
+    UpdateTagInteractor,
 )
-from src.apps.workspace.use_cases.workspace_invite_use_cases import (
-    CreateWorkspaceInviteUseCase,
-    DeleteWorkspaceInviteUseCase,
-    GetWorkspaceIdByInviteCodeUseCase,
-    GetWorkspaceInviteByWorkspaceUseCase,
-    UpdateWorkspaceInviteUseCase,
+from src.apps.workspace.interactors.workspace_invite_interactors import (
+    CreateWorkspaceInviteInteractor,
+    DeleteWorkspaceInviteInteractor,
+    GetWorkspaceIdByInviteCodeInteractor,
+    GetWorkspaceInviteByWorkspaceInteractor,
+    UpdateWorkspaceInviteInteractor,
 )
-from src.apps.workspace.use_cases.workspace_use_cases import (
-    AddMemberInWorkspaceUseCase,
-    CreateWorkspaceUseCase,
-    DeleteWorkspaceUseCase,
-    GetWorkspaceByIdUseCase,
-    GetWorkspaceByMemberUseCase,
-    UpdateWorkspaceUseCase,
+from src.apps.workspace.interactors.workspace_interactors import (
+    AddMemberInWorkspaceInteractor,
+    CreateWorkspaceInteractor,
+    DeleteWorkspaceInteractor,
+    GetWorkspaceByIdInteractor,
+    GetWorkspaceByMemberInteractor,
+    UpdateWorkspaceInteractor,
 )
 
 
@@ -105,54 +104,53 @@ class InteractorProvider(Provider):
 class WorkspaceUseCaseProvider(Provider):
     scope = Scope.REQUEST
 
-    create_workspace = provide(CreateWorkspaceUseCase)
-    get_workspace_by_id = provide(GetWorkspaceByIdUseCase)
-    get_workspace_by_owner_id = provide(GetWorkspaceByMemberUseCase)
-    update_workspace = provide(UpdateWorkspaceUseCase)
-    delete_workspace = provide(DeleteWorkspaceUseCase)
-    add_member = provide(AddMemberInWorkspaceUseCase)
+    create_workspace = provide(CreateWorkspaceInteractor)
+    get_workspace_by_id = provide(GetWorkspaceByIdInteractor)
+    get_workspace_by_owner_id = provide(GetWorkspaceByMemberInteractor)
+    update_workspace = provide(UpdateWorkspaceInteractor)
+    delete_workspace = provide(DeleteWorkspaceInteractor)
+    add_member = provide(AddMemberInWorkspaceInteractor)
 
 
 class RoleUseCaseProvider(Provider):
     scope = Scope.REQUEST
 
-    create_role = provide(CreateRoleUseCase)
-    get_role_by_id = provide(GetRoleByIdUseCase)
-    get_role_by_workspace = provide(GetRoleByWorkspaceUseCase)
-    update_role = provide(UpdateRoleUseCase)
-    delete_role = provide(DeleteRoleUseCase)
-    assign_role_to_user = provide(AssignRoleToWorkspaceMemberUseCase)
-    remove_role_from_member = provide(RemoveRoleFromWorkspaceMemberUseCase)
+    create_role = provide(CreateRoleInteractor)
+    get_role_by_id = provide(GetRoleByIdInteractor)
+    get_role_by_workspace = provide(GetRoleByWorkspaceInteractor)
+    update_role = provide(UpdateRoleInteractor)
+    delete_role = provide(DeleteRoleInteractor)
+    assign_role_to_user = provide(AssignRoleToWorkspaceMemberInteractor)
+    remove_role_from_member = provide(RemoveRoleFromWorkspaceMemberInteractor)
 
 
 class TagUseCaseProvider(Provider):
     scope = Scope.REQUEST
 
-    create_tag = provide(CreateTagUseCase)
-    get_tag_by_id = provide(GetTagByIdUseCase)
-    get_tag_by_workspace = provide(GetTagByWorkspaceUseCase)
-    update_tag = provide(UpdateTagUseCase)
-    delete_tag = provide(DeleteTagUseCase)
+    create_tag = provide(CreateTagInteractor)
+    get_tag_by_id = provide(GetTagByIdInteractor)
+    get_tag_by_workspace = provide(GetTagByWorkspaceInteractor)
+    update_tag = provide(UpdateTagInteractor)
+    delete_tag = provide(DeleteTagInteractor)
 
 
 class CategoryUseCaseProvider(Provider):
     scope = Scope.REQUEST
 
-    create_category = provide(CreateCategoryUseCase)
-    get_category_by_id = provide(GetCategoryByIdUseCase)
-    get_category_by_workspace = provide(GetCategoryByWorkspaceUseCase)
-    update_category = provide(UpdateCategoryUseCase)
-    delete_category = provide(DeleteCategoryUseCase)
+    create_category = provide(CreateCategoryInteractor)
+    get_category_by_workspace = provide(GetCategoryByWorkspaceInteractor)
+    update_category = provide(UpdateCategoryInteractor)
+    delete_category = provide(DeleteCategoryInteractor)
 
 
 class WorkspaceInviteUseCaseProvider(Provider):
     scope = Scope.REQUEST
 
-    create_workspace_invite = provide(CreateWorkspaceInviteUseCase)
-    get_workspace_invite_by_id = provide(GetWorkspaceIdByInviteCodeUseCase)
-    get_workspace_invite_by_workspace = provide(GetWorkspaceInviteByWorkspaceUseCase)
-    update_workspace_invite = provide(UpdateWorkspaceInviteUseCase)
-    delete_workspace_invite = provide(DeleteWorkspaceInviteUseCase)
+    create_workspace_invite = provide(CreateWorkspaceInviteInteractor)
+    get_workspace_invite_by_id = provide(GetWorkspaceIdByInviteCodeInteractor)
+    get_workspace_invite_by_workspace = provide(GetWorkspaceInviteByWorkspaceInteractor)
+    update_workspace_invite = provide(UpdateWorkspaceInviteInteractor)
+    delete_workspace_invite = provide(DeleteWorkspaceInviteInteractor)
 
 
 class ProjectUseCaseProvider(Provider):

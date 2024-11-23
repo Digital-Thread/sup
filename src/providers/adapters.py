@@ -37,7 +37,7 @@ from src.apps.workspace.repositories import (
     IWorkspaceInviteRepository,
     IWorkspaceRepository,
 )
-from src.apps.workspace.repositories.i_user_workspace_role_repository import IUserWorkspaceRoleRepository
+from src.apps.workspace.repositories.user_workspace_role_repository import IUserWorkspaceRoleRepository
 from src.config import Config, DbConfig, JWTConfig, RedisConfig, SMTPConfig
 from src.data_access.repositories import (
     CategoryRepository,

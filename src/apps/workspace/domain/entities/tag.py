@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from src.apps.workspace.domain.entities.validator_mixins import (
+from src.apps.workspace.domain.validator_mixins import (
     ColorValidatorMixin,
     NameValidatorMixin,
 )
@@ -8,7 +8,7 @@ from src.apps.workspace.domain.types_ids import TagId, WorkspaceId
 
 
 @dataclass
-class Tag(NameValidatorMixin, ColorValidatorMixin):
+class TagEntity(NameValidatorMixin, ColorValidatorMixin):
     _workspace_id: WorkspaceId
     _name: str
     _color: str
