@@ -7,9 +7,10 @@ from fastapi import APIRouter, HTTPException, status
 from src.api.dtos.project import (
     CreateProjectRequestDTO,
     ProjectResponseDTO,
+    ProjectWithParticipantsResponseDTO,
     UpdateProjectRequestDTO,
 )
-from src.apps.project.dtos import ProjectFindDTO, ProjectCreateDTO, ProjectUpdateDTO
+from src.apps.project.dtos import ProjectCreateDTO, ProjectFindDTO, ProjectUpdateDTO
 from src.apps.project.exceptions import ProjectException
 from src.apps.project.interactors import (
     CreateProjectInteractor,
@@ -17,6 +18,7 @@ from src.apps.project.interactors import (
     GetProjectByWorkspaceInteractor,
     UpdateProjectInteractor,
 )
+from src.apps.project.use_cases.get_project_by_id import GetProjectByIdUseCase
 
 project_router = APIRouter(route_class=DishkaRoute)
 
@@ -32,6 +34,22 @@ async def create_project(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
 
     return {'redirect_url': '/'}
+
+
+@project_router.get(
+    '/{workspace_id}/{project_id}',
+    status_code=status.HTTP_200_OK,
+    response_model=ProjectWithParticipantsResponseDTO,
+)
+async def get_project_by_id(
+    workspace_id: UUID, project_id: int, use_case: FromDishka[GetProjectByIdUseCase]
+) -> ProjectWithParticipantsResponseDTO:
+    try:
+        response = await use_case.execute(ProjectFindDTO(workspace_id=workspace_id, id=project_id))
+    except ProjectException as error:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
+    else:
+        return ProjectWithParticipantsResponseDTO(**response.__dict__)
 
 
 @project_router.get('/', status_code=status.HTTP_200_OK, response_model=list[ProjectResponseDTO])

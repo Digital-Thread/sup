@@ -1,4 +1,5 @@
 from dataclasses import asdict
+from uuid import UUID
 
 from src.apps.project.domain.project import ProjectEntity
 from src.apps.project.domain.types_ids import (
@@ -12,12 +13,32 @@ from src.apps.project.dtos import (
     ProjectCreateDTO,
     ProjectUpdateDTO,
     ProjectWithParticipantCountDTO,
+    ProjectWithParticipantsDTO,
 )
 
 
 class ProjectMapper:
     @staticmethod
-    def entity_to_dto(project: ProjectEntity) -> ProjectWithParticipantCountDTO:
+    def entity_to_dto(
+        project: ProjectEntity, participants: list[dict[str, UUID | str | bool]]
+    ) -> ProjectWithParticipantsDTO:
+        return ProjectWithParticipantsDTO(
+            id=project.id,
+            owner_id=project.owner_id,
+            workspace_id=project.workspace_id,
+            name=project.name,
+            description=project.description,
+            logo=project.logo,
+            status=project.status,
+            created_at=project.created_at,
+            assigned_to=project.assigned_to,
+            participants=participants,
+        )
+
+    @staticmethod
+    def entity_to_dto_with_participant_count(
+        project: ProjectEntity,
+    ) -> ProjectWithParticipantCountDTO:
         return ProjectWithParticipantCountDTO(**asdict(project))
 
     @staticmethod

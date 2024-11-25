@@ -5,7 +5,7 @@ from src.apps.project.domain.types_ids import (
     AssignedId,
     OwnerId,
     ProjectId,
-    WorkspaceId,
+    WorkspaceId, ParticipantId,
 )
 from src.data_access.models.project import ProjectModel
 from src.data_access.models.project_participants import ProjectParticipantsModel
@@ -24,6 +24,7 @@ class ProjectMapper:
             _status=StatusProject(project_model.status),
             created_at=project_model.created_at,
             assigned_to=AssignedId(project_model.assigned_to),
+            participant_ids=[ParticipantId(participant.participant_id) for participant in project_model.participants],
         )
         return project
 

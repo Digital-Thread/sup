@@ -45,3 +45,17 @@ class ProjectUpdateDTO:
     status: StatusProject | None = None
     assigned_to: UUID | None = None
     participant_ids: list[UUID] | None = None
+
+
+@dataclass
+class ProjectWithParticipantsDTO:
+    id: int
+    workspace_id: UUID
+    owner_id: UUID
+    name: str
+    logo: str | None
+    description: str | None
+    status: StatusProject
+    created_at: datetime | None
+    assigned_to: UUID | None
+    participants: list[dict[str, UUID | str | bool]]
