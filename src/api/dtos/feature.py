@@ -15,8 +15,7 @@ from src.apps.feature.domain import (
     UserId,
     WorkspaceId,
 )
-from src.apps.feature.exceptions import FeatureUpdateError
-from src.apps.feature.repository import FilterField, OrderByField, SortOrder
+from src.apps.feature import FeatureUpdateError, FilterField, OrderByField, SortOrder
 
 
 class SuccessResponse(BaseModel):

@@ -1,8 +1,8 @@
+from src.apps.feature.query_parameters import FeatureListQuery
 from src.apps.feature.mapper import FeatureMapper
 from src.apps.feature.domain import WorkspaceId
 from src.apps.feature.dtos import FeatureOutputDTO
 from src.apps.feature.interactors.base_interactor import BaseInteractor
-from src.apps.feature.repository import FeatureListQuery
 
 
 class GetAllFeaturesInteractor(BaseInteractor):

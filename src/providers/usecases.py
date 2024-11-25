@@ -18,7 +18,7 @@ from src.apps.comment import (
     UpdateCommentInteractor,
 )
 from src.apps.comment.domain import Interactor
-from src.apps.feature import (
+from src.apps.feature.interactors import (
     CreateFeatureInteractor,
     DeleteFeatureInteractor,
     GetAllFeaturesInteractor,

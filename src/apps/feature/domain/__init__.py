@@ -1,16 +1,3 @@
-__all__ = (
-    'FeatureEntity',
-    'Priority',
-    'Status',
-    'OptionalFeatureUpdateFields',
-    'FeatureId',
-    'OwnerId',
-    'ProjectId',
-    'TagId',
-    'UserId',
-    'WorkspaceId',
-)
-
 from src.apps.feature.domain.types_ids import (
     FeatureId,
     OwnerId,
@@ -24,4 +11,17 @@ from src.apps.feature.domain.feature import (
     OptionalFeatureUpdateFields,
     Priority,
     Status,
+)
+
+__all__ = (
+    'FeatureEntity',
+    'Priority',
+    'Status',
+    'OptionalFeatureUpdateFields',
+    'FeatureId',
+    'OwnerId',
+    'ProjectId',
+    'TagId',
+    'UserId',
+    'WorkspaceId',
 )

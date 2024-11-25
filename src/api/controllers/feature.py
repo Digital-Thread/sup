@@ -12,25 +12,22 @@ from src.api.dtos.feature import (
     SuccessResponse,
     UpdateFeatureRequestDTO,
 )
-from src.apps.feature import (
+from src.apps.feature.interactors import (
     CreateFeatureInteractor,
     DeleteFeatureInteractor,
-    FeatureInputDTO,
-    FeatureUpdateDTO,
     GetAllFeaturesInteractor,
     GetFeatureInteractor,
     UpdateFeatureInteractor,
 )
 from src.apps.feature.domain import FeatureId, OptionalFeatureUpdateFields
-from src.apps.feature import FeatureListQuery
-from apps.feature.repository import OrderBy, PaginateParams
+from src.apps.feature import FeatureListQuery, FeatureInputDTO, FeatureUpdateDTO, OrderBy, PaginateParams
 
 feature_router = APIRouter(route_class=DishkaRoute)
 
 
 @feature_router.post('/', status_code=status.HTTP_201_CREATED, response_model=SuccessResponse)
 async def create_feature(
-    dto: CreateFeatureRequestDTO, interactor: FromDishka[CreateFeatureInteractor]
+        dto: CreateFeatureRequestDTO, interactor: FromDishka[CreateFeatureInteractor]
 ) -> SuccessResponse:
     feature = FeatureInputDTO(**dto.model_dump())
     await interactor.execute(dto=feature)
@@ -40,7 +37,7 @@ async def create_feature(
 
 @feature_router.get('/', status_code=status.HTTP_200_OK, response_model=list[FeatureResponseDTO])
 async def get_features(
-    query: Annotated[QueryParams, Query()], interactor: FromDishka[GetAllFeaturesInteractor]
+        query: Annotated[QueryParams, Query()], interactor: FromDishka[GetAllFeaturesInteractor]
 ) -> list[FeatureResponseDTO]:
     workspace_id = query.workspace_id
     query_params = FeatureListQuery(
@@ -56,8 +53,8 @@ async def get_features(
     '/{feature_id}', status_code=status.HTTP_200_OK, response_model=FeatureResponseDTO
 )
 async def get_feature_by_id(
-    feature_id: FeatureId,
-    interactor: FromDishka[GetFeatureInteractor],
+        feature_id: FeatureId,
+        interactor: FromDishka[GetFeatureInteractor],
 ) -> FeatureResponseDTO:
     feature = await interactor.execute(feature_id=feature_id)
     return FeatureResponseDTO(**asdict(feature))
@@ -67,9 +64,9 @@ async def get_feature_by_id(
     '/{feature_id}', status_code=status.HTTP_200_OK, response_model=SuccessResponse
 )
 async def update_feature(
-    feature_id: FeatureId,
-    dto: UpdateFeatureRequestDTO,
-    interactor: FromDishka[UpdateFeatureInteractor],
+        feature_id: FeatureId,
+        dto: UpdateFeatureRequestDTO,
+        interactor: FromDishka[UpdateFeatureInteractor],
 ) -> SuccessResponse:
     update_data = FeatureUpdateDTO(
         id=feature_id,
@@ -81,7 +78,7 @@ async def update_feature(
 
 @feature_router.delete('/{feature_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_feature(
-    feature_id: FeatureId,
-    interactor: FromDishka[DeleteFeatureInteractor],
+        feature_id: FeatureId,
+        interactor: FromDishka[DeleteFeatureInteractor],
 ) -> None:
     await interactor.execute(feature_id=feature_id)
