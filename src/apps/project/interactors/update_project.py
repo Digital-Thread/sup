@@ -1,8 +1,6 @@
-from uuid import UUID
-
 from src.apps.project.domain.project import ProjectEntity
 from src.apps.project.domain.types_ids import ParticipantId, ProjectId, WorkspaceId
-from src.apps.project.dtos import UpdateProjectAppDTO
+from src.apps.project.dtos import ProjectUpdateDTO, ProjectFindDTO
 from src.apps.project.exceptions import (
     ParticipantNotFound,
     ProjectException,
@@ -18,13 +16,13 @@ class UpdateProjectInteractor:
         self._project_repository = project_repository
 
     async def execute(
-        self, project_id: int, workspace_id: UUID, update_data: UpdateProjectAppDTO
+        self, project_find_data: ProjectFindDTO, updated_data: ProjectUpdateDTO
     ) -> None:
         existing_project = await self._get_existing_project_in_workspace(
-            ProjectId(project_id), WorkspaceId(workspace_id)
+            ProjectId(project_find_data.id), WorkspaceId(project_find_data.workspace_id)
         )
-        await self.update_participant(existing_project, update_data)
-        updated_project = self._apply_update_data_to_project(existing_project, update_data)
+        await self.update_participant(existing_project, updated_data)
+        updated_project = self._apply_update_data_to_project(existing_project, updated_data)
 
         try:
             await self._project_repository.update_project(updated_project)
@@ -42,7 +40,7 @@ class UpdateProjectInteractor:
             return existing_project
 
     async def update_participant(
-        self, existing_project: ProjectEntity, update_data: UpdateProjectAppDTO
+        self, existing_project: ProjectEntity, update_data: ProjectUpdateDTO
     ) -> None:
         if self._has_participants_changed(existing_project, update_data):
             try:
@@ -56,7 +54,7 @@ class UpdateProjectInteractor:
 
     @staticmethod
     def _has_participants_changed(
-        existing_project: ProjectEntity, update_data: UpdateProjectAppDTO
+        existing_project: ProjectEntity, update_data: ProjectUpdateDTO
     ) -> bool:
         if (
             update_data.participant_ids
@@ -68,7 +66,7 @@ class UpdateProjectInteractor:
 
     @staticmethod
     def _apply_update_data_to_project(
-        project: ProjectEntity, update_data: UpdateProjectAppDTO
+        project: ProjectEntity, update_data: ProjectUpdateDTO
     ) -> ProjectEntity:
         try:
             updated_project = ProjectMapper.update_data(project, update_data)

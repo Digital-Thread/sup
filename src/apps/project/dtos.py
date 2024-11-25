@@ -6,7 +6,7 @@ from src.apps.project.domain.project import StatusProject
 
 
 @dataclass
-class CreateProjectAppDTO:
+class ProjectCreateDTO:
     workspace_id: UUID
     owner_id: UUID
     name: str
@@ -18,7 +18,7 @@ class CreateProjectAppDTO:
 
 
 @dataclass
-class ProjectWithParticipantCountAppDTO:
+class ProjectWithParticipantCountDTO:
     id: int
     workspace_id: UUID
     owner_id: UUID
@@ -32,7 +32,13 @@ class ProjectWithParticipantCountAppDTO:
 
 
 @dataclass
-class UpdateProjectAppDTO:
+class ProjectFindDTO:
+    id: int
+    workspace_id: UUID
+
+
+@dataclass
+class ProjectUpdateDTO:
     name: str | None = None
     logo: str | None = None
     description: str | None = None

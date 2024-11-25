@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from src.apps.project.domain.project import StatusProject
 
 
-class CreateProjectDTO(BaseModel):
+class CreateProjectRequestDTO(BaseModel):
     workspace_id: UUID
     owner_id: UUID
     name: str
@@ -17,7 +17,7 @@ class CreateProjectDTO(BaseModel):
     participant_ids: list[UUID] | None = Field(default=None)
 
 
-class ResponseProjectDTO(BaseModel):
+class ProjectResponseDTO(BaseModel):
     id: int
     workspace_id: UUID
     owner_id: UUID
@@ -32,7 +32,7 @@ class ResponseProjectDTO(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class UpdateProjectDTO(BaseModel):
+class UpdateProjectRequestDTO(BaseModel):
     name: str | None = Field(default=None)
     logo: str | None = Field(default=None)
     description: str | None = Field(default=None)
