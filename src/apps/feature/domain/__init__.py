@@ -19,7 +19,7 @@ from src.apps.feature.domain.aliases import (
     UserId,
     WorkspaceId,
 )
-from src.apps.feature.domain.entities.feature import (
+from apps.feature.domain.feature import (
     Feature,
     OptionalFeatureUpdateFields,
     Priority,
