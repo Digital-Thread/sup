@@ -37,6 +37,7 @@ from src.apps.workspace.repositories import (
     IWorkspaceInviteRepository,
     IWorkspaceRepository,
 )
+from src.apps.workspace.repositories.user_workspace_role_repository import IUserWorkspaceRoleRepository
 from src.config import Config, DbConfig, JWTConfig, RedisConfig, SMTPConfig
 from src.data_access.repositories import (
     CategoryRepository,
@@ -52,6 +53,7 @@ from src.data_access.repositories.meet import MeetRepository
 from src.data_access.repositories.meet_participant import ParticipantRepository
 from src.data_access.repositories.project_repository import ProjectRepository
 from src.data_access.repositories.user_repository import UserRepository
+from src.data_access.repositories.user_workspace_role_repository import UserWorkspaceRoleRepository
 
 
 class SqlalchemyProvider(Provider):
@@ -115,6 +117,7 @@ class RepositoriesProvider(Provider):
     )
     category_repository = provide(CategoryRepository, provides=ICategoryRepository)
     role_repository = provide(RoleRepository, provides=IRoleRepository)
+    user_workspace_role_repository = provide(UserWorkspaceRoleRepository, provides=IUserWorkspaceRoleRepository)
     tag_repository = provide(TagRepository, provides=ITagRepository)
     project_repository = provide(ProjectRepository, provides=IProjectRepository)
 

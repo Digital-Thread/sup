@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from src.apps.workspace.domain.entities.validator_mixins import (
+from src.apps.workspace.domain.validator_mixins import (
     ColorValidatorMixin,
     NameValidatorMixin,
 )
@@ -8,7 +8,7 @@ from src.apps.workspace.domain.types_ids import TagId, WorkspaceId
 
 
 @dataclass
-class Tag(NameValidatorMixin, ColorValidatorMixin):
+class TagEntity(NameValidatorMixin, ColorValidatorMixin):
     _workspace_id: WorkspaceId
     _name: str
     _color: str
@@ -21,6 +21,13 @@ class Tag(NameValidatorMixin, ColorValidatorMixin):
     @property
     def id(self) -> TagId | None:
         return self._id
+
+    @id.setter
+    def id(self, new_id: TagId) -> None:
+        if self._id is not None:
+            raise AttributeError('Идентификатор тега уже установлен')
+
+        self._id = new_id
 
     @property
     def workspace_id(self) -> WorkspaceId:

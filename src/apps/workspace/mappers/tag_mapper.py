@@ -1,17 +1,17 @@
 from dataclasses import asdict
 
-from src.apps.workspace.domain.entities.tag import Tag
+from src.apps.workspace.domain.entities.tag import TagEntity
 from src.apps.workspace.domain.types_ids import TagId, WorkspaceId
 from src.apps.workspace.dtos.tag_dtos import TagAppDTO, UpdateTagAppDTO
 from src.apps.workspace.mappers.base_mapper import BaseMapper
 
 
-class TagMapper(BaseMapper[Tag, TagAppDTO]):
+class TagMapper(BaseMapper[TagEntity, TagAppDTO]):
 
     @staticmethod
-    def dto_to_entity(dto: TagAppDTO) -> Tag:
+    def dto_to_entity(dto: TagAppDTO) -> TagEntity:
 
-        return Tag(
+        return TagEntity(
             _workspace_id=WorkspaceId(dto.workspace_id),
             _name=dto.name,
             _color=dto.color,
@@ -19,9 +19,9 @@ class TagMapper(BaseMapper[Tag, TagAppDTO]):
         )
 
     @staticmethod
-    def update_data(existing_tag: Tag, dto: UpdateTagAppDTO) -> Tag:
+    def update_data(existing_tag: TagEntity, dto: UpdateTagAppDTO) -> TagEntity:
         for field, value in asdict(dto).items():
-            if value is not None:
+            if value is not None and field in ['name', 'color']:
                 setattr(existing_tag, field, value)
 
         return existing_tag

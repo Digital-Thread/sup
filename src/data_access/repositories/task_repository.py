@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 from src.apps.task.domain import FeatureId, TagId, Task, TaskId
 from src.apps.task.exceptions import RepositoryError
 from src.apps.task.repositories import ITaskRepository, TaskListQuery
-from src.data_access.converters.task_converter import TaskConverter
+from src.data_access.mappers.task_converter import TaskConverter
 from src.data_access.models import TagModel, TaskModel
 
 

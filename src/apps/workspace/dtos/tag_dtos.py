@@ -1,6 +1,11 @@
 from dataclasses import dataclass
-from typing import TypedDict
 from uuid import UUID
+
+
+@dataclass
+class BaseTagDTO:
+    id: int
+    workspace_id: UUID
 
 
 @dataclass
@@ -8,17 +13,24 @@ class CreateTagAppDTO:
     name: str
     color: str
     workspace_id: UUID
+    
+    
+@dataclass
+class TagAppDTO(BaseTagDTO):
+    name: str
+    color: str
 
 
 @dataclass
-class TagAppDTO:
-    id: int
-    name: str
-    color: str
+class GetTagsAppDTO:
     workspace_id: UUID
 
 
 @dataclass
-class UpdateTagAppDTO:
+class UpdateTagAppDTO(BaseTagDTO):
     name: str | None = None
     color: str | None = None
+
+
+class DeleteTagAppDTO(BaseTagDTO):
+    pass

@@ -13,11 +13,11 @@ class StatusInvite(Enum):
 
 
 @dataclass
-class WorkspaceInvite:
+class WorkspaceInviteEntity:
     EXPIRATION_DAYS = 7
 
     _workspace_id: WorkspaceId
-    id: InviteId | None = field(default=None)
+    _id: InviteId | None = field(default=None)
     code: UUID = field(default_factory=uuid4)
     _status: StatusInvite = field(default=StatusInvite.ACTIVE)
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
@@ -49,6 +49,17 @@ class WorkspaceInvite:
     def _validate_status_change(self, new_status: StatusInvite) -> None:
         if new_status == self._status:
             raise ValueError('Статус уже установлен')
+
+    @property
+    def id(self) -> InviteId:
+        return self._id
+
+    @id.setter
+    def id(self, new_id: InviteId) -> None:
+        if self._id is not None:
+            raise AttributeError('Идентификатор ссылки приглашения уже установлен')
+
+        self._id = new_id
 
     @property
     def workspace_id(self) -> WorkspaceId:
