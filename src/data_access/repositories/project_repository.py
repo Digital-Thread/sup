@@ -15,7 +15,7 @@ from src.apps.project.exceptions import (
     ProjectNotFound,
     WorkspaceForProjectNotFound,
 )
-from src.apps.project.i_project_repository import IProjectRepository
+from src.apps.project.project_repository import IProjectRepository
 from src.data_access.mappers.project_mapper import ProjectMapper
 from src.data_access.models.project import ProjectModel
 from src.data_access.models.project_participants import ProjectParticipantsModel

@@ -3,7 +3,7 @@ from uuid import UUID
 from src.apps.project.domain.types_ids import WorkspaceId
 from src.apps.project.dtos import ProjectWithParticipantCountAppDTO
 from src.apps.project.exceptions import ProjectException, WorkspaceForProjectNotFound
-from src.apps.project.i_project_repository import IProjectRepository
+from src.apps.project.project_repository import IProjectRepository
 from src.apps.project.mapper import ProjectMapper
 
 

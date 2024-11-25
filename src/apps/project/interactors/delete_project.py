@@ -6,7 +6,7 @@ from src.apps.project.exceptions import (
     ProjectNotFound,
     WorkspaceForProjectNotFound,
 )
-from src.apps.project.i_project_repository import IProjectRepository
+from src.apps.project.project_repository import IProjectRepository
 
 
 class DeleteProjectInteractor:
