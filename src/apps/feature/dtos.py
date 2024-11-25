@@ -1,9 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Self
 
 from src.apps.feature.domain import (
-    FeatureEntity,
     FeatureId,
     OptionalFeatureUpdateFields,
     OwnerId,
@@ -51,21 +49,3 @@ class FeatureOutputDTO:
     status: Status = Status.NEW
     tags: list[TagId] | None = None
     members: list[UserId] | None = None
-
-    @classmethod
-    def from_entity(cls, feature_id: FeatureId, entity: FeatureEntity) -> Self:
-        return cls(
-            id=feature_id,
-            workspace_id=entity.workspace_id,
-            name=entity.name,
-            project_id=entity.project_id,
-            owner_id=entity.owner_id,
-            created_at=entity.created_at,
-            updated_at=entity.updated_at,
-            assigned_to=entity.assigned_to,
-            description=entity.description,
-            priority=entity.priority,
-            status=entity.status,
-            tags=entity.tags,
-            members=entity.members,
-        )

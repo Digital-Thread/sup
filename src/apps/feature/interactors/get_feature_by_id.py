@@ -1,3 +1,4 @@
+from src.apps.feature.mapper import FeatureMapper
 from src.apps.feature import FeatureOutputDTO
 from src.apps.feature.domain import FeatureId
 from src.apps.feature.exceptions import FeatureDoesNotExistError
@@ -10,5 +11,5 @@ class GetFeatureInteractor(BaseInteractor):
         if not feature:
             raise FeatureDoesNotExistError(feature_id)
 
-        feature_dto = FeatureOutputDTO.from_entity(feature_id=feature_id, entity=feature)
+        feature_dto = FeatureMapper.entity_to_dto(feature_id=feature_id, entity=feature)
         return feature_dto
