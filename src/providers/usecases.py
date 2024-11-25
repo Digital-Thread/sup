@@ -25,12 +25,13 @@ from src.apps.feature import (
     GetFeatureInteractor,
     UpdateFeatureInteractor,
 )
-from src.apps.project.use_cases import (
-    CreateProjectUseCase,
-    DeleteProjectUseCase,
-    GetProjectByWorkspaceUseCase,
-    UpdateProjectUseCase,
+from src.apps.project.interactors import (
+    CreateProjectInteractor,
+    DeleteProjectInteractor,
+    GetProjectByWorkspaceInteractor,
+    UpdateProjectInteractor,
 )
+from src.apps.project.use_cases.get_project_by_id import GetProjectByIdUseCase
 from src.apps.task import (
     CreateTaskInteractor,
     DeleteTaskInteractor,
@@ -60,6 +61,7 @@ from src.apps.workspace.interactors.tag_interactors import (
     GetTagByWorkspaceInteractor,
     UpdateTagInteractor,
 )
+from src.apps.workspace.interactors.workspace_interactors.get_workspace_members import GetWorkspaceMembersInteractor
 from src.apps.workspace.interactors.workspace_invite_interactors import (
     CreateWorkspaceInviteInteractor,
     DeleteWorkspaceInviteInteractor,
@@ -110,6 +112,7 @@ class WorkspaceUseCaseProvider(Provider):
     update_workspace = provide(UpdateWorkspaceInteractor)
     delete_workspace = provide(DeleteWorkspaceInteractor)
     add_member = provide(AddMemberInWorkspaceInteractor)
+    get_workspace_member = provide(GetWorkspaceMembersInteractor)
 
 
 class RoleUseCaseProvider(Provider):
@@ -153,13 +156,14 @@ class WorkspaceInviteUseCaseProvider(Provider):
     delete_workspace_invite = provide(DeleteWorkspaceInviteInteractor)
 
 
-class ProjectUseCaseProvider(Provider):
+class ProjectInteractorProvider(Provider):
     scope = Scope.REQUEST
 
-    create_project = provide(CreateProjectUseCase)
-    get_project_by_workspace = provide(GetProjectByWorkspaceUseCase)
-    update_project = provide(UpdateProjectUseCase)
-    delete_project = provide(DeleteProjectUseCase)
+    create_project = provide(CreateProjectInteractor)
+    get_project_by_workspace = provide(GetProjectByWorkspaceInteractor)
+    get_project_by_id = provide(GetProjectByIdUseCase)
+    update_project = provide(UpdateProjectInteractor)
+    delete_project = provide(DeleteProjectInteractor)
 
 
 class FeatureInteractorProvider(Provider):
