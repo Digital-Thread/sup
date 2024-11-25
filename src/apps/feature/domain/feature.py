@@ -3,7 +3,7 @@ from enum import IntEnum
 from re import match
 from typing import TypedDict
 
-from src.apps.feature.domain.aliases import (
+from src.apps.feature.domain.types_ids import (
     OwnerId,
     ProjectId,
     TagId,

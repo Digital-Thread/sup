@@ -11,7 +11,7 @@ __all__ = (
     'WorkspaceId',
 )
 
-from src.apps.feature.domain.aliases import (
+from src.apps.feature.domain.types_ids import (
     FeatureId,
     OwnerId,
     ProjectId,
