@@ -1,5 +1,5 @@
 from src.apps.feature.domain import (
-    Feature,
+    FeatureEntity,
     OwnerId,
     ProjectId,
     TagId,
@@ -12,7 +12,7 @@ from src.data_access.models import FeatureModel
 class FeatureConverter:
     MODEL = FeatureModel
 
-    async def map_entity_to_model(self, feature_entity: Feature) -> FeatureModel:
+    async def map_entity_to_model(self, feature_entity: FeatureEntity) -> FeatureModel:
         feature_model = self.MODEL(
             workspace_id=feature_entity.workspace_id,
             name=feature_entity.name,
@@ -28,8 +28,8 @@ class FeatureConverter:
         return feature_model
 
     @staticmethod
-    def map_model_to_entity(feature_model: FeatureModel) -> Feature:
-        feature = Feature(
+    def map_model_to_entity(feature_model: FeatureModel) -> FeatureEntity:
+        feature = FeatureEntity(
             workspace_id=WorkspaceId(feature_model.workspace_id),
             name=feature_model.name,
             project_id=ProjectId(feature_model.project_id),

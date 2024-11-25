@@ -1,5 +1,5 @@
 __all__ = (
-    'Feature',
+    'FeatureEntity',
     'Priority',
     'Status',
     'OptionalFeatureUpdateFields',
@@ -20,7 +20,7 @@ from src.apps.feature.domain.aliases import (
     WorkspaceId,
 )
 from apps.feature.domain.feature import (
-    Feature,
+    FeatureEntity,
     OptionalFeatureUpdateFields,
     Priority,
     Status,

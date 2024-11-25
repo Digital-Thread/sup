@@ -4,7 +4,7 @@ from enum import Enum
 from typing import Literal, NamedTuple, TypedDict
 
 from src.apps.feature.domain import (
-    Feature,
+    FeatureEntity,
     FeatureId,
     ProjectId,
     Status,
@@ -55,15 +55,15 @@ class FeatureListQuery:
 class IFeatureRepository(ABC):
 
     @abstractmethod
-    async def save(self, feature: Feature) -> None:
+    async def save(self, feature: FeatureEntity) -> None:
         pass
 
     @abstractmethod
-    async def get_by_id(self, feature_id: FeatureId) -> Feature | None:
+    async def get_by_id(self, feature_id: FeatureId) -> FeatureEntity | None:
         pass
 
     @abstractmethod
-    async def update(self, feature_id: FeatureId, feature: Feature) -> None:
+    async def update(self, feature_id: FeatureId, feature: FeatureEntity) -> None:
         pass
 
     @abstractmethod
@@ -73,5 +73,5 @@ class IFeatureRepository(ABC):
     @abstractmethod
     async def get_list(
         self, workspace_id: WorkspaceId, query: FeatureListQuery
-    ) -> list[tuple[FeatureId, Feature]]:
+    ) -> list[tuple[FeatureId, FeatureEntity]]:
         pass

@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from src.apps.feature.domain import Feature, FeatureId, WorkspaceId
+from src.apps.feature.domain import FeatureEntity, FeatureId, WorkspaceId
 from src.apps.feature.exceptions import RepositoryError
 from src.apps.feature.repositories import FeatureListQuery, IFeatureRepository
 from src.data_access.mappers.feature_converter import FeatureConverter
@@ -38,7 +38,7 @@ class FeatureRepository(IFeatureRepository):
 
         return feature_model
 
-    async def save(self, feature: Feature) -> None:
+    async def save(self, feature: FeatureEntity) -> None:
         feature_model = await self.converter.map_entity_to_model(feature)
         feature_model.tags = await self._get_m2m_objects(feature.tags, TagModel)
         feature_model.members = await self._get_m2m_objects(feature.members, UserModel)
@@ -54,14 +54,14 @@ class FeatureRepository(IFeatureRepository):
             else:
                 raise
 
-    async def get_by_id(self, feature_id: FeatureId) -> Feature | None:
+    async def get_by_id(self, feature_id: FeatureId) -> FeatureEntity | None:
         feature_model = await self.get_model(feature_id=feature_id)
         if feature_model:
             return self.converter.map_model_to_entity(feature_model)
         else:
             return None
 
-    async def update(self, feature_id: FeatureId, feature: Feature) -> None:
+    async def update(self, feature_id: FeatureId, feature: FeatureEntity) -> None:
         feature_model = await self.get_model(feature_id=feature_id)
         if feature_model:
             feature_model.name = feature.name
@@ -93,7 +93,7 @@ class FeatureRepository(IFeatureRepository):
 
     async def get_list(
         self, workspace_id: WorkspaceId, query: FeatureListQuery
-    ) -> list[tuple[FeatureId, Feature]] | None:
+    ) -> list[tuple[FeatureId, FeatureEntity]] | None:
         conditions = [self.model.workspace_id == workspace_id]
 
         filters = query.filters

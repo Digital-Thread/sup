@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Self
 
 from src.apps.feature.domain import (
-    Feature,
+    FeatureEntity,
     FeatureId,
     OptionalFeatureUpdateFields,
     OwnerId,
@@ -53,7 +53,7 @@ class FeatureOutputDTO:
     members: list[UserId] | None = None
 
     @classmethod
-    def from_entity(cls, feature_id: FeatureId, entity: Feature) -> Self:
+    def from_entity(cls, feature_id: FeatureId, entity: FeatureEntity) -> Self:
         return cls(
             id=feature_id,
             workspace_id=entity.workspace_id,

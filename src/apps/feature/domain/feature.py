@@ -57,7 +57,7 @@ class OptionalFeatureUpdateFields(TypedDict, total=False):
     members: list[UserId] | None
 
 
-class Feature:
+class FeatureEntity:
 
     def __init__(
         self,

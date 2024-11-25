@@ -1,5 +1,5 @@
 from src.apps.feature import FeatureInputDTO
-from src.apps.feature.domain import Feature
+from src.apps.feature.domain import FeatureEntity
 from src.apps.feature.exceptions import FeatureCreateError, RepositoryError
 from src.apps.feature.interactors.base_interactor import BaseInteractor
 
@@ -7,7 +7,7 @@ from src.apps.feature.interactors.base_interactor import BaseInteractor
 class CreateFeatureInteractor(BaseInteractor):
     async def execute(self, dto: FeatureInputDTO) -> None:
         try:
-            feature = Feature(
+            feature = FeatureEntity(
                 workspace_id=dto.workspace_id,
                 name=dto.name,
                 project_id=dto.project_id,
