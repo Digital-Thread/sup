@@ -9,9 +9,9 @@ from src.apps.project.domain.types_ids import (
     WorkspaceId,
 )
 from src.apps.project.dtos import (
-    CreateProjectAppDTO,
-    ProjectWithParticipantCountDTO,
+    ProjectCreateDTO,
     ProjectUpdateDTO,
+    ProjectWithParticipantCountDTO,
 )
 
 
@@ -21,7 +21,7 @@ class ProjectMapper:
         return ProjectWithParticipantCountDTO(**asdict(project))
 
     @staticmethod
-    def dto_to_entity(dto: CreateProjectAppDTO) -> ProjectEntity:
+    def dto_to_entity(dto: ProjectCreateDTO) -> ProjectEntity:
         return ProjectEntity(
             _id=ProjectId(dto.id) if isinstance(dto, ProjectWithParticipantCountDTO) else None,
             _workspace_id=WorkspaceId(dto.workspace_id),

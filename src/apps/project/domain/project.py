@@ -41,6 +41,9 @@ class ProjectEntity:
 
     @staticmethod
     def _validate_name(name: str) -> None:
+        if not name.strip():
+            raise ValueError(f'Имя проекта должно содержать хотя бы одну букву')
+
         pattern = r'^[a-zA-Zа-яА-ЯёЁ\s]{1,20}$'
         if not bool(match(pattern, name)):
             raise ValueError(
@@ -49,13 +52,24 @@ class ProjectEntity:
             )
 
     @staticmethod
-    def _validate_description(description: str | None) -> None:
-        if not len(description) <= 500:
-            raise ValueError('Длина описания не должна превышать 500 символов.')
+    def _validate_description(description: str) -> None:
+        pattern = r'^[a-zA-Zа-яА-ЯёЁ\s\.\-]{1,500}$'
+        if not bool(match(pattern, description)):
+            raise ValueError(
+                f'Длина описания проекта не должна превышать 500 символов.'
+                f'И содержать только буквы латинского и русского алфавитов, включая символы пробела и - .'
+            )
 
     @property
     def id(self) -> ProjectId | None:
         return self._id
+
+    @id.setter
+    def id(self, new_id: ProjectId) -> None:
+        if self._id is not None:
+            raise AttributeError('Идентификатор проекта уже установлен')
+
+        self._id = new_id
 
     @property
     def owner_id(self) -> OwnerId:

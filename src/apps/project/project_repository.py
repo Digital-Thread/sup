@@ -11,11 +11,15 @@ class IProjectRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def find_by_id(self, project_id: ProjectId, workspace_id: WorkspaceId) -> ProjectEntity | None:
+    async def find_by_id(
+        self, project_id: ProjectId, workspace_id: WorkspaceId
+    ) -> ProjectEntity | None:
         raise NotImplementedError
 
     @abstractmethod
-    async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[tuple[ProjectEntity, int]]:
+    async def find_by_workspace_id(
+        self, workspace_id: WorkspaceId
+    ) -> list[tuple[ProjectEntity, int]]:
         raise NotImplementedError
 
     @abstractmethod
