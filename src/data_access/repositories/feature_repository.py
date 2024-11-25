@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectinload
 
 from src.apps.feature.domain import FeatureEntity, FeatureId, WorkspaceId
 from src.apps.feature.exceptions import RepositoryError
-from src.apps.feature.repositories import FeatureListQuery, IFeatureRepository
+from src.apps.feature import FeatureListQuery, IFeatureRepository
 from src.data_access.mappers.feature_converter import FeatureConverter
 from src.data_access.models import FeatureModel, TagModel, UserModel
 

@@ -22,7 +22,7 @@ from src.apps.feature import (
     UpdateFeatureInteractor,
 )
 from src.apps.feature.domain import FeatureId, OptionalFeatureUpdateFields
-from src.apps.feature.repositories import FeatureListQuery
+from src.apps.feature import FeatureListQuery
 from apps.feature.repository import OrderBy, PaginateParams
 
 feature_router = APIRouter(route_class=DishkaRoute)

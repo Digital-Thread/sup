@@ -8,8 +8,11 @@ __all__ = (
     'GetAllFeaturesInteractor',
     'UpdateFeatureInteractor',
     'DeleteFeatureInteractor',
+    'IFeatureRepository',
+    'FeatureListQuery',
 )
 
+from src.apps.feature.repository import IFeatureRepository, FeatureListQuery
 from src.apps.feature.dtos import FeatureInputDTO, FeatureOutputDTO, FeatureUpdateDTO
 from src.apps.feature.exceptions import FeatureError
 from src.apps.feature.interactors.create_feature import CreateFeatureInteractor
