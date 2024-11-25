@@ -17,7 +17,7 @@ from src.apps.workspace.repositories.workspace_repository import IWorkspaceRepos
 from src.data_access.mappers.workspace_mapper import WorkspaceMapper
 from src.data_access.models import (
     WorkspaceMemberModel,
-    WorkspaceModel,
+    WorkspaceModel, UserModel,
 )
 
 
@@ -94,6 +94,21 @@ class WorkspaceRepository(IWorkspaceRepository):
 
         stmt = delete(WorkspaceModel).filter_by(id=workspace_id, owner_id=owner_id)
         await self._session.execute(stmt)
+
+    async def find_workspace_members(self, workspace_id: WorkspaceId) -> dict[MemberId, str]:
+        query = select(
+            UserModel.id,
+            UserModel.first_name,
+            UserModel.last_name,
+        ).join(WorkspaceMemberModel).filter(WorkspaceMemberModel.workspace_id == workspace_id)
+
+        members = await self._session.execute(query)
+
+        return {
+            member.id: f"{member.first_name} {member.last_name}"
+            for member in members
+        }
+
 
     async def add_member(self, workspace_id: WorkspaceId, user_id: MemberId) -> None:
         stmt = WorkspaceMemberModel(workspace_id=workspace_id, user_id=user_id)

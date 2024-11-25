@@ -4,6 +4,7 @@ from .delete_workspace import DeleteWorkspaceInteractor
 from .get_by_member_id import GetWorkspaceByMemberInteractor
 from .get_workspace import GetWorkspaceByIdInteractor
 from .update_workspace import UpdateWorkspaceInteractor
+from .get_workspace_members import GetWorkspaceMembersInteractor
 
 __all__ = (
     'CreateWorkspaceInteractor',
@@ -12,4 +13,5 @@ __all__ = (
     'DeleteWorkspaceInteractor',
     'GetWorkspaceByMemberInteractor',
     'AddMemberInWorkspaceInteractor',
+    'GetWorkspaceMembersInteractor'
 )
