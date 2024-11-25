@@ -21,7 +21,7 @@ class StatusProject(Enum):
 
 
 @dataclass
-class Project:
+class ProjectEntity:
     _name: str
     _workspace_id: WorkspaceId
     _owner_id: OwnerId

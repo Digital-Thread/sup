@@ -1,6 +1,6 @@
 from typing import Any, Sequence
 
-from src.apps.project.domain.entity.project import Project, StatusProject
+from src.apps.project.domain.project import ProjectEntity, StatusProject
 from src.apps.project.domain.types_ids import (
     AssignedId,
     OwnerId,
@@ -13,8 +13,8 @@ from src.data_access.models.project_participants import ProjectParticipantsModel
 
 class ProjectMapper:
     @staticmethod
-    def model_to_entity(project_model: ProjectModel) -> Project:
-        project = Project(
+    def model_to_entity(project_model: ProjectModel) -> ProjectEntity:
+        project = ProjectEntity(
             _id=ProjectId(project_model.id),
             _workspace_id=WorkspaceId(project_model.workspace_id),
             _owner_id=OwnerId(project_model.owner_id),
@@ -28,7 +28,7 @@ class ProjectMapper:
         return project
 
     @staticmethod
-    def entity_to_model(project: Project) -> ProjectModel:
+    def entity_to_model(project: ProjectEntity) -> ProjectModel:
         project_model = ProjectModel(
             id=project.id,
             workspace_id=project.workspace_id,
@@ -52,7 +52,7 @@ class ProjectMapper:
         return project_model
 
     @staticmethod
-    def entity_to_dict(project: Project) -> dict[str, str | AssignedId]:
+    def entity_to_dict(project: ProjectEntity) -> dict[str, str | AssignedId]:
         return {
             'name': project.name,
             'description': project.description,
@@ -62,12 +62,12 @@ class ProjectMapper:
         }
 
     @staticmethod
-    def list_to_entity(projects_list: Sequence[Any]) -> list[tuple[Project, int]]:
+    def list_to_entity(projects_list: Sequence[Any]) -> list[tuple[ProjectEntity, int]]:
         projects_with_user_count = []
         for project in projects_list:
             projects_with_user_count.append(
                 (
-                    Project(
+                    ProjectEntity(
                         _id=ProjectId(project[0].id),
                         _workspace_id=WorkspaceId(project[0].workspace_id),
                         _owner_id=OwnerId(project[0].owner_id),

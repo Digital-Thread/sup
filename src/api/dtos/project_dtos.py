@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from src.apps.project.domain.entity.project import StatusProject
+from src.apps.project.domain.project import StatusProject
 
 
 class CreateProjectDTO(BaseModel):

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
 
-from src.apps.project.domain.entity.project import StatusProject
+from src.apps.project.domain.project import StatusProject
 
 
 @dataclass

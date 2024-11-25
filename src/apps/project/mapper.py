@@ -1,6 +1,6 @@
 from dataclasses import asdict
 
-from src.apps.project.domain.entity.project import Project
+from src.apps.project.domain.project import ProjectEntity
 from src.apps.project.domain.types_ids import (
     AssignedId,
     OwnerId,
@@ -17,12 +17,12 @@ from src.apps.project.dtos import (
 
 class ProjectMapper:
     @staticmethod
-    def entity_to_dto(project: Project) -> ProjectWithParticipantCountAppDTO:
+    def entity_to_dto(project: ProjectEntity) -> ProjectWithParticipantCountAppDTO:
         return ProjectWithParticipantCountAppDTO(**asdict(project))
 
     @staticmethod
-    def dto_to_entity(dto: CreateProjectAppDTO) -> Project:
-        return Project(
+    def dto_to_entity(dto: CreateProjectAppDTO) -> ProjectEntity:
+        return ProjectEntity(
             _id=ProjectId(dto.id) if isinstance(dto, ProjectWithParticipantCountAppDTO) else None,
             _workspace_id=WorkspaceId(dto.workspace_id),
             _owner_id=OwnerId(dto.owner_id),
@@ -39,7 +39,7 @@ class ProjectMapper:
         )
 
     @staticmethod
-    def update_data(existing_project: Project, dto: UpdateProjectAppDTO) -> Project:
+    def update_data(existing_project: ProjectEntity, dto: UpdateProjectAppDTO) -> ProjectEntity:
         for field, value in asdict(dto).items():
             if value is not None:
                 setattr(existing_project, field, value)
@@ -48,7 +48,7 @@ class ProjectMapper:
 
     @staticmethod
     def list_tuple_to_dto(
-        projects: list[tuple[Project, int]]
+        projects: list[tuple[ProjectEntity, int]]
     ) -> list[ProjectWithParticipantCountAppDTO]:
         projects_with_user_count = []
         for project in projects:
