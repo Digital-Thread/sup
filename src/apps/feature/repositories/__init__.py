@@ -7,7 +7,7 @@ __all__ = (
     'IFeatureRepository',
 )
 
-from src.apps.feature.repositories.feature_repository import (
+from apps.feature.repository import (
     FeatureListQuery,
     FilterField,
     IFeatureRepository,
