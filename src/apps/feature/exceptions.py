@@ -43,5 +43,5 @@ class FeatureDoesNotExistError(FeatureError):
         self.args = (self.feature_id, self.context, self.message)
 
 
-class RepositoryError(FeatureError):
+class FeatureRepositoryError(FeatureError):
     DEFAULT_MESSAGE = 'Ошибка репозитория.'

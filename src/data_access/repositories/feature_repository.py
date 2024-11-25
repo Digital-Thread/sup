@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from src.apps.feature.domain import FeatureEntity, FeatureId, WorkspaceId
-from src.apps.feature.exceptions import RepositoryError
+from src.apps.feature.exceptions import FeatureRepositoryError
 from src.apps.feature import FeatureListQuery, IFeatureRepository
 from src.data_access.mappers.feature_converter import FeatureConverter
 from src.data_access.models import FeatureModel, TagModel, UserModel
@@ -50,7 +50,7 @@ class FeatureRepository(IFeatureRepository):
             orig_exception = e.orig.__cause__
             if isinstance(orig_exception, ForeignKeyViolationError):
                 detail_message = orig_exception.detail
-                raise RepositoryError(detail_message)
+                raise FeatureRepositoryError(detail_message)
             else:
                 raise
 
@@ -80,7 +80,7 @@ class FeatureRepository(IFeatureRepository):
                 orig_exception = e.orig.__cause__
                 if isinstance(orig_exception, ForeignKeyViolationError):
                     detail_message = orig_exception.detail
-                    raise RepositoryError(detail_message)
+                    raise FeatureRepositoryError(detail_message)
                 else:
                     raise
 
@@ -89,7 +89,7 @@ class FeatureRepository(IFeatureRepository):
         if feature_model:
             await self._session.delete(feature_model)
         else:
-            raise RepositoryError(message=f'Не найдена фича с id: {feature_id}')
+            raise FeatureRepositoryError(message=f'Не найдена фича с id: {feature_id}')
 
     async def get_list(
         self, workspace_id: WorkspaceId, query: FeatureListQuery

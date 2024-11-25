@@ -2,7 +2,7 @@ from src.apps.feature.dtos import FeatureUpdateDTO
 from src.apps.feature.exceptions import (
     FeatureDoesNotExistError,
     FeatureUpdateError,
-    RepositoryError,
+    FeatureRepositoryError,
 )
 from src.apps.feature.interactors.base_interactor import BaseInteractor
 
@@ -20,5 +20,5 @@ class UpdateFeatureInteractor(BaseInteractor):
 
         try:
             await self._repository.update(feature_id=dto.id, feature=feature)
-        except RepositoryError as e:
+        except FeatureRepositoryError as e:
             raise FeatureUpdateError(context=e) from None

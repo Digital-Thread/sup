@@ -1,6 +1,6 @@
 from src.apps.feature.mapper import FeatureMapper
 from src.apps.feature.dtos import FeatureInputDTO
-from src.apps.feature.exceptions import FeatureCreateError, RepositoryError
+from src.apps.feature.exceptions import FeatureCreateError, FeatureRepositoryError
 from src.apps.feature.interactors.base_interactor import BaseInteractor
 
 
@@ -13,5 +13,5 @@ class CreateFeatureInteractor(BaseInteractor):
 
         try:
             await self._repository.save(feature=feature)
-        except RepositoryError as e:
+        except FeatureRepositoryError as e:
             raise FeatureCreateError(context=e) from None
