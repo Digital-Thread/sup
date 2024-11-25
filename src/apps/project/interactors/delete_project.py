@@ -9,7 +9,7 @@ from src.apps.project.exceptions import (
 from src.apps.project.i_project_repository import IProjectRepository
 
 
-class DeleteProjectUseCase:
+class DeleteProjectInteractor:
     def __init__(self, project_repository: IProjectRepository):
         self._project_repository = project_repository
 

@@ -7,7 +7,7 @@ from src.apps.project.i_project_repository import IProjectRepository
 from src.apps.project.mapper import ProjectMapper
 
 
-class GetProjectByWorkspaceUseCase:
+class GetProjectByWorkspaceInteractor:
     def __init__(self, project_repository: IProjectRepository):
         self._project_repository = project_repository
 
