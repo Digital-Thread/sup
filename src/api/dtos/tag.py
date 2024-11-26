@@ -9,7 +9,7 @@ class CreateTagDTO(BaseModel):
     workspace_id: UUID
 
 
-class ResponseTagDTO(BaseModel):
+class TagResponseDTO(BaseModel):
     id: int
     name: str
     color: str

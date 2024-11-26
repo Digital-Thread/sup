@@ -2,14 +2,14 @@ from dataclasses import asdict
 
 from src.apps.workspace.domain.entities.tag import TagEntity
 from src.apps.workspace.domain.types_ids import TagId, WorkspaceId
-from src.apps.workspace.dtos.tag_dtos import TagAppDTO, UpdateTagAppDTO
+from src.apps.workspace.dtos.tag_dtos import TagOutDTO, UpdateTagAppDTO
 from src.apps.workspace.mappers.base_mapper import BaseMapper
 
 
-class TagMapper(BaseMapper[TagEntity, TagAppDTO]):
+class TagMapper(BaseMapper[TagEntity, TagOutDTO]):
 
     @staticmethod
-    def dto_to_entity(dto: TagAppDTO) -> TagEntity:
+    def dto_to_entity(dto: TagOutDTO) -> TagEntity:
 
         return TagEntity(
             _workspace_id=WorkspaceId(dto.workspace_id),

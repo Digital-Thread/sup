@@ -16,7 +16,7 @@ class CreateTagAppDTO:
     
     
 @dataclass
-class TagAppDTO(BaseTagDTO):
+class TagOutDTO(BaseTagDTO):
     name: str
     color: str
 
