@@ -9,13 +9,19 @@ class CreateRoleDTO(BaseModel):
     workspace_id: UUID
 
 
-class ResponseRoleWithUserCountDTO(BaseModel):
+class RoleWithUserCountResponseDTO(BaseModel):
     id: int
     name: str
     color: str
     user_count: int
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class RoleResponseDTO(BaseModel):
+    id: int
+    name: str
+    color: str
 
 
 class UpdateRoleDTO(BaseModel):

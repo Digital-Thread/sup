@@ -3,12 +3,12 @@ from uuid import UUID
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter, Body, HTTPException, status
+from fastapi import APIRouter, Body, HTTPException, status, Path, Query
 
-from src.api.dtos.role_dtos import (
+from src.api.dtos.role import (
     CreateRoleDTO,
-    ResponseRoleWithUserCountDTO,
-    UpdateRoleDTO,
+    RoleWithUserCountResponseDTO,
+    UpdateRoleDTO, RoleResponseDTO,
 )
 from src.apps.workspace.dtos.role_dtos import (
     AssignRoleToWorkspaceMemberDTO,
@@ -24,7 +24,7 @@ from src.apps.workspace.interactors.role_interactors import (
     CreateRoleInteractor,
     DeleteRoleInteractor,
     GetRoleByWorkspaceInteractor,
-    UpdateRoleInteractor,
+    UpdateRoleInteractor, GetRoleByIdInteractor,
 )
 from src.apps.workspace.interactors.role_interactors.remove_role_from_workspace_member import (
     RemoveRoleFromWorkspaceMemberInteractor,
@@ -46,16 +46,30 @@ async def create_role(
 
 
 @role_router.get(
-    '/', status_code=status.HTTP_200_OK, response_model=list[ResponseRoleWithUserCountDTO]
+    '/', status_code=status.HTTP_200_OK, response_model=list[RoleWithUserCountResponseDTO]
 )
 async def get_roles_by_workspace_id(
     workspace_id: UUID, interactor: FromDishka[GetRoleByWorkspaceInteractor]
-) -> list[ResponseRoleWithUserCountDTO]:
+) -> list[RoleWithUserCountResponseDTO]:
     try:
         response = await interactor.execute(GetRolesAppDTO(workspace_id=workspace_id))
     except RoleException as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
-    return [ResponseRoleWithUserCountDTO(**role.__dict__) for role in response]
+    return [RoleWithUserCountResponseDTO(**role.__dict__) for role in response]
+
+
+@role_router.get('/{role_id}', status_code=status.HTTP_200_OK, response_model=RoleResponseDTO)
+async def get_role_by_id(
+        role_id: Annotated[int, Path()],
+        workspace_id: Annotated[UUID, Query()],
+        interactor: FromDishka[GetRoleByIdInteractor]
+) -> RoleResponseDTO:
+    try:
+        response = await interactor.execute(role_id, workspace_id)
+    except RoleException as error:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
+    else:
+        return RoleResponseDTO(**response.__dict__)
 
 
 @role_router.patch('/{workspace_id}/{role_id}', status_code=status.HTTP_200_OK)
