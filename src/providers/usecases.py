@@ -45,6 +45,7 @@ from src.apps.workspace.interactors.category_interactors import (
     GetCategoryByWorkspaceInteractor,
     UpdateCategoryInteractor,
 )
+from src.apps.workspace.interactors.category_interactors.get_category_by_id import GetCategoryByIdInteractor
 from src.apps.workspace.interactors.role_interactors import (
     CreateRoleInteractor,
     DeleteRoleInteractor,
@@ -142,6 +143,7 @@ class CategoryUseCaseProvider(Provider):
 
     create_category = provide(CreateCategoryInteractor)
     get_category_by_workspace = provide(GetCategoryByWorkspaceInteractor)
+    get_category_by_id = provide(GetCategoryByIdInteractor)
     update_category = provide(UpdateCategoryInteractor)
     delete_category = provide(DeleteCategoryInteractor)
 

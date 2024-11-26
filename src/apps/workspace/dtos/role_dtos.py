@@ -24,6 +24,12 @@ class RoleWithUserCountAppDTO:
 
 
 @dataclass
+class RoleOutDTO(BaseRoleDTO):
+    name: str
+    color: str
+
+
+@dataclass
 class GetRolesAppDTO:
     workspace_id: UUID
 
