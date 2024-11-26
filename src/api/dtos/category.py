@@ -8,7 +8,7 @@ class CreateCategoryDTO(BaseModel):
     workspace_id: UUID
 
 
-class ResponseCategoryDTO(BaseModel):
+class CategoryResponseDTO(BaseModel):
     id: int
     name: str
 

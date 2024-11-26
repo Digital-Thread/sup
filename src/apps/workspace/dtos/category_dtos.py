@@ -15,7 +15,7 @@ class CreateCategoryAppDTO:
 
 
 @dataclass
-class CategoryAppDTO(BaseCategoryDTO):
+class CategoryOutDTO(BaseCategoryDTO):
     name: str
 
 
