@@ -2,11 +2,11 @@ from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
 
-from src.apps.project.domain.entity.project import StatusProject
+from src.apps.project.domain.project import StatusProject
 
 
 @dataclass
-class CreateProjectAppDTO:
+class ProjectCreateDTO:
     workspace_id: UUID
     owner_id: UUID
     name: str
@@ -18,7 +18,7 @@ class CreateProjectAppDTO:
 
 
 @dataclass
-class ProjectWithParticipantCountAppDTO:
+class ProjectWithParticipantCountDTO:
     id: int
     workspace_id: UUID
     owner_id: UUID
@@ -32,10 +32,30 @@ class ProjectWithParticipantCountAppDTO:
 
 
 @dataclass
-class UpdateProjectAppDTO:
+class ProjectFindDTO:
+    id: int
+    workspace_id: UUID
+
+
+@dataclass
+class ProjectUpdateDTO:
     name: str | None = None
     logo: str | None = None
     description: str | None = None
     status: StatusProject | None = None
     assigned_to: UUID | None = None
     participant_ids: list[UUID] | None = None
+
+
+@dataclass
+class ProjectWithParticipantsDTO:
+    id: int
+    workspace_id: UUID
+    owner_id: UUID
+    name: str
+    logo: str | None
+    description: str | None
+    status: StatusProject
+    created_at: datetime | None
+    assigned_to: UUID | None
+    participants: list[dict[str, UUID | str | bool]]

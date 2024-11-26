@@ -1,17 +1,17 @@
 from uuid import UUID
 
 from src.apps.project.domain.types_ids import WorkspaceId
-from src.apps.project.dtos import ProjectWithParticipantCountAppDTO
+from src.apps.project.dtos import ProjectWithParticipantCountDTO
 from src.apps.project.exceptions import ProjectException, WorkspaceForProjectNotFound
-from src.apps.project.i_project_repository import IProjectRepository
+from src.apps.project.project_repository import IProjectRepository
 from src.apps.project.mapper import ProjectMapper
 
 
-class GetProjectByWorkspaceUseCase:
+class GetProjectByWorkspaceInteractor:
     def __init__(self, project_repository: IProjectRepository):
         self._project_repository = project_repository
 
-    async def execute(self, workspace_id: UUID) -> list[ProjectWithParticipantCountAppDTO]:
+    async def execute(self, workspace_id: UUID) -> list[ProjectWithParticipantCountDTO]:
         try:
             projects = await self._project_repository.find_by_workspace_id(
                 WorkspaceId(workspace_id)

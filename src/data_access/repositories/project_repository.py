@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from src.apps.project.domain.entity.project import Project
+from src.apps.project.domain.project import ProjectEntity
 from src.apps.project.domain.types_ids import ParticipantId, ProjectId, WorkspaceId
 from src.apps.project.exceptions import (
     ParticipantNotFound,
@@ -15,7 +15,7 @@ from src.apps.project.exceptions import (
     ProjectNotFound,
     WorkspaceForProjectNotFound,
 )
-from src.apps.project.i_project_repository import IProjectRepository
+from src.apps.project.project_repository import IProjectRepository
 from src.data_access.mappers.project_mapper import ProjectMapper
 from src.data_access.models.project import ProjectModel
 from src.data_access.models.project_participants import ProjectParticipantsModel
@@ -26,7 +26,7 @@ class ProjectRepository(IProjectRepository):
         self._session = session_factory
         self._counter = 0
 
-    async def save(self, project: Project) -> None:
+    async def save(self, project: ProjectEntity) -> None:
         stmt_project = ProjectMapper.entity_to_model(project)
         self._session.add(stmt_project)
 
@@ -43,7 +43,7 @@ class ProjectRepository(IProjectRepository):
                 f'Рабочего пространства с id={project.workspace_id} не существует'
             )
 
-    async def find_by_id(self, project_id: ProjectId, workspace_id: WorkspaceId) -> Project | None:
+    async def find_by_id(self, project_id: ProjectId, workspace_id: WorkspaceId) -> ProjectEntity | None:
         query = (
             select(ProjectModel)
             .options(selectinload(ProjectModel.participants))
@@ -60,7 +60,7 @@ class ProjectRepository(IProjectRepository):
         else:
             return ProjectMapper.model_to_entity(project_model)
 
-    async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[tuple[Project, int]]:
+    async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[tuple[ProjectEntity, int]]:
         query = (
             select(
                 ProjectModel,
@@ -99,7 +99,7 @@ class ProjectRepository(IProjectRepository):
         stmt = delete(ProjectModel).filter_by(id=project_id, workspace_id=workspace_id)
         await self._session.execute(stmt)
 
-    async def update_project(self, project: Project) -> None:
+    async def update_project(self, project: ProjectEntity) -> None:
         updated_data = ProjectMapper.entity_to_dict(project)
         stmt = (
             update(ProjectModel)

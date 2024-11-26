@@ -1,6 +1,7 @@
 from dataclasses import asdict
+from uuid import UUID
 
-from src.apps.project.domain.entity.project import Project
+from src.apps.project.domain.project import ProjectEntity
 from src.apps.project.domain.types_ids import (
     AssignedId,
     OwnerId,
@@ -9,21 +10,41 @@ from src.apps.project.domain.types_ids import (
     WorkspaceId,
 )
 from src.apps.project.dtos import (
-    CreateProjectAppDTO,
-    ProjectWithParticipantCountAppDTO,
-    UpdateProjectAppDTO,
+    ProjectCreateDTO,
+    ProjectUpdateDTO,
+    ProjectWithParticipantCountDTO,
+    ProjectWithParticipantsDTO,
 )
 
 
 class ProjectMapper:
     @staticmethod
-    def entity_to_dto(project: Project) -> ProjectWithParticipantCountAppDTO:
-        return ProjectWithParticipantCountAppDTO(**asdict(project))
+    def entity_to_dto(
+        project: ProjectEntity, participants: list[dict[str, UUID | str | bool]]
+    ) -> ProjectWithParticipantsDTO:
+        return ProjectWithParticipantsDTO(
+            id=project.id,
+            owner_id=project.owner_id,
+            workspace_id=project.workspace_id,
+            name=project.name,
+            description=project.description,
+            logo=project.logo,
+            status=project.status,
+            created_at=project.created_at,
+            assigned_to=project.assigned_to,
+            participants=participants,
+        )
 
     @staticmethod
-    def dto_to_entity(dto: CreateProjectAppDTO) -> Project:
-        return Project(
-            _id=ProjectId(dto.id) if isinstance(dto, ProjectWithParticipantCountAppDTO) else None,
+    def entity_to_dto_with_participant_count(
+        project: ProjectEntity,
+    ) -> ProjectWithParticipantCountDTO:
+        return ProjectWithParticipantCountDTO(**asdict(project))
+
+    @staticmethod
+    def dto_to_entity(dto: ProjectCreateDTO) -> ProjectEntity:
+        return ProjectEntity(
+            _id=ProjectId(dto.id) if isinstance(dto, ProjectWithParticipantCountDTO) else None,
             _workspace_id=WorkspaceId(dto.workspace_id),
             _owner_id=OwnerId(dto.owner_id),
             _name=dto.name,
@@ -39,7 +60,7 @@ class ProjectMapper:
         )
 
     @staticmethod
-    def update_data(existing_project: Project, dto: UpdateProjectAppDTO) -> Project:
+    def update_data(existing_project: ProjectEntity, dto: ProjectUpdateDTO) -> ProjectEntity:
         for field, value in asdict(dto).items():
             if value is not None:
                 setattr(existing_project, field, value)
@@ -48,12 +69,12 @@ class ProjectMapper:
 
     @staticmethod
     def list_tuple_to_dto(
-        projects: list[tuple[Project, int]]
-    ) -> list[ProjectWithParticipantCountAppDTO]:
+        projects: list[tuple[ProjectEntity, int]]
+    ) -> list[ProjectWithParticipantCountDTO]:
         projects_with_user_count = []
         for project in projects:
             projects_with_user_count.append(
-                ProjectWithParticipantCountAppDTO(
+                ProjectWithParticipantCountDTO(
                     id=ProjectId(project[0].id),
                     workspace_id=WorkspaceId(project[0].workspace_id),
                     owner_id=OwnerId(project[0].owner_id),
