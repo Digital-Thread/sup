@@ -1,11 +1,7 @@
 from abc import ABC, abstractmethod
 
+from src.apps.feature.domain import FeatureEntity, FeatureId, WorkspaceId
 from src.apps.feature.query_parameters import FeatureListQuery
-from src.apps.feature.domain import (
-    FeatureEntity,
-    FeatureId,
-    WorkspaceId,
-)
 
 
 class IFeatureRepository(ABC):
@@ -28,6 +24,6 @@ class IFeatureRepository(ABC):
 
     @abstractmethod
     async def get_list(
-            self, workspace_id: WorkspaceId, query: FeatureListQuery
+        self, workspace_id: WorkspaceId, query: FeatureListQuery
     ) -> list[tuple[FeatureId, FeatureEntity]]:
         pass

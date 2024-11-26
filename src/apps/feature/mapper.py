@@ -1,13 +1,13 @@
-from src.apps.feature.dtos import FeatureOutputDTO, FeatureInputDTO
 from src.apps.feature.domain import FeatureEntity, FeatureId
+from src.apps.feature.dtos import FeatureInputDTO, FeatureOutputDTO
 
 
 class FeatureMapper:
 
     @staticmethod
     def entity_to_dto(
-            feature_id: FeatureId,
-            entity: FeatureEntity
+        feature_id: FeatureId,
+        entity: FeatureEntity,
     ) -> FeatureOutputDTO:
         return FeatureOutputDTO(
             id=feature_id,
