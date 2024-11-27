@@ -15,6 +15,7 @@ from src.providers.adapters import (
     ConfigProvider,
     RepositoriesProvider,
     SqlalchemyProvider,
+    WorkspaceProvider,
 )
 from src.providers.usecases import (
     CategoryUseCaseProvider,
@@ -42,6 +43,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 def container_factory() -> AsyncContainer:
     return make_async_container(
         SqlalchemyProvider(),
+        WorkspaceProvider(),
         ConfigProvider(),
         RepositoriesProvider(),
         ProjectInteractorProvider(),

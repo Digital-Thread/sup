@@ -1,7 +1,8 @@
 from typing import AsyncIterable
 
-from dishka import Provider, Scope, provide
+from dishka import Provider, Scope, from_context, provide
 from environs import Env
+from fastapi import Request
 from passlib.context import CryptContext
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
@@ -37,7 +38,9 @@ from src.apps.workspace.repositories import (
     IWorkspaceInviteRepository,
     IWorkspaceRepository,
 )
-from src.apps.workspace.repositories.user_workspace_role_repository import IUserWorkspaceRoleRepository
+from src.apps.workspace.repositories.user_workspace_role_repository import (
+    IUserWorkspaceRoleRepository,
+)
 from src.config import Config, DbConfig, JWTConfig, RedisConfig, SMTPConfig
 from src.data_access.repositories import (
     CategoryRepository,
@@ -53,7 +56,10 @@ from src.data_access.repositories.meet import MeetRepository
 from src.data_access.repositories.meet_participant import ParticipantRepository
 from src.data_access.repositories.project_repository import ProjectRepository
 from src.data_access.repositories.user_repository import UserRepository
-from src.data_access.repositories.user_workspace_role_repository import UserWorkspaceRoleRepository
+from src.data_access.repositories.user_workspace_role_repository import (
+    UserWorkspaceRoleRepository,
+)
+from src.providers.context import WorkspaceContext
 
 
 class SqlalchemyProvider(Provider):
@@ -105,6 +111,20 @@ class ConfigProvider(Provider):
         return config.jwt
 
 
+class WorkspaceProvider(Provider):
+    scope = Scope.REQUEST
+    request = from_context(provides=Request, scope=Scope.REQUEST)
+
+    @provide
+    def provide_workspace_context(self, request: Request) -> WorkspaceContext:
+        workspace_id = getattr(request.state, 'workspace_id', None)
+
+        if not workspace_id:
+            raise ValueError('Workspace ID is missing in the request state')
+
+        return WorkspaceContext(workspace_id=workspace_id)
+
+
 class RepositoriesProvider(Provider):
     scope = Scope.REQUEST
 
@@ -117,7 +137,9 @@ class RepositoriesProvider(Provider):
     )
     category_repository = provide(CategoryRepository, provides=ICategoryRepository)
     role_repository = provide(RoleRepository, provides=IRoleRepository)
-    user_workspace_role_repository = provide(UserWorkspaceRoleRepository, provides=IUserWorkspaceRoleRepository)
+    user_workspace_role_repository = provide(
+        UserWorkspaceRoleRepository, provides=IUserWorkspaceRoleRepository
+    )
     tag_repository = provide(TagRepository, provides=ITagRepository)
     project_repository = provide(ProjectRepository, provides=IProjectRepository)
 
