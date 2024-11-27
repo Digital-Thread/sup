@@ -13,6 +13,9 @@ class WorkspaceMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next: Callable[[Request], Awaitable[Response]]) -> Response:
         workspace_id = self._get_workspace_id_from_headers(request)
 
+        if request.url.path in ['/', '/openapi.json']: # временно !
+            return await call_next(request)
+
         if workspace_id is None:
             raise HTTPException(status_code=400, detail="Workspace ID is missing in request headers")
 
