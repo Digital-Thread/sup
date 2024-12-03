@@ -13,8 +13,8 @@ class DeleteProjectInteractor:
     def __init__(self, project_repository: IProjectRepository):
         self._project_repository = project_repository
 
-    async def execute(self, project_id: int, workspace_id: UUID) -> None:
+    async def execute(self, project_id: int) -> None:
         try:
-            await self._project_repository.delete(ProjectId(project_id), WorkspaceId(workspace_id))
+            await self._project_repository.delete(ProjectId(project_id))
         except (ProjectNotFound, WorkspaceForProjectNotFound) as error:
             raise ProjectException(f'{str(error)}')

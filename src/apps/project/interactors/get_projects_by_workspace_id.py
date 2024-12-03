@@ -11,11 +11,9 @@ class GetProjectByWorkspaceInteractor:
     def __init__(self, project_repository: IProjectRepository):
         self._project_repository = project_repository
 
-    async def execute(self, workspace_id: UUID) -> list[ProjectWithParticipantCountDTO]:
+    async def execute(self) -> list[ProjectWithParticipantCountDTO]:
         try:
-            projects = await self._project_repository.find_by_workspace_id(
-                WorkspaceId(workspace_id)
-            )
+            projects = await self._project_repository.get_by_workspace_id()
         except WorkspaceForProjectNotFound as error:
             raise ProjectException(f'{str(error)}')
         else:

@@ -19,11 +19,13 @@ from src.data_access.models import (
     WorkspaceMemberModel,
     WorkspaceModel, UserModel,
 )
+from src.providers.context import WorkspaceContext
 
 
 class WorkspaceRepository(IWorkspaceRepository):
-    def __init__(self, session_factory: AsyncSession):
+    def __init__(self, session_factory: AsyncSession, context: WorkspaceContext):
         self._session = session_factory
+        self._context = context
 
     async def save(self, workspace: WorkspaceEntity) -> None:
         stmt = WorkspaceMapper.entity_to_model(workspace)
@@ -95,12 +97,12 @@ class WorkspaceRepository(IWorkspaceRepository):
         stmt = delete(WorkspaceModel).filter_by(id=workspace_id, owner_id=owner_id)
         await self._session.execute(stmt)
 
-    async def find_workspace_members(self, workspace_id: WorkspaceId) -> dict[MemberId, str]:
+    async def find_workspace_members(self) -> dict[MemberId, str]:
         query = select(
             UserModel.id,
             UserModel.first_name,
             UserModel.last_name,
-        ).join(WorkspaceMemberModel).filter(WorkspaceMemberModel.workspace_id == workspace_id)
+        ).join(WorkspaceMemberModel).filter(WorkspaceMemberModel.workspace_id == self._context.workspace_id)
 
         members = await self._session.execute(query)
 
