@@ -1,9 +1,9 @@
 from logging import warning
 
 from asyncpg.exceptions import ForeignKeyViolationError, UniqueViolationError
-from sqlalchemy import delete, exists, func, select, update
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -12,8 +12,7 @@ from src.apps.project.domain.types_ids import ParticipantId, ProjectId, Workspac
 from src.apps.project.exceptions import (
     ParticipantNotFound,
     ProjectAlreadyExists,
-    ProjectNotFound,
-    WorkspaceForProjectNotFound,
+    WorkspaceForProjectNotFound, ProjectNotDeleted,
 )
 from src.apps.project.project_repository import IProjectRepository
 from src.data_access.mappers.project_mapper import ProjectMapper
@@ -39,11 +38,11 @@ class ProjectRepository(IProjectRepository):
             if isinstance(error.orig.__cause__, UniqueViolationError):
                 raise ProjectAlreadyExists(
                     'Проект с таким именем в этом рабочем пространстве уже существует.'
-                )
+                ) from error
 
             raise WorkspaceForProjectNotFound(
-                f'Рабочего пространства с id={project.workspace_id} не существует'
-            )
+                f'Рабочего пространства с id={project.workspace_id} не существует.'
+            ) from error
 
     async def get_by_id(self, project_id: ProjectId) -> ProjectEntity | None:
         query = (
@@ -52,15 +51,9 @@ class ProjectRepository(IProjectRepository):
             .filter_by(id=project_id, workspace_id=self._context.workspace_id)
         )
         result = await self._session.execute(query)
-        try:
-            project_model = result.scalar_one()
-        except NoResultFound as error:
-            warning(error)
-            raise ProjectNotFound(
-                f'Проект с id={project_id} не найден в указанном рабочем пространстве.'
-            )
-        else:
-            return ProjectMapper.model_to_entity(project_model)
+        project_model = result.scalar_one_or_none()
+
+        return ProjectMapper.model_to_entity(project_model)
 
     async def get_by_workspace_id(self) -> list[tuple[ProjectEntity, int]]:
         query = (
@@ -79,30 +72,16 @@ class ProjectRepository(IProjectRepository):
         list_projects_with_user_count = result.all()
         projects = ProjectMapper.list_to_entity(list_projects_with_user_count)
 
-        if not projects:
-            raise WorkspaceForProjectNotFound(
-                f'Рабочее пространство с id={self._context.workspace_id} не найдено'
-            )
-
         return projects
 
     async def delete(self, project_id: ProjectId) -> None:
-        exists_project = await self._session.execute(
-            select(
-                exists().where(
-                    ProjectModel.id == project_id,
-                    ProjectModel.workspace_id == self._context.workspace_id,
-                )
-            )
-        )
-
-        if not exists_project.scalar():
-            raise ProjectNotFound(f'Проект с id={project_id} не найден в рабочем пространстве')
-
         stmt = delete(ProjectModel).filter_by(
             id=project_id, workspace_id=self._context.workspace_id
         )
-        await self._session.execute(stmt)
+        result = await self._session.execute(stmt)
+
+        if result.rowcount == 0:
+            raise ProjectNotDeleted(f'Проект с id={project_id} не удален.')
 
     async def update(self, project: ProjectEntity) -> None:
         updated_data = ProjectMapper.entity_to_dict(project)
@@ -149,4 +128,4 @@ class ProjectRepository(IProjectRepository):
         except IntegrityError as error:
             warning(error)
             if isinstance(error.orig.__cause__, ForeignKeyViolationError):
-                raise ParticipantNotFound(f'Участник не найден')
+                raise ParticipantNotFound(f'Участник не найден.') from error

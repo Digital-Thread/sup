@@ -5,7 +5,7 @@ from src.apps.project.domain.types_ids import ParticipantId, ProjectId
 from src.apps.project.dtos import (
     ProjectWithParticipantsDTO,
 )
-from src.apps.project.exceptions import ProjectException, ProjectNotFound
+from src.apps.project.exceptions import ProjectException
 from src.apps.project.mapper import ProjectMapper
 from src.apps.project.project_repository import IProjectRepository
 from src.apps.workspace.exceptions.workspace_exceptions import WorkspaceException
@@ -35,8 +35,8 @@ class GetProjectByIdUseCase:
     async def _get_project(self, project_id: ProjectId) -> ProjectEntity:
         try:
             return await self._project_repository.get_by_id(project_id)
-        except ProjectNotFound as error:
-            raise ProjectException(f'Проект не найден: {str(error)}')
+        except AttributeError as error:
+            raise ProjectException(f'Проект с id={project_id} не найден')
 
     @staticmethod
     def _map_participants_to_dto(

@@ -1,10 +1,7 @@
-from uuid import UUID
-
-from src.apps.project.domain.types_ids import ProjectId, WorkspaceId
+from src.apps.project.domain.types_ids import ProjectId
 from src.apps.project.exceptions import (
     ProjectException,
-    ProjectNotFound,
-    WorkspaceForProjectNotFound,
+    ProjectNotDeleted,
 )
 from src.apps.project.project_repository import IProjectRepository
 
@@ -16,5 +13,5 @@ class DeleteProjectInteractor:
     async def execute(self, project_id: int) -> None:
         try:
             await self._project_repository.delete(ProjectId(project_id))
-        except (ProjectNotFound, WorkspaceForProjectNotFound) as error:
-            raise ProjectException(f'{str(error)}')
+        except ProjectNotDeleted as error:
+            raise ProjectException(str(error)) from error

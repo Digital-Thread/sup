@@ -25,7 +25,7 @@ class UpdateProjectInteractor:
         try:
             await self._project_repository.update(updated_project)
         except ProjectNotUpdated as error:
-            raise ProjectException(f'{str(error)}')
+            raise ProjectException(str(error)) from error
 
     async def _get_existing_project_in_workspace(
         self, project_id: ProjectId
@@ -33,7 +33,7 @@ class UpdateProjectInteractor:
         try:
             existing_project = await self._project_repository.get_by_id(project_id)
         except ProjectNotFound as error:
-            raise ProjectException(f'{str(error)}')
+            raise ProjectException(str(error)) from error
         else:
             return existing_project
 
@@ -47,7 +47,7 @@ class UpdateProjectInteractor:
                     [ParticipantId(participant) for participant in update_data.participant_ids],
                 )
             except ParticipantNotFound as error:
-                raise ProjectException(f'{str(error)}')
+                raise ProjectException(str(error)) from error
 
     @staticmethod
     def _has_participants_changed(
@@ -68,6 +68,6 @@ class UpdateProjectInteractor:
         try:
             updated_project = ProjectMapper.update_data(project, update_data)
         except ValueError as error:
-            raise ProjectException(f'{str(error)}')
+            raise ProjectException(str(error)) from error
         else:
             return updated_project

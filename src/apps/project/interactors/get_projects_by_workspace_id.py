@@ -15,6 +15,6 @@ class GetProjectByWorkspaceInteractor:
         try:
             projects = await self._project_repository.get_by_workspace_id()
         except WorkspaceForProjectNotFound as error:
-            raise ProjectException(f'{str(error)}')
-        else:
-            return ProjectMapper.list_tuple_to_dto(projects)
+            raise ProjectException(str(error)) from error
+
+        return ProjectMapper.list_tuple_to_dto(projects)
