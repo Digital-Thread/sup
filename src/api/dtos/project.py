@@ -8,7 +8,6 @@ from src.apps.project.domain.project import StatusProject
 
 
 class CreateProjectRequestDTO(BaseModel):
-    workspace_id: UUID
     owner_id: UUID
     name: str
     logo: str | None = Field(default=None)

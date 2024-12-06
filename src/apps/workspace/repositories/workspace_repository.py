@@ -22,7 +22,7 @@ class IWorkspaceRepository:
         raise NotImplementedError
 
     @abstractmethod
-    async def find_workspace_members(self, workspace_id: WorkspaceId) -> dict[MemberId, str]:
+    async def find_workspace_members(self) -> dict[MemberId, str]:
         raise NotImplementedError
 
     @abstractmethod

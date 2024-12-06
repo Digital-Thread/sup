@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter, HTTPException, status
@@ -10,7 +8,7 @@ from src.api.dtos.project import (
     ProjectWithParticipantsResponseDTO,
     UpdateProjectRequestDTO,
 )
-from src.apps.project.dtos import ProjectCreateDTO, ProjectFindDTO, ProjectUpdateDTO
+from src.apps.project.dtos import ProjectCreateDTO, ProjectUpdateDTO
 from src.apps.project.exceptions import ProjectException
 from src.apps.project.interactors import (
     CreateProjectInteractor,
@@ -37,15 +35,15 @@ async def create_project(
 
 
 @project_router.get(
-    '/{workspace_id}/{project_id}',
+    '/{project_id}',
     status_code=status.HTTP_200_OK,
     response_model=ProjectWithParticipantsResponseDTO,
 )
 async def get_project_by_id(
-    workspace_id: UUID, project_id: int, use_case: FromDishka[GetProjectByIdUseCase]
+    project_id: int, use_case: FromDishka[GetProjectByIdUseCase]
 ) -> ProjectWithParticipantsResponseDTO:
     try:
-        response = await use_case.execute(ProjectFindDTO(workspace_id=workspace_id, id=project_id))
+        response = await use_case.execute(project_id)
     except ProjectException as error:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
     else:
@@ -54,27 +52,25 @@ async def get_project_by_id(
 
 @project_router.get('/', status_code=status.HTTP_200_OK, response_model=list[ProjectResponseDTO])
 async def get_projects_by_workspace_id(
-    workspace_id: UUID, interactor: FromDishka[GetProjectByWorkspaceInteractor]
+    interactor: FromDishka[GetProjectByWorkspaceInteractor],
 ) -> list[ProjectResponseDTO]:
     try:
-        response = await interactor.execute(workspace_id)
+        response = await interactor.execute()
     except ProjectException as error:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
     else:
         return [ProjectResponseDTO(**project.__dict__) for project in response]
 
 
-@project_router.patch('/{workspace_id}/{project_id}', status_code=status.HTTP_200_OK)
+@project_router.patch('/{project_id}', status_code=status.HTTP_200_OK)
 async def update_project(
     body: UpdateProjectRequestDTO,
     project_id: int,
-    workspace_id: UUID,
     interactor: FromDishka[UpdateProjectInteractor],
 ) -> dict[str, str]:
     updated_data = ProjectUpdateDTO(**body.model_dump(exclude_none=True))
-    project_find_data = ProjectFindDTO(id=project_id, workspace_id=workspace_id)
     try:
-        await interactor.execute(project_find_data, updated_data)
+        await interactor.execute(project_id, updated_data)
     except ProjectException as error:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
     else:
@@ -83,10 +79,10 @@ async def update_project(
 
 @project_router.delete('/{project_id}', status_code=status.HTTP_200_OK)
 async def delete_project(
-    project_id: int, workspace_id: UUID, interactor: FromDishka[DeleteProjectInteractor]
+    project_id: int, interactor: FromDishka[DeleteProjectInteractor]
 ) -> dict[str, str]:
     try:
-        await interactor.execute(project_id, workspace_id)
+        await interactor.execute(project_id)
     except ProjectException as error:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
     else:
