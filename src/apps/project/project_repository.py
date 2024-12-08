@@ -11,30 +11,25 @@ class IProjectRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def find_by_id(
-        self, project_id: ProjectId, workspace_id: WorkspaceId
-    ) -> ProjectEntity | None:
+    async def get_by_id(self, project_id: ProjectId) -> ProjectEntity | None:
         raise NotImplementedError
 
     @abstractmethod
-    async def find_by_workspace_id(
-        self, workspace_id: WorkspaceId
-    ) -> list[tuple[ProjectEntity, int]]:
+    async def get_by_workspace_id(self) -> list[tuple[ProjectEntity, int]]:
         raise NotImplementedError
 
     @abstractmethod
-    async def update_project(self, project: ProjectEntity) -> None:
+    async def update(self, project: ProjectEntity) -> None:
         raise NotImplementedError
 
     @abstractmethod
     async def update_participants(
         self,
         project_id: ProjectId,
-        workspace_id: WorkspaceId,
         update_participants: list[ParticipantId],
     ) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    async def delete(self, project_id: ProjectId, workspace_id: WorkspaceId) -> None:
+    async def delete(self, project_id: ProjectId) -> None:
         raise NotImplementedError

@@ -1,12 +1,11 @@
 from uuid import UUID
 
 from src.apps.project.domain.project import ProjectEntity
-from src.apps.project.domain.types_ids import ParticipantId, ProjectId, WorkspaceId
+from src.apps.project.domain.types_ids import ParticipantId, ProjectId
 from src.apps.project.dtos import (
-    ProjectFindDTO,
     ProjectWithParticipantsDTO,
 )
-from src.apps.project.exceptions import ProjectException, ProjectNotFound
+from src.apps.project.exceptions import ProjectException
 from src.apps.project.mapper import ProjectMapper
 from src.apps.project.project_repository import IProjectRepository
 from src.apps.workspace.exceptions.workspace_exceptions import WorkspaceException
@@ -18,30 +17,26 @@ class GetProjectByIdUseCase:
         self._project_repository = project_repository
         self._workspace_members_interactor = workspace_members_interactor
 
-    async def execute(self, request_data: ProjectFindDTO) -> ProjectWithParticipantsDTO:
-        workspace_members = await self.fetch_workspace_members(
-            WorkspaceId(request_data.workspace_id)
-        )
-        project = await self._get_project(
-            ProjectId(request_data.id), WorkspaceId(request_data.workspace_id)
-        )
+    async def execute(self, project_id: int) -> ProjectWithParticipantsDTO:
+        workspace_members = await self.fetch_workspace_members()
+        project = await self._get_project(ProjectId(project_id))
         participants = self._map_participants_to_dto(workspace_members, project.participant_ids)
 
         return ProjectMapper.entity_to_dto(project, participants)
 
-    async def fetch_workspace_members(self, workspace_id: WorkspaceId) -> dict[UUID, str]:
+    async def fetch_workspace_members(self) -> dict[UUID, str]:
         try:
-            return await self._workspace_members_interactor.execute(workspace_id)
+            return await self._workspace_members_interactor.execute()
         except WorkspaceException as error:
             raise ProjectException(
                 f'Ошибка при получении участников рабочего пространства: {str(error)}'
             )
 
-    async def _get_project(self, project_id: ProjectId, workspace_id: WorkspaceId) -> ProjectEntity:
+    async def _get_project(self, project_id: ProjectId) -> ProjectEntity:
         try:
-            return await self._project_repository.find_by_id(project_id, workspace_id)
-        except ProjectNotFound as error:
-            raise ProjectException(f'Проект не найден: {str(error)}')
+            return await self._project_repository.get_by_id(project_id)
+        except AttributeError as error:
+            raise ProjectException(f'Проект с id={project_id} не найден')
 
     @staticmethod
     def _map_participants_to_dto(

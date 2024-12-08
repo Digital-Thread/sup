@@ -16,4 +16,4 @@ class CreateProjectInteractor:
         try:
             await self._project_repository.save(ProjectMapper.dto_to_entity(project_data))
         except (ValueError, WorkspaceForProjectNotFound, ProjectAlreadyExists) as error:
-            raise ProjectException(f'{str(error)}')
+            raise ProjectException(str(error)) from error

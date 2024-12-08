@@ -23,8 +23,8 @@ class StatusProject(Enum):
 @dataclass
 class ProjectEntity:
     _name: str
-    _workspace_id: WorkspaceId
     _owner_id: OwnerId
+    _workspace_id: WorkspaceId | None = field(default=None)
     _id: ProjectId | None = field(default=None)
     _description: str | None = field(default=None)
     logo: str | None = field(default=None)
@@ -78,6 +78,13 @@ class ProjectEntity:
     @property
     def workspace_id(self) -> WorkspaceId:
         return self._workspace_id
+
+    @workspace_id.setter
+    def workspace_id(self, new_workspace_id: WorkspaceId) -> None:
+        if self.workspace_id is not None:
+            raise AttributeError('Идентификатор рабочего пространство для этого проекта уже установлен')
+
+        self._workspace_id = new_workspace_id
 
     @property
     def name(self) -> str:

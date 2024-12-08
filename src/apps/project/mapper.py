@@ -44,8 +44,6 @@ class ProjectMapper:
     @staticmethod
     def dto_to_entity(dto: ProjectCreateDTO) -> ProjectEntity:
         return ProjectEntity(
-            _id=ProjectId(dto.id) if isinstance(dto, ProjectWithParticipantCountDTO) else None,
-            _workspace_id=WorkspaceId(dto.workspace_id),
             _owner_id=OwnerId(dto.owner_id),
             _name=dto.name,
             _description=dto.description,
