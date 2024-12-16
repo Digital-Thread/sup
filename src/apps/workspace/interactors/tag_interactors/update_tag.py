@@ -1,5 +1,5 @@
 from src.apps.workspace.domain.entities.tag import TagEntity
-from src.apps.workspace.domain.types_ids import TagId, WorkspaceId
+from src.apps.workspace.domain.types_ids import TagId
 from src.apps.workspace.dtos.tag_dtos import UpdateTagAppDTO
 from src.apps.workspace.exceptions.tag_exceptions import (
     TagException,
@@ -15,18 +15,16 @@ class UpdateTagInteractor:
         self._tag_repository = tag_repository
 
     async def execute(self, request_data: UpdateTagAppDTO) -> None:
-        existing_tag = await self._get_existing_tag_in_workspace(
-            TagId(request_data.id), WorkspaceId(request_data.workspace_id)
-        )
+        existing_tag = await self._get_existing_tag_in_workspace(TagId(request_data.id))
         updated_tag = self._map_to_update_data(existing_tag, request_data)
         try:
             await self._tag_repository.update(updated_tag)
         except TagNotUpdated as error:
             raise TagException(f'{str(error)}')
 
-    async def _get_existing_tag_in_workspace(self, tag_id: TagId, workspace_id: WorkspaceId) -> TagEntity:
+    async def _get_existing_tag_in_workspace(self, tag_id: TagId) -> TagEntity:
         try:
-            existing_tag = await self._tag_repository.get_by_id(tag_id, workspace_id)
+            existing_tag = await self._tag_repository.get_by_id(tag_id)
         except TagNotFound as error:
             raise TagException(f'{str(error)}')
         else:

@@ -2,35 +2,23 @@ from dataclasses import dataclass
 from uuid import UUID
 
 
-@dataclass
-class BaseTagDTO:
-    id: int
-    workspace_id: UUID
-
 
 @dataclass
 class CreateTagAppDTO:
     name: str
     color: str
-    workspace_id: UUID
-    
+
     
 @dataclass
-class TagOutDTO(BaseTagDTO):
+class TagOutDTO:
+    id: int
     name: str
     color: str
-
-
-@dataclass
-class GetTagsAppDTO:
     workspace_id: UUID
 
 
 @dataclass
-class UpdateTagAppDTO(BaseTagDTO):
+class UpdateTagAppDTO:
+    id: int
     name: str | None = None
     color: str | None = None
-
-
-class DeleteTagAppDTO(BaseTagDTO):
-    pass
