@@ -34,7 +34,7 @@ async def create_tag(
 
 
 @tag_router.get('/', status_code=status.HTTP_200_OK, response_model=list[TagResponseDTO])
-async def get_tags_by_workspace_id(
+async def get_tags_in_workspace(
     interactor: FromDishka[GetTagByWorkspaceInteractor]
 ) -> list[TagResponseDTO]:
     try:

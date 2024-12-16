@@ -45,7 +45,7 @@ async def create_role(
 @role_router.get(
     '/', status_code=status.HTTP_200_OK, response_model=list[RoleWithUserCountResponseDTO]
 )
-async def get_roles_by_workspace_id(
+async def get_roles_in_workspace(
         interactor: FromDishka[GetRoleByWorkspaceInteractor]
 ) -> list[RoleWithUserCountResponseDTO]:
     try:

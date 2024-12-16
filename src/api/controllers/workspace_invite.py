@@ -35,7 +35,7 @@ async def create_workspace_invite(interactor: FromDishka[CreateWorkspaceInviteIn
 @workspace_invite_router.get(
     '/', status_code=status.HTTP_200_OK, response_model=list[ResponseWorkspaceInviteDTO]
 )
-async def get_invites_by_workspace_id(
+async def get_invites_in_workspace(
     request: Request,
     interactor: FromDishka[GetWorkspaceInviteByWorkspaceInteractor],
 ) -> list[ResponseWorkspaceInviteDTO]:

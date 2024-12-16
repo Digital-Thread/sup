@@ -32,7 +32,7 @@ async def create_category(
 
 
 @category_router.get('/', status_code=status.HTTP_200_OK, response_model=list[CategoryResponseDTO])
-async def get_categories_by_workspace_id(interactor: FromDishka[GetCategoryByWorkspaceInteractor]) -> list[CategoryResponseDTO]:
+async def get_categories_in_workspace(interactor: FromDishka[GetCategoryByWorkspaceInteractor]) -> list[CategoryResponseDTO]:
     try:
         response = await interactor.execute()
     except CategoryException as error:
