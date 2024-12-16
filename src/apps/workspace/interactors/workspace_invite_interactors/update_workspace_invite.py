@@ -32,7 +32,7 @@ class UpdateWorkspaceInviteInteractor:
         self, invite_id: InviteId, workspace_id: WorkspaceId
     ) -> WorkspaceInviteEntity:
         try:
-            existing_invite = await self._workspace_invite_repository.find_by_id(
+            existing_invite = await self._workspace_invite_repository.get_by_id(
                 invite_id, workspace_id
             )
         except (WorkspaceWorkspaceInviteNotFound, WorkspaceInviteNotFound) as error:

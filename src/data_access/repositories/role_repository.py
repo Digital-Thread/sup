@@ -33,7 +33,7 @@ class RoleRepository(IRoleRepository):
                 f'Рабочего пространства с id={role.workspace_id} не существует'
             )
 
-    async def find_by_id(self, role_id: RoleId, workspace_id: WorkspaceId) -> RoleEntity | None:
+    async def get_by_id(self, role_id: RoleId, workspace_id: WorkspaceId) -> RoleEntity | None:
         query = select(RoleModel).filter_by(id=role_id, workspace_id=workspace_id)
         result = await self._session.execute(query)
         try:

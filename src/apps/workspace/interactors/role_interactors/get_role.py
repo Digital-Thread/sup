@@ -13,7 +13,7 @@ class GetRoleByIdInteractor:
 
     async def execute(self, role_id: int, workspace_id: UUID) -> RoleOutDTO:
         try:
-            role = await self._role_repository.find_by_id(RoleId(role_id), WorkspaceId(workspace_id))
+            role = await self._role_repository.get_by_id(RoleId(role_id), WorkspaceId(workspace_id))
         except RoleNotFound as error:
             raise RoleException(f'{str(error)}')
         else:

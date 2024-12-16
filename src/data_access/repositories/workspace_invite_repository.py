@@ -39,7 +39,7 @@ class WorkspaceInviteRepository(IWorkspaceInviteRepository):
                 f'Рабочего пространства с id={workspace_invite.workspace_id} не существует'
             )
 
-    async def find_by_id(
+    async def get_by_id(
         self, workspace_invite_id: InviteId, workspace_id: WorkspaceId
     ) -> WorkspaceInviteEntity | None:
         query = select(WorkspaceInviteModel).filter_by(

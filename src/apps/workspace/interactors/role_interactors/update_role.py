@@ -30,7 +30,7 @@ class UpdateRoleInteractor:
         self, role_id: RoleId, workspace_id: WorkspaceId
     ) -> RoleEntity:
         try:
-            existing_role = await self._role_repository.find_by_id(role_id, workspace_id)
+            existing_role = await self._role_repository.get_by_id(role_id, workspace_id)
         except RoleNotFound as error:
             raise RoleException(f'{str(error)}')
         else:

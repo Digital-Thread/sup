@@ -26,7 +26,7 @@ class UpdateTagInteractor:
 
     async def _get_existing_tag_in_workspace(self, tag_id: TagId, workspace_id: WorkspaceId) -> TagEntity:
         try:
-            existing_tag = await self._tag_repository.find_by_id(tag_id, workspace_id)
+            existing_tag = await self._tag_repository.get_by_id(tag_id, workspace_id)
         except TagNotFound as error:
             raise TagException(f'{str(error)}')
         else:

@@ -13,7 +13,7 @@ class GetTagByIdInteractor:
 
     async def execute(self, tag_id: int, workspace_id: UUID) -> TagOutDTO:
         try:
-            tag = await self._tag_repository.find_by_id(TagId(tag_id), WorkspaceId(workspace_id))
+            tag = await self._tag_repository.get_by_id(TagId(tag_id), WorkspaceId(workspace_id))
         except TagNotFound:
             raise TagException(f'Тег с id={tag_id} не найден')
         else:

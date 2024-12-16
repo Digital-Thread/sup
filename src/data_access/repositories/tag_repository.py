@@ -40,7 +40,7 @@ class TagRepository(ITagRepository):
                 f'Рабочего пространства с id={tag.workspace_id} не существует'
             )
 
-    async def find_by_id(self, tag_id: TagId, workspace_id: WorkspaceId) -> TagEntity | None:
+    async def get_by_id(self, tag_id: TagId, workspace_id: WorkspaceId) -> TagEntity | None:
         query = select(TagModel).filter_by(id=tag_id, workspace_id=workspace_id)
         result = await self._session.execute(query)
         try:
