@@ -13,13 +13,8 @@ class CreateCategoryInteractor:
     def __init__(self, category_repository: ICategoryRepository):
         self._category_repository = category_repository
 
-    async def execute(self, request_data: CreateCategoryAppDTO) -> None:
+    async def execute(self, category_name: str) -> None:
         try:
-            await self._category_repository.save(
-                CategoryEntity(
-                    _name=request_data.name,
-                    _workspace_id=WorkspaceId(request_data.workspace_id),
-                )
-            )
+            await self._category_repository.save(CategoryEntity(_name=category_name,))
         except (ValueError, WorkspaceCategoryNotFound, CategoryAlreadyExists) as error:
             raise CategoryException(f'{str(error)}')

@@ -3,32 +3,19 @@ from uuid import UUID
 
 
 @dataclass
-class BaseCategoryDTO:
-    id: int
-    workspace_id: UUID
-
-
-@dataclass
 class CreateCategoryAppDTO:
     name: str
     workspace_id: UUID
 
 
 @dataclass
-class CategoryOutDTO(BaseCategoryDTO):
+class CategoryOutDTO:
+    id: int
+    workspace_id: UUID
     name: str
 
 
 @dataclass
-class GetCategoriesAppDTO:
-    workspace_id: UUID
-
-
-@dataclass
-class UpdateCategoryAppDTO(BaseCategoryDTO):
+class UpdateCategoryAppDTO:
+    category_id: int
     name: str | None = None
-
-
-@dataclass
-class DeleteCategoryAppDTO(BaseCategoryDTO):
-    pass
