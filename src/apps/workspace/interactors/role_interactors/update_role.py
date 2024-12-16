@@ -1,5 +1,5 @@
 from src.apps.workspace.domain.entities.role import RoleEntity
-from src.apps.workspace.domain.types_ids import RoleId, WorkspaceId
+from src.apps.workspace.domain.types_ids import RoleId
 from src.apps.workspace.dtos.role_dtos import UpdateRoleAppDTO
 from src.apps.workspace.exceptions.role_exceptions import (
     RoleException,
@@ -17,20 +17,16 @@ class UpdateRoleInteractor:
     async def execute(
         self, request_data: UpdateRoleAppDTO
     ) -> None:
-        existing_role = await self._get_existing_role_in_workspace(
-            RoleId(request_data.id), WorkspaceId(request_data.workspace_id)
-        )
+        existing_role = await self._get_existing_role_in_workspace(RoleId(request_data.id))
         updated_role = self._map_to_update_data(existing_role, request_data)
         try:
             await self._role_repository.update(updated_role)
         except RoleNotUpdated as error:
             raise RoleException(f'{str(error)}')
 
-    async def _get_existing_role_in_workspace(
-        self, role_id: RoleId, workspace_id: WorkspaceId
-    ) -> RoleEntity:
+    async def _get_existing_role_in_workspace(self, role_id: RoleId) -> RoleEntity:
         try:
-            existing_role = await self._role_repository.get_by_id(role_id, workspace_id)
+            existing_role = await self._role_repository.get_by_id(role_id)
         except RoleNotFound as error:
             raise RoleException(f'{str(error)}')
         else:

@@ -11,6 +11,6 @@ class AssignRoleToWorkspaceMemberInteractor:
 
     async def execute(self, request_data: AssignRoleToWorkspaceMemberDTO) -> None:
         try:
-            await self._user_workspace_role_repository.assign_role_to_workspace_member(WorkspaceId(request_data.workspace_id), MemberId(request_data.member_id), RoleId(request_data.id))
+            await self._user_workspace_role_repository.assign_role_to_workspace_member(MemberId(request_data.member_id), RoleId(request_data.id))
         except (WorkspaceNotFound, RoleNotFound, WorkspaceMemberNotFound) as error:
             raise RoleException(f'{str(error)}')
