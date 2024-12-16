@@ -1,18 +1,12 @@
-from typing import Annotated
-from uuid import UUID
-
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter, Body, HTTPException, Request, status
+from fastapi import APIRouter, HTTPException, Request, status
 
 from src.api.dtos.workspace_invite_dtos import (
     ResponseWorkspaceInviteDTO,
     UpdateWorkspaceInviteDTO,
 )
 from src.apps.workspace.dtos.workspace_invite_dtos import (
-    CreateWorkspaceInviteDTO,
-    DeleteWorkspaceInviteAppDTO,
-    GetWorkspaceInvitesAppDTO,
     UpdateWorkspaceInviteAppDTO,
 )
 from src.apps.workspace.exceptions.workspace_invite_exceptions import (
@@ -29,12 +23,9 @@ workspace_invite_router = APIRouter(route_class=DishkaRoute)
 
 
 @workspace_invite_router.post('', status_code=status.HTTP_201_CREATED)
-async def create_workspace_invite(
-    workspace_id: Annotated[UUID, Body(embed=True)],
-    interactor: FromDishka[CreateWorkspaceInviteInteractor],
-) -> dict[str, str]:
+async def create_workspace_invite(interactor: FromDishka[CreateWorkspaceInviteInteractor],) -> dict[str, str]:
     try:
-        await interactor.execute(CreateWorkspaceInviteDTO(workspace_id=workspace_id))
+        await interactor.execute()
     except WorkspaceInviteException as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
     else:
@@ -46,11 +37,10 @@ async def create_workspace_invite(
 )
 async def get_invites_by_workspace_id(
     request: Request,
-    workspace_id: UUID,
     interactor: FromDishka[GetWorkspaceInviteByWorkspaceInteractor],
 ) -> list[ResponseWorkspaceInviteDTO]:
     try:
-        response = await interactor.execute(GetWorkspaceInvitesAppDTO(workspace_id=workspace_id))
+        response = await interactor.execute()
     except WorkspaceInviteException as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
     else:
@@ -63,15 +53,14 @@ async def get_invites_by_workspace_id(
         ]
 
 
-@workspace_invite_router.patch('/{workspace_id}/{workspace_invite}', status_code=status.HTTP_200_OK)
+@workspace_invite_router.patch('/{workspace_invite}', status_code=status.HTTP_200_OK)
 async def update_status_invite(
     body: UpdateWorkspaceInviteDTO,
-    workspace_id: UUID,
     workspace_invite_id: int,
     interactor: FromDishka[UpdateWorkspaceInviteInteractor],
 ) -> dict[str, str]:
     request = UpdateWorkspaceInviteAppDTO(
-        **body.model_dump(exclude_none=True), id_=workspace_invite_id, workspace_id=workspace_id
+        **body.model_dump(exclude_none=True), id_=workspace_invite_id
     )
 
     try:
@@ -83,17 +72,14 @@ async def update_status_invite(
 
 
 @workspace_invite_router.delete(
-    '/{workspace_id}/{workspace_invite_id}', status_code=status.HTTP_200_OK
+    '/{workspace_invite_id}', status_code=status.HTTP_200_OK
 )
 async def delete_category_by_id(
     workspace_invite_id: int,
-    workspace_id: UUID,
     interactor: FromDishka[DeleteWorkspaceInviteInteractor],
 ) -> dict[str, str]:
     try:
-        await interactor.execute(
-            DeleteWorkspaceInviteAppDTO(id_=workspace_invite_id, workspace_id=workspace_id)
-        )
+        await interactor.execute(workspace_invite_id)
     except WorkspaceInviteException as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
     return {'redirect_url': '/'}
