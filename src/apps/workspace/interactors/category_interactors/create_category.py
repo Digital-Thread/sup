@@ -1,6 +1,4 @@
 from src.apps.workspace.domain.entities.category import CategoryEntity
-from src.apps.workspace.domain.types_ids import WorkspaceId
-from src.apps.workspace.dtos.category_dtos import CreateCategoryAppDTO
 from src.apps.workspace.exceptions.category_exceptions import (
     CategoryAlreadyExists,
     CategoryException,
