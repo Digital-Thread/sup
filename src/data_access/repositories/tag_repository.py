@@ -73,14 +73,10 @@ class TagRepository(ITagRepository):
             raise TagNotUpdated(f'Тег с id={tag.id} не обновлен')
 
     async def delete(self, tag_id: TagId) -> None:
-        exists_tag = await self._session.execute(
-            select(exists().where(TagModel.id == tag_id, TagModel.workspace_id == self._context.workspace_id))
-        )
+        stmt = delete(TagModel).filter_by(id=tag_id, workspace_id=self._context.workspace_id)
+        result = await self._session.execute(stmt)
 
-        if not exists_tag.scalar():
+        if result.rowcount == 0:
             raise TagNotFound(
                 f'Тег с id={tag_id} не найден в указанном рабочем пространстве при удалении.'
             )
-
-        stmt = delete(TagModel).filter_by(id=tag_id, workspace_id=self._context.workspace_id)
-        await self._session.execute(stmt)

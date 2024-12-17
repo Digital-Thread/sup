@@ -85,21 +85,12 @@ class WorkspaceInviteRepository(IWorkspaceInviteRepository):
             )
 
     async def delete(self, workspace_invite_id: InviteId) -> None:
-        exists_workspace_invite = await self._session.execute(
-            select(
-                exists().where(
-                    WorkspaceInviteModel.id == workspace_invite_id,
-                    WorkspaceInviteModel.workspace_id == self._context.workspace_id,
-                )
-            )
-        )
-
-        if not exists_workspace_invite.scalar():
-            raise WorkspaceInviteNotFound(
-                f'Ссылка приглашения с id={workspace_invite_id} не найдена в рабочем пространстве при удалении.'
-            )
-
         stmt = delete(WorkspaceInviteModel).filter_by(
             id=workspace_invite_id, workspace_id=self._context.workspace_id
         )
-        await self._session.execute(stmt)
+        result = await self._session.execute(stmt)
+
+        if result.rowcount == 0:
+            raise WorkspaceInviteNotFound(
+                f'Ссылка приглашения с id={workspace_invite_id} не найдена в рабочем пространстве при удалении.'
+            )

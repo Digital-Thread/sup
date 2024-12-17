@@ -69,12 +69,8 @@ class RoleRepository(IRoleRepository):
             raise RoleNotUpdated(f'Роль с id={role.id} не обновлена')
 
     async def delete(self, role_id: RoleId) -> None:
-        exists_role = await self._session.execute(
-            select(exists().where(RoleModel.id == role_id, RoleModel.workspace_id == self._context.workspace_id))
-        )
-
-        if not exists_role.scalar():
-            raise RoleNotFound(f'Роль с id={role_id} не найдена в рабочем пространстве')
-
         stmt = delete(RoleModel).filter_by(id=role_id, workspace_id=self._context.workspace_id)
-        await self._session.execute(stmt)
+        result = await self._session.execute(stmt)
+
+        if result.rowcount == 0:
+            raise RoleNotFound(f'Роль с id={role_id} не найдена в рабочем пространстве')

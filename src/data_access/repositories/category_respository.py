@@ -75,18 +75,9 @@ class CategoryRepository(ICategoryRepository):
             raise CategoryNotUpdated(f'Категория с id={category.id} не обновлена')
 
     async def delete(self, category_id: CategoryId) -> None:
-        exists_category = await self._session.execute(
-            select(
-                exists().where(
-                    CategoryModel.id == category_id, CategoryModel.workspace_id == self._context.workspace_id
-                )
-            )
-        )
-
-        if not exists_category.scalar():
+        stmt = delete(CategoryModel).filter_by(id=category_id, workspace_id=self._context.workspace_id)
+        result = await self._session.execute(stmt)
+        if result.rowcount == 0:
             raise CategoryNotFound(
                 f'Категория с id={category_id} не найдена в рабочем пространстве'
             )
-
-        stmt = delete(CategoryModel).filter_by(id=category_id, workspace_id=self._context.workspace_id)
-        await self._session.execute(stmt)
