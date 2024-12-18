@@ -1,12 +1,9 @@
-from uuid import UUID
-
 from pydantic import BaseModel, ConfigDict, Field
 
 
 class CreateTagDTO(BaseModel):
     name: str
     color: str
-    workspace_id: UUID
 
 
 class TagResponseDTO(BaseModel):

@@ -6,7 +6,6 @@ from pydantic import BaseModel, ConfigDict, Field
 class CreateRoleDTO(BaseModel):
     name: str
     color: str
-    workspace_id: UUID
 
 
 class RoleWithUserCountResponseDTO(BaseModel):

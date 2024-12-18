@@ -8,9 +8,9 @@ from src.apps.workspace.repositories.base_repository import IBaseRepository
 
 class IWorkspaceInviteRepository(IBaseRepository[WorkspaceInviteEntity, InviteId]):
     @abstractmethod
-    async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[WorkspaceInviteEntity]:
+    async def get_by_workspace_id(self) -> list[WorkspaceInviteEntity]:
         raise NotImplementedError
 
     @abstractmethod
-    async def find_by_code(self, code: UUID) -> tuple[WorkspaceId, InviteId]:
+    async def get_by_code(self, code: UUID) -> tuple[WorkspaceId, InviteId]:
         raise NotImplementedError

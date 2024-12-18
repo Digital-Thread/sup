@@ -1,15 +1,12 @@
-from uuid import UUID
 from typing import Annotated
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter, HTTPException, status, Path, Query
+from fastapi import APIRouter, HTTPException, status, Path
 
 from src.api.dtos.tag import CreateTagDTO, TagResponseDTO, UpdateTagDTO
 from src.apps.workspace.dtos.tag_dtos import (
     CreateTagAppDTO,
-    DeleteTagAppDTO,
-    GetTagsAppDTO,
     UpdateTagAppDTO,
 )
 from src.apps.workspace.exceptions.tag_exceptions import TagException
@@ -37,11 +34,11 @@ async def create_tag(
 
 
 @tag_router.get('/', status_code=status.HTTP_200_OK, response_model=list[TagResponseDTO])
-async def get_tags_by_workspace_id(
-    workspace_id: UUID, interactor: FromDishka[GetTagByWorkspaceInteractor]
+async def get_tags_in_workspace(
+    interactor: FromDishka[GetTagByWorkspaceInteractor]
 ) -> list[TagResponseDTO]:
     try:
-        response = await interactor.execute(GetTagsAppDTO(workspace_id=workspace_id))
+        response = await interactor.execute()
     except TagException as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
     return [TagResponseDTO(**tag.__dict__) for tag in response]
@@ -50,11 +47,10 @@ async def get_tags_by_workspace_id(
 @tag_router.get('/{tag_id}', status_code=status.HTTP_200_OK, response_model=TagResponseDTO)
 async def get_tag_by_id(
         tag_id: Annotated[int, Path()],
-        workspace_id: Annotated[UUID, Query()],
         interactor: FromDishka[GetTagByIdInteractor]
 ) -> TagResponseDTO:
     try:
-        response = await interactor.execute(tag_id, workspace_id)
+        response = await interactor.execute(tag_id)
     except TagException as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
     else:
@@ -65,13 +61,10 @@ async def get_tag_by_id(
 @tag_router.patch('/{tag_id}', status_code=status.HTTP_200_OK)
 async def update_tag(
     body: UpdateTagDTO,
-    workspace_id: UUID,
     tag_id: int,
     interactor: FromDishka[UpdateTagInteractor],
 ) -> dict[str, str]:
-    request = UpdateTagAppDTO(
-        **body.model_dump(exclude_none=True), id=tag_id, workspace_id=workspace_id
-    )
+    request = UpdateTagAppDTO(**body.model_dump(exclude_none=True), id=tag_id)
     try:
         await interactor.execute(request)
     except TagException as error:
@@ -81,10 +74,10 @@ async def update_tag(
 
 @tag_router.delete('/{tag_id}')
 async def delete_tag_by_id(
-    tag_id: int, workspace_id: UUID, interactor: FromDishka[DeleteTagInteractor]
+    tag_id: int, interactor: FromDishka[DeleteTagInteractor]
 ) -> dict[str, str]:
     try:
-        await interactor.execute(DeleteTagAppDTO(id=tag_id, workspace_id=workspace_id))
+        await interactor.execute(tag_id)
     except TagException as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
     return {'redirect_url': '/'}

@@ -51,7 +51,7 @@ async def get_project_by_id(
 
 
 @project_router.get('/', status_code=status.HTTP_200_OK, response_model=list[ProjectResponseDTO])
-async def get_projects_by_workspace_id(
+async def get_projects_in_workspace(
     interactor: FromDishka[GetProjectByWorkspaceInteractor],
 ) -> list[ProjectResponseDTO]:
     try:

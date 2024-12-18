@@ -7,7 +7,7 @@ from src.apps.workspace.domain.types_ids import CategoryId, WorkspaceId
 @dataclass
 class CategoryEntity(NameValidatorMixin):
     _name: str
-    _workspace_id: WorkspaceId
+    _workspace_id: WorkspaceId | None = field(default=None)
     _id: CategoryId | None = field(default=None)
 
     def __post_init__(self) -> None:
@@ -27,6 +27,13 @@ class CategoryEntity(NameValidatorMixin):
     @property
     def workspace_id(self) -> WorkspaceId:
         return self._workspace_id
+
+    @workspace_id.setter
+    def workspace_id(self, new_workspace_id: WorkspaceId) -> None:
+        if self._workspace_id is not None:
+            raise AttributeError('Идентификатор рабочего пространства уже установлен')
+
+        self._workspace_id = new_workspace_id
 
     @property
     def name(self) -> str:

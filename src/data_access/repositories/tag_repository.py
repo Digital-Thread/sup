@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError, NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.apps.workspace.domain.entities.tag import TagEntity
-from src.apps.workspace.domain.types_ids import TagId, WorkspaceId
+from src.apps.workspace.domain.types_ids import TagId
 from src.apps.workspace.exceptions.tag_exceptions import (
     TagAlreadyExists,
     TagNotFound,
@@ -17,13 +17,16 @@ from src.apps.workspace.repositories.tag_repository import ITagRepository
 from src.data_access.mappers.tag_mapper import TagMapper
 from src.data_access.models import WorkspaceModel
 from src.data_access.models.workspace_models.tag import TagModel
+from src.providers.context import WorkspaceContext
 
 
 class TagRepository(ITagRepository):
-    def __init__(self, session_factory: AsyncSession):
+    def __init__(self, session_factory: AsyncSession, context: WorkspaceContext):
         self._session = session_factory
+        self._context = context
 
     async def save(self, tag: TagEntity) -> None:
+        tag.workspace_id = self._context.workspace_id
         stmt = TagMapper.entity_to_model(tag)
         self._session.add(stmt)
 
@@ -40,8 +43,8 @@ class TagRepository(ITagRepository):
                 f'Рабочего пространства с id={tag.workspace_id} не существует'
             )
 
-    async def find_by_id(self, tag_id: TagId, workspace_id: WorkspaceId) -> TagEntity | None:
-        query = select(TagModel).filter_by(id=tag_id, workspace_id=workspace_id)
+    async def get_by_id(self, tag_id: TagId) -> TagEntity | None:
+        query = select(TagModel).filter_by(id=tag_id, workspace_id=self._context.workspace_id)
         result = await self._session.execute(query)
         try:
             tag_model = result.scalar_one()
@@ -51,13 +54,13 @@ class TagRepository(ITagRepository):
         else:
             return TagMapper.model_to_entity(tag_model)
 
-    async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[TagEntity]:
-        query = select(TagModel).filter_by(workspace_id=workspace_id)
+    async def get_by_workspace_id(self) -> list[TagEntity]:
+        query = select(TagModel).filter_by(workspace_id=self._context.workspace_id)
         result = await self._session.execute(query)
         tags = [TagMapper.model_to_entity(tag) for tag in result.scalars().all()]
         if not tags:
-            if not await self._session.get(WorkspaceModel, workspace_id):
-                raise WorkspaceTagNotFound(f'Рабочее пространство с id={workspace_id} не найдено')
+            if not await self._session.get(WorkspaceModel, self._context.workspace_id):
+                raise WorkspaceTagNotFound(f'Рабочее пространство с id={self._context.workspace_id} не найдено')
 
         return tags
 
@@ -69,15 +72,11 @@ class TagRepository(ITagRepository):
         if result.rowcount == 0:
             raise TagNotUpdated(f'Тег с id={tag.id} не обновлен')
 
-    async def delete(self, tag_id: TagId, workspace_id: WorkspaceId) -> None:
-        exists_tag = await self._session.execute(
-            select(exists().where(TagModel.id == tag_id, TagModel.workspace_id == workspace_id))
-        )
+    async def delete(self, tag_id: TagId) -> None:
+        stmt = delete(TagModel).filter_by(id=tag_id, workspace_id=self._context.workspace_id)
+        result = await self._session.execute(stmt)
 
-        if not exists_tag.scalar():
+        if result.rowcount == 0:
             raise TagNotFound(
                 f'Тег с id={tag_id} не найден в указанном рабочем пространстве при удалении.'
             )
-
-        stmt = delete(TagModel).filter_by(id=tag_id, workspace_id=workspace_id)
-        await self._session.execute(stmt)

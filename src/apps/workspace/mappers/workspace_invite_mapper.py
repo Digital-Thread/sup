@@ -5,14 +5,14 @@ from src.apps.workspace.domain.entities.workspace_invite import (
 from src.apps.workspace.domain.types_ids import InviteId, WorkspaceId
 from src.apps.workspace.dtos.workspace_invite_dtos import (
     UpdateWorkspaceInviteAppDTO,
-    WorkspaceInviteAppDTO,
+    WorkspaceInviteOutDTO,
 )
 from src.apps.workspace.mappers.base_mapper import BaseMapper
 
 
-class WorkspaceInviteMapper(BaseMapper[WorkspaceInviteEntity, WorkspaceInviteAppDTO]):
+class WorkspaceInviteMapper(BaseMapper[WorkspaceInviteEntity, WorkspaceInviteOutDTO]):
     @staticmethod
-    def dto_to_entity(dto: WorkspaceInviteAppDTO) -> WorkspaceInviteEntity:
+    def dto_to_entity(dto: WorkspaceInviteOutDTO) -> WorkspaceInviteEntity:
 
         return WorkspaceInviteEntity(
             _id=InviteId(dto.id),

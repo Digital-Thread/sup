@@ -21,13 +21,16 @@ from src.data_access.mappers.workspace_invite_mapper import (
 from src.data_access.models.workspace_models.workspace_invite import (
     WorkspaceInviteModel,
 )
+from src.providers.context import WorkspaceContext
 
 
 class WorkspaceInviteRepository(IWorkspaceInviteRepository):
-    def __init__(self, session_factory: AsyncSession):
+    def __init__(self, session_factory: AsyncSession, context: WorkspaceContext):
         self._session = session_factory
+        self._context = context
 
     async def save(self, workspace_invite: WorkspaceInviteEntity) -> None:
+        workspace_invite.workspace_id = self._context.workspace_id
         stmt = WorkspaceInviteMapper.entity_to_model(workspace_invite)
         self._session.add(stmt)
 
@@ -39,11 +42,9 @@ class WorkspaceInviteRepository(IWorkspaceInviteRepository):
                 f'Рабочего пространства с id={workspace_invite.workspace_id} не существует'
             )
 
-    async def find_by_id(
-        self, workspace_invite_id: InviteId, workspace_id: WorkspaceId
-    ) -> WorkspaceInviteEntity | None:
+    async def get_by_id(self, workspace_invite_id: InviteId) -> WorkspaceInviteEntity | None:
         query = select(WorkspaceInviteModel).filter_by(
-            id=workspace_invite_id, workspace_id=workspace_id
+            id=workspace_invite_id, workspace_id=self._context.workspace_id
         )
         result = await self._session.execute(query)
         try:
@@ -56,20 +57,16 @@ class WorkspaceInviteRepository(IWorkspaceInviteRepository):
         else:
             return WorkspaceInviteMapper.model_to_entity(invite_model)
 
-    async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[WorkspaceInviteEntity]:
-        query = select(WorkspaceInviteModel).filter_by(workspace_id=workspace_id)
+    async def get_by_workspace_id(self) -> list[WorkspaceInviteEntity]:
+        query = select(WorkspaceInviteModel).filter_by(workspace_id=self._context.workspace_id)
         result = await self._session.execute(query)
         invites = [
             WorkspaceInviteMapper.model_to_entity(invite) for invite in result.scalars().all()
         ]
-        if not invites:
-            raise WorkspaceWorkspaceInviteNotFound(
-                f'Рабочее пространство с id={workspace_id} для ссылки приглашения не найдено'
-            )
 
         return invites
 
-    async def find_by_code(self, code: UUID) -> tuple[WorkspaceId, InviteId]:
+    async def get_by_code(self, code: UUID) -> tuple[WorkspaceId, InviteId]:
         query = select(WorkspaceInviteModel.workspace_id, WorkspaceInviteModel.id).filter_by(
             code=code
         )
@@ -87,22 +84,13 @@ class WorkspaceInviteRepository(IWorkspaceInviteRepository):
                 f'Ссылка приглашения с id={workspace_invite.id} не обновлена'
             )
 
-    async def delete(self, workspace_invite_id: InviteId, workspace_id: WorkspaceId) -> None:
-        exists_workspace_invite = await self._session.execute(
-            select(
-                exists().where(
-                    WorkspaceInviteModel.id == workspace_invite_id,
-                    WorkspaceInviteModel.workspace_id == workspace_id,
-                )
-            )
+    async def delete(self, workspace_invite_id: InviteId) -> None:
+        stmt = delete(WorkspaceInviteModel).filter_by(
+            id=workspace_invite_id, workspace_id=self._context.workspace_id
         )
+        result = await self._session.execute(stmt)
 
-        if not exists_workspace_invite.scalar():
+        if result.rowcount == 0:
             raise WorkspaceInviteNotFound(
                 f'Ссылка приглашения с id={workspace_invite_id} не найдена в рабочем пространстве при удалении.'
             )
-
-        stmt = delete(WorkspaceInviteModel).filter_by(
-            id=workspace_invite_id, workspace_id=workspace_id
-        )
-        await self._session.execute(stmt)
