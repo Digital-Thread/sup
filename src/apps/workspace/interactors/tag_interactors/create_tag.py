@@ -20,7 +20,6 @@ class CreateTagInteractor:
                 TagEntity(
                     _name=tag_data.name,
                     _color=tag_data.color,
-                    _workspace_id=WorkspaceId(tag_data.workspace_id),
                 )
             )
         except (ValueError, WorkspaceTagNotFound, TagAlreadyExists) as error:

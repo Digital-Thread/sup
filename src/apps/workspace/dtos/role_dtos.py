@@ -3,16 +3,9 @@ from uuid import UUID
 
 
 @dataclass
-class BaseRoleDTO:
-    id: int
-    workspace_id: UUID
-
-
-@dataclass
 class CreateRoleAppDTO:
     name: str
     color: str
-    workspace_id: UUID
 
 
 @dataclass
@@ -24,32 +17,21 @@ class RoleWithUserCountAppDTO:
 
 
 @dataclass
-class RoleOutDTO(BaseRoleDTO):
+class RoleOutDTO:
+    id: int
+    workspace_id: UUID
     name: str
     color: str
 
 
 @dataclass
-class GetRolesAppDTO:
-    workspace_id: UUID
-
-
-@dataclass
-class UpdateRoleAppDTO(BaseRoleDTO):
+class UpdateRoleAppDTO:
+    id: int
     name: str | None = None
     color: str | None = None
 
 
-class DeleteRoleAppDTO(BaseRoleDTO):
-    pass
-
-
 @dataclass
-class AssignRoleToWorkspaceMemberDTO(BaseRoleDTO):
-    member_id: UUID
-
-
-@dataclass
-class RemoveRoleFromWorkspaceMemberDTO:
-    workspace_id: UUID
+class AssignRoleToWorkspaceMemberDTO:
+    id: int
     member_id: UUID

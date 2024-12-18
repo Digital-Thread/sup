@@ -7,5 +7,5 @@ from src.apps.workspace.repositories.base_repository import IBaseRepository
 
 class ITagRepository(IBaseRepository[TagEntity, TagId]):
     @abstractmethod
-    async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[TagEntity]:
+    async def get_by_workspace_id(self) -> list[TagEntity]:
         raise NotImplementedError

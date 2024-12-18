@@ -16,7 +16,7 @@ class StatusInvite(Enum):
 class WorkspaceInviteEntity:
     EXPIRATION_DAYS = 7
 
-    _workspace_id: WorkspaceId
+    _workspace_id: WorkspaceId | None = field(default=None)
     _id: InviteId | None = field(default=None)
     code: UUID = field(default_factory=uuid4)
     _status: StatusInvite = field(default=StatusInvite.ACTIVE)
@@ -64,6 +64,13 @@ class WorkspaceInviteEntity:
     @property
     def workspace_id(self) -> WorkspaceId:
         return self._workspace_id
+
+    @workspace_id.setter
+    def workspace_id(self, new_workspace_id: WorkspaceId) -> None:
+        if self._workspace_id is not None:
+            raise AttributeError('Идентификатор рабочего пространства уже установлен')
+
+        self._workspace_id = new_workspace_id
 
     @property
     def status(self) -> StatusInvite:

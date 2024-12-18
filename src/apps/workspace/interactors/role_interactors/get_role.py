@@ -1,6 +1,4 @@
-from uuid import UUID
-
-from src.apps.workspace.domain.types_ids import RoleId, WorkspaceId
+from src.apps.workspace.domain.types_ids import RoleId
 from src.apps.workspace.dtos.role_dtos import RoleOutDTO
 from src.apps.workspace.exceptions.role_exceptions import RoleException, RoleNotFound
 from src.apps.workspace.mappers.role_mapper import RoleMapper
@@ -11,9 +9,9 @@ class GetRoleByIdInteractor:
     def __init__(self, role_repository: IRoleRepository):
         self._role_repository = role_repository
 
-    async def execute(self, role_id: int, workspace_id: UUID) -> RoleOutDTO:
+    async def execute(self, role_id: int) -> RoleOutDTO:
         try:
-            role = await self._role_repository.find_by_id(RoleId(role_id), WorkspaceId(workspace_id))
+            role = await self._role_repository.get_by_id(RoleId(role_id))
         except RoleNotFound as error:
             raise RoleException(f'{str(error)}')
         else:
