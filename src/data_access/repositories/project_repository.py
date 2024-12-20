@@ -1,7 +1,8 @@
 from logging import warning
+from uuid import UUID
 
 from asyncpg.exceptions import ForeignKeyViolationError, UniqueViolationError
-from sqlalchemy import delete, func, select, update
+from sqlalchemy import delete, exists, func, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,10 +13,13 @@ from src.apps.project.domain.types_ids import ParticipantId, ProjectId, Workspac
 from src.apps.project.exceptions import (
     ParticipantNotFound,
     ProjectAlreadyExists,
-    WorkspaceForProjectNotFound, ProjectNotDeleted,
+    ProjectNotDeleted,
+    WorkspaceForProjectNotFound,
 )
 from src.apps.project.project_repository import IProjectRepository
+from src.apps.workspace.exceptions.workspace_exceptions import WorkspaceMemberNotFound
 from src.data_access.mappers.project_mapper import ProjectMapper
+from src.data_access.models import WorkspaceMemberModel
 from src.data_access.models.project import ProjectModel
 from src.data_access.models.project_participants import ProjectParticipantsModel
 from src.providers.context import WorkspaceContext
@@ -25,6 +29,21 @@ class ProjectRepository(IProjectRepository):
     def __init__(self, session_factory: AsyncSession, context: WorkspaceContext):
         self._session = session_factory
         self._context = context
+
+    async def check_user_in_workspace(self, user_ids: set[UUID]) -> None:
+        query = select(WorkspaceMemberModel.user_id).where(
+            WorkspaceMemberModel.workspace_id == self._context.workspace_id,
+            WorkspaceMemberModel.user_id.in_(user_ids),
+        )
+        result = await self._session.execute(query)
+        valid_user_ids = {row.user_id for row in result}
+
+        invalid_users = user_ids - valid_user_ids
+
+        if invalid_users:
+            raise WorkspaceMemberNotFound(
+                'Пользователь отсутствует в рабочем пространстве, в котором находится проект'
+            )
 
     async def save(self, project: ProjectEntity) -> None:
         project.workspace_id = WorkspaceId(self._context.workspace_id)
