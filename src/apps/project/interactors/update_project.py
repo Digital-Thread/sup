@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from src.apps.project.domain.project import ProjectEntity
 from src.apps.project.domain.types_ids import ParticipantId, ProjectId
 from src.apps.project.dtos import ProjectUpdateDTO
@@ -7,19 +9,23 @@ from src.apps.project.exceptions import (
     ProjectNotFound,
     ProjectNotUpdated,
 )
+from src.apps.project.interactors.update_participants import UpdateParticipantsInteractor
 from src.apps.project.project_repository import IProjectRepository
 from src.apps.project.mapper import ProjectMapper
+from src.apps.workspace.exceptions.workspace_exceptions import WorkspaceMemberNotFound
 
 
 class UpdateProjectInteractor:
-    def __init__(self, project_repository: IProjectRepository):
+    def __init__(self, project_repository: IProjectRepository, update_participants_interactor: UpdateParticipantsInteractor):
         self._project_repository = project_repository
+        self._update_participants_interactor = update_participants_interactor
 
     async def execute(
         self, project_id: int, updated_data: ProjectUpdateDTO
     ) -> None:
         existing_project = await self._get_existing_project_in_workspace(ProjectId(project_id))
-        await self.update_participant(existing_project, updated_data)
+        await self._check_user_in_workspace(updated_data.assigned_to, updated_data.participant_ids)
+        await self._update_participants_interactor.execute(existing_project, updated_data)
         updated_project = self._apply_update_data_to_project(existing_project, updated_data)
 
         try:
@@ -37,29 +43,14 @@ class UpdateProjectInteractor:
         else:
             return existing_project
 
-    async def update_participant(
-        self, existing_project: ProjectEntity, update_data: ProjectUpdateDTO
-    ) -> None:
-        if self._has_participants_changed(existing_project, update_data):
+    async def _check_user_in_workspace(self, assigned_to: UUID | None, participants_ids: list[UUID] | None) -> None:
+        user_ids = ProjectMapper.map_to_set_users(assigned_to, participants_ids)
+
+        if user_ids:
             try:
-                await self._project_repository.update_participants(
-                    existing_project.id,
-                    [ParticipantId(participant) for participant in update_data.participant_ids],
-                )
-            except ParticipantNotFound as error:
-                raise ProjectException(str(error)) from error
-
-    @staticmethod
-    def _has_participants_changed(
-        existing_project: ProjectEntity, update_data: ProjectUpdateDTO
-    ) -> bool:
-        if (
-            update_data.participant_ids
-            and existing_project.participant_ids != update_data.participant_ids
-        ):
-            return True
-
-        return False
+                await self._project_repository.check_user_in_workspace(user_ids)
+            except WorkspaceMemberNotFound as error:
+                raise ProjectException(str(error))
 
     @staticmethod
     def _apply_update_data_to_project(

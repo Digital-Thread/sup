@@ -87,3 +87,13 @@ class ProjectMapper:
             )
 
         return projects_with_user_count
+
+    @staticmethod
+    def map_to_set_users(
+        assigned_to: UUID | None = None, participants: list[UUID] | None = None
+    ) -> set[UUID]:
+        user_ids = set(participants or [])
+        if assigned_to:
+            user_ids.add(assigned_to)
+
+        return user_ids

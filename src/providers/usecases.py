@@ -31,6 +31,7 @@ from src.apps.project.interactors import (
     GetProjectByWorkspaceInteractor,
     UpdateProjectInteractor,
 )
+from src.apps.project.interactors.update_participants import UpdateParticipantsInteractor
 from src.apps.project.use_cases.get_project_by_id import GetProjectByIdUseCase
 from src.apps.task import (
     CreateTaskInteractor,
@@ -165,6 +166,7 @@ class ProjectInteractorProvider(Provider):
     get_project_by_workspace = provide(GetProjectByWorkspaceInteractor)
     get_project_by_id = provide(GetProjectByIdUseCase)
     update_project = provide(UpdateProjectInteractor)
+    update_participants = provide(UpdateParticipantsInteractor)
     delete_project = provide(DeleteProjectInteractor)
 
 
