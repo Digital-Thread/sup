@@ -88,7 +88,7 @@ class WorkspaceRepository(IWorkspaceRepository):
                 f'Рабочее пространство с id={workspace_id} не найдено у этого пользователя.'
             )
 
-    async def find_workspace_members(self) -> dict[MemberId, str]:
+    async def get_workspace_members(self) -> dict[MemberId, str]:
         query = select(
             UserModel.id,
             UserModel.first_name,
