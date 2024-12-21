@@ -22,7 +22,7 @@ from src.apps.workspace.interactors.workspace_interactors import (
     DeleteWorkspaceInteractor,
     GetWorkspaceByIdInteractor,
     GetWorkspaceByMemberInteractor,
-    UpdateWorkspaceInteractor,
+    UpdateWorkspaceInteractor, GetWorkspaceMembersInteractor,
 )
 
 workspace_router = APIRouter(route_class=DishkaRoute)
@@ -42,6 +42,16 @@ async def create_workspace(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
 
     return {'redirect_url': '/'}
+
+
+@workspace_router.get('/members')
+async def get_workspace_members(interactor: FromDishka[GetWorkspaceMembersInteractor]):
+    try:
+        response = await interactor.execute()
+    except WorkspaceException as error:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'{str(error)}')
+
+    return response
 
 
 @workspace_router.get(
@@ -96,3 +106,5 @@ async def delete_workspace(
     except WorkspaceException as error:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'{str(error)}')
     return {'redirect_url': '/'}
+
+

@@ -7,5 +7,5 @@ class GetWorkspaceMembersInteractor:
         self._workspace_repository = workspace_repository
 
     async def execute(self) -> dict[MemberId, str]:
-        members = await self._workspace_repository.find_workspace_members()
+        members = await self._workspace_repository.get_workspace_members()
         return members
