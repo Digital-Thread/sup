@@ -1,10 +1,15 @@
 from abc import ABC, abstractmethod
+from uuid import UUID
 
 from src.apps.project.domain.project import ProjectEntity
 from src.apps.project.domain.types_ids import ParticipantId, ProjectId, WorkspaceId
 
 
 class IProjectRepository(ABC):
+
+    @abstractmethod
+    async def check_user_in_workspace(self, user_ids: set[UUID]) -> None:
+        raise NotImplementedError
 
     @abstractmethod
     async def save(self, project: ProjectEntity) -> None:
