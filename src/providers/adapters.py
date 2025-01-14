@@ -118,10 +118,6 @@ class WorkspaceProvider(Provider):
     @provide
     def provide_workspace_context(self, request: Request) -> WorkspaceContext:
         workspace_id = getattr(request.state, 'workspace_id', None)
-
-        if not workspace_id:
-            raise ValueError('Workspace ID is missing in the request state')
-
         return WorkspaceContext(workspace_id=workspace_id)
 
 
