@@ -19,17 +19,21 @@ from src.apps.feature.interactors import (
     GetFeatureInteractor,
     UpdateFeatureInteractor,
 )
-from src.apps.feature.domain import FeatureId, OptionalFeatureUpdateFields
+from src.apps.feature.domain import FeatureId, OptionalFeatureUpdateFields, WorkspaceId
 from src.apps.feature import FeatureListQuery, FeatureInputDTO, FeatureUpdateDTO, OrderBy, PaginateParams
+from src.providers.context import WorkspaceContext
 
 feature_router = APIRouter(route_class=DishkaRoute)
 
 
 @feature_router.post('/', status_code=status.HTTP_201_CREATED, response_model=SuccessResponse)
 async def create_feature(
-        dto: CreateFeatureRequestDTO, interactor: FromDishka[CreateFeatureInteractor]
+        dto: CreateFeatureRequestDTO,
+        interactor: FromDishka[CreateFeatureInteractor],
+        context: FromDishka[WorkspaceContext],
 ) -> SuccessResponse:
-    feature = FeatureInputDTO(**dto.model_dump())
+    workspace_id = context.workspace_id
+    feature = FeatureInputDTO(WorkspaceId(workspace_id), **dto.model_dump())
     await interactor.execute(dto=feature)
 
     return SuccessResponse(message='Feature created')
@@ -37,9 +41,11 @@ async def create_feature(
 
 @feature_router.get('/', status_code=status.HTTP_200_OK, response_model=list[FeatureResponseDTO])
 async def get_features(
-        query: Annotated[QueryParams, Query()], interactor: FromDishka[GetAllFeaturesInteractor]
+        query: Annotated[QueryParams, Query()],
+        interactor: FromDishka[GetAllFeaturesInteractor],
+        context: FromDishka[WorkspaceContext],
 ) -> list[FeatureResponseDTO]:
-    workspace_id = query.workspace_id
+    workspace_id = WorkspaceId(context.workspace_id)
     query_params = FeatureListQuery(
         filters=query.filters,
         order_by=OrderBy(field=query.order_by_field, order=query.sort_order),
