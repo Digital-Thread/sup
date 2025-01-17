@@ -9,6 +9,7 @@ from src.apps.feature.domain.types_ids import (
     TagId,
     UserId,
     WorkspaceId,
+    FeatureId,
 )
 
 
@@ -60,18 +61,19 @@ class OptionalFeatureUpdateFields(TypedDict, total=False):
 class FeatureEntity:
 
     def __init__(
-        self,
-        name: str,
-        workspace_id: WorkspaceId,
-        project_id: ProjectId,
-        owner_id: OwnerId,
-        assigned_to: UserId | None = None,
-        description: str | None = None,
-        priority: Priority = Priority.NO_PRIORITY,
-        status: Status = Status.NEW,
-        tags: list[TagId] | None = None,
-        members: list[UserId] | None = None,
+            self,
+            name: str,
+            workspace_id: WorkspaceId,
+            project_id: ProjectId,
+            owner_id: OwnerId,
+            assigned_to: UserId | None = None,
+            description: str | None = None,
+            priority: Priority = Priority.NO_PRIORITY,
+            status: Status = Status.NEW,
+            tags: list[TagId] | None = None,
+            members: list[UserId] | None = None,
     ):
+        self._id: FeatureId | None = None
         self.name = name
         self._workspace_id = workspace_id
         self.project_id = project_id
@@ -84,6 +86,17 @@ class FeatureEntity:
         self.members = members
         self.created_at = datetime.now(timezone.utc)
         self.updated_at = datetime.now(timezone.utc)
+
+    @property
+    def id(self):
+        return self._id
+
+    @id.setter
+    def id(self, _id: FeatureId):
+        if self._id is not None:
+            raise AttributeError('Идентификатор фичи уже установлен')
+
+        self._id = _id
 
     @property
     def name(self) -> str:

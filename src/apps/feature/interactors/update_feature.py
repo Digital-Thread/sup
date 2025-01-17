@@ -19,6 +19,6 @@ class UpdateFeatureInteractor(BaseInteractor):
             raise FeatureUpdateError(context=e) from None
 
         try:
-            await self._repository.update(feature_id=dto.id, feature=feature)
+            await self._repository.update(feature=feature)
         except FeatureRepositoryError as e:
             raise FeatureUpdateError(context=e) from None

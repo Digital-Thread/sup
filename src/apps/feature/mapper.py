@@ -6,11 +6,10 @@ class FeatureMapper:
 
     @staticmethod
     def entity_to_dto(
-        feature_id: FeatureId,
         entity: FeatureEntity,
     ) -> FeatureOutputDTO:
         return FeatureOutputDTO(
-            id=feature_id,
+            id=entity.id,
             workspace_id=entity.workspace_id,
             name=entity.name,
             project_id=entity.project_id,

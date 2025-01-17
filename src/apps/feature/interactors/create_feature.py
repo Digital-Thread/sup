@@ -8,7 +8,7 @@ class CreateFeatureInteractor(BaseInteractor):
     async def execute(self, dto: FeatureInputDTO) -> None:
         try:
             feature = FeatureMapper.dto_to_entity(dto=dto)
-        except ValueError as e:
+        except (ValueError, AttributeError) as e:
             raise FeatureCreateError(context=e) from None
 
         try:

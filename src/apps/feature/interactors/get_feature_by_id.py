@@ -11,5 +11,5 @@ class GetFeatureInteractor(BaseInteractor):
         if not feature:
             raise FeatureDoesNotExistError(feature_id)
 
-        feature_dto = FeatureMapper.entity_to_dto(feature_id=feature_id, entity=feature)
+        feature_dto = FeatureMapper.entity_to_dto(entity=feature)
         return feature_dto

@@ -49,7 +49,7 @@ class FeatureRepository(IFeatureRepository):
         except IntegrityError as e:
             orig_exception = e.orig.__cause__
             if isinstance(orig_exception, ForeignKeyViolationError):
-                detail_message = orig_exception.detail
+                detail_message = orig_exception.detail  # noqa
                 raise FeatureRepositoryError(detail_message)
             else:
                 raise
@@ -58,11 +58,11 @@ class FeatureRepository(IFeatureRepository):
         feature_model = await self.get_model(feature_id=feature_id)
         if feature_model:
             return self.converter.map_model_to_entity(feature_model)
-        else:
-            return None
 
-    async def update(self, feature_id: FeatureId, feature: FeatureEntity) -> None:
-        feature_model = await self.get_model(feature_id=feature_id)
+        return None
+
+    async def update(self, feature: FeatureEntity) -> None:
+        feature_model = await self.get_model(feature_id=feature.id)
         if feature_model:
             feature_model.name = feature.name
             feature_model.created_at = feature.created_at
@@ -79,7 +79,7 @@ class FeatureRepository(IFeatureRepository):
             except IntegrityError as e:
                 orig_exception = e.orig.__cause__
                 if isinstance(orig_exception, ForeignKeyViolationError):
-                    detail_message = orig_exception.detail
+                    detail_message = orig_exception.detail  # noqa
                     raise FeatureRepositoryError(detail_message)
                 else:
                     raise
@@ -92,8 +92,10 @@ class FeatureRepository(IFeatureRepository):
             raise FeatureRepositoryError(message=f'Не найдена фича с id: {feature_id}')
 
     async def get_list(
-        self, workspace_id: WorkspaceId, query: FeatureListQuery
-    ) -> list[tuple[FeatureId, FeatureEntity]] | None:
+            self,
+            workspace_id: WorkspaceId,
+            query: FeatureListQuery,
+    ) -> list[FeatureEntity] | None:
         conditions = [self.model.workspace_id == workspace_id]
 
         filters = query.filters
@@ -128,7 +130,7 @@ class FeatureRepository(IFeatureRepository):
         result = await self._session.execute(stmt)
         features = result.scalars().all()
         return (
-            [(FeatureId(f.id), self.converter.map_model_to_entity(f)) for f in features]
+            [self.converter.map_model_to_entity(f) for f in features]
             if features
             else None
         )

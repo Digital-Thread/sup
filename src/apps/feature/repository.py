@@ -15,7 +15,7 @@ class IFeatureRepository(ABC):
         pass
 
     @abstractmethod
-    async def update(self, feature_id: FeatureId, feature: FeatureEntity) -> None:
+    async def update(self, feature: FeatureEntity) -> None:
         pass
 
     @abstractmethod
@@ -25,5 +25,5 @@ class IFeatureRepository(ABC):
     @abstractmethod
     async def get_list(
         self, workspace_id: WorkspaceId, query: FeatureListQuery
-    ) -> list[tuple[FeatureId, FeatureEntity]]:
+    ) -> list[FeatureEntity]:
         pass

@@ -5,6 +5,7 @@ from src.apps.feature.domain import (
     TagId,
     UserId,
     WorkspaceId,
+    FeatureId,
 )
 from src.data_access.models import FeatureModel
 
@@ -47,6 +48,7 @@ class FeatureConverter:
                 else None
             ),
         )
+        feature.id = FeatureId(feature_model.id)
         feature.created_at = feature_model.created_at
         feature.updated_at = feature_model.updated_at
         return feature
