@@ -23,7 +23,6 @@ class SuccessResponse(BaseModel):
 
 
 class CreateFeatureRequestDTO(BaseModel):
-    workspace_id: WorkspaceId
     name: str
     project_id: ProjectId
     owner_id: OwnerId
@@ -91,8 +90,6 @@ class PageLimits(StrEnum):
 
 
 class QueryParams(BaseModel):
-    workspace_id: WorkspaceId
-
     filter_by_members: list[UserId] | None = None
     filter_by_tags: list[TagId] | None = None
     filter_by_statuses: list[Status] | None = None
