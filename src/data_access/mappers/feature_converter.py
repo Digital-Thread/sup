@@ -6,6 +6,7 @@ from src.apps.feature.domain import (
     UserId,
     WorkspaceId,
     FeatureId,
+    TaskId,
 )
 from src.data_access.models import FeatureModel
 
@@ -29,7 +30,7 @@ class FeatureConverter:
         return feature_model
 
     @staticmethod
-    def map_model_to_entity(feature_model: FeatureModel) -> FeatureEntity:
+    def map_model_to_entity(feature_model: FeatureModel, with_tasks: bool) -> FeatureEntity:
         feature = FeatureEntity(
             workspace_id=WorkspaceId(feature_model.workspace_id),
             name=feature_model.name,
@@ -48,6 +49,9 @@ class FeatureConverter:
                 else None
             ),
         )
+        if with_tasks:
+            feature.tasks = ([TaskId(task.id) for task in feature_model.tasks] if feature_model.tasks else None)
+
         feature.id = FeatureId(feature_model.id)
         feature.created_at = feature_model.created_at
         feature.updated_at = feature_model.updated_at

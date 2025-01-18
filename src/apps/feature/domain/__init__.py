@@ -5,6 +5,7 @@ from src.apps.feature.domain.types_ids import (
     TagId,
     UserId,
     WorkspaceId,
+    TaskId,
 )
 from src.apps.feature.domain.feature import (
     FeatureEntity,
@@ -24,4 +25,5 @@ __all__ = (
     'TagId',
     'UserId',
     'WorkspaceId',
+    'TaskId',
 )

@@ -14,6 +14,7 @@ from src.apps.feature.domain import (
     TagId,
     UserId,
     WorkspaceId,
+    TaskId,
 )
 from src.apps.feature import FeatureUpdateError, FilterField, OrderByField, SortOrder
 
@@ -67,6 +68,7 @@ class FeatureResponseDTO(BaseModel):
     status: Status
     tags: list[TagId] | None
     members: list[UserId] | None
+    tasks: list[TaskId] | None
     model_config = ConfigDict(
         from_attributes=True,
     )

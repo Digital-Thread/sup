@@ -31,7 +31,11 @@ class FeatureRepository(IFeatureRepository):
         stmt = (
             select(self.model)
             .where(self.model.id == feature_id)
-            .options(selectinload(self.model.tags), selectinload(self.model.members))
+            .options(
+                selectinload(self.model.tags),
+                selectinload(self.model.members),
+                selectinload(self.model.tasks),
+            )
         )
         result = await self._session.execute(stmt)
         feature_model = result.scalar_one_or_none()
@@ -57,7 +61,7 @@ class FeatureRepository(IFeatureRepository):
     async def get_by_id(self, feature_id: FeatureId) -> FeatureEntity | None:
         feature_model = await self.get_model(feature_id=feature_id)
         if feature_model:
-            return self.converter.map_model_to_entity(feature_model)
+            return self.converter.map_model_to_entity(feature_model=feature_model, with_tasks=True)
 
         return None
 
@@ -130,7 +134,7 @@ class FeatureRepository(IFeatureRepository):
         result = await self._session.execute(stmt)
         features = result.scalars().all()
         return (
-            [self.converter.map_model_to_entity(f) for f in features]
+            [self.converter.map_model_to_entity(feature_model=f, with_tasks=False) for f in features]
             if features
             else None
         )

@@ -11,6 +11,7 @@ from src.apps.feature.domain import (
     TagId,
     UserId,
     WorkspaceId,
+    TaskId,
 )
 
 
@@ -49,3 +50,4 @@ class FeatureOutputDTO:
     status: Status = Status.NEW
     tags: list[TagId] | None = None
     members: list[UserId] | None = None
+    tasks: list[TaskId] | None = None

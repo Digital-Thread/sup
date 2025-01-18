@@ -22,6 +22,7 @@ class FeatureMapper:
             status=entity.status,
             tags=entity.tags,
             members=entity.members,
+            tasks=entity.tasks,
         )
 
     @staticmethod
