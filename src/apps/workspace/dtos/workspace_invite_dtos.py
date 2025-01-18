@@ -18,4 +18,5 @@ class WorkspaceInviteOutDTO:
 @dataclass
 class UpdateWorkspaceInviteAppDTO:
     id_: int
+    workspace_id: UUID | None = None
     status: StatusInvite | None = None

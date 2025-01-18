@@ -13,7 +13,7 @@ class IBaseRepository[T, ID](ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_by_id(self, entity_id: ID) -> T | None:
+    async def get_by_id(self, entity_id: ID, workspace_id: WorkspaceId | None) -> T | None:
         raise NotImplementedError
 
     @abstractmethod

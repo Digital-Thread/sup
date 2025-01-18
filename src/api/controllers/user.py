@@ -199,22 +199,18 @@ async def create_user_by_invite(
     update_status_invite_interactor: FromDishka[UpdateWorkspaceInviteInteractor],
     invite_token: UUID = Path(...),
 ) -> UserResponseDTO:
-    workspace_id_for_invite = await workspace_invite_interactor.execute(invite_token)
+    workspace_id, invite_id = await workspace_invite_interactor.execute(invite_token)
     new_user = await create_user_service.create_user(dto=create_user_dto)
-
     await workspace_interactor.execute(
         CreateWorkspaceAppDTO(
             name=f'{new_user.first_name} {new_user.last_name}',
             owner_id=new_user.id,
         )
     )
-    await add_member_interactor.execute(workspace_id_for_invite[0], new_user.id)
+    await add_member_interactor.execute(workspace_id, new_user.id)
     await update_status_invite_interactor.execute(
-        workspace_id_for_invite[1],
-        workspace_id_for_invite[0],
-        UpdateWorkspaceInviteAppDTO(status=StatusInvite.USED),
+        UpdateWorkspaceInviteAppDTO(id_=invite_id, workspace_id=workspace_id, status=StatusInvite.USED),
     )
-
     return UserResponseDTO.model_validate(new_user)
 
 
