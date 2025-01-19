@@ -4,7 +4,7 @@ from typing import List, Optional
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.apps.user.domain.entities import User
+from src.apps.user.domain.entity import User
 from src.apps.user.repositories import IUserRepository
 from src.data_access.mappers.user_mapper import UserMapper
 from src.data_access.models import UserModel

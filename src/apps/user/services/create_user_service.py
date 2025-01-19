@@ -8,9 +8,9 @@ from typing import Optional
 import redis.asyncio as redis
 from passlib.context import CryptContext
 
-from src.apps.user.domain.entities import User
+from src.apps.user.domain.entity import User
 from src.apps.user.dtos import UserCreateDTO
-from src.apps.user.dtos.dtos import AdminCreateUserDTO
+from src.apps.user.dtos import AdminCreateUserDTO
 from src.apps.user.exceptions import (
     LengthUserPasswordException,
     TokenActivationExpire,

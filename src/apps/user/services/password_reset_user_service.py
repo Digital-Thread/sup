@@ -1,4 +1,4 @@
-from src.apps.user.domain.entities import User
+from src.apps.user.domain.entity import User
 from src.apps.user.dtos import AdminPasswordUpdateDTO, UserPasswordUpdateDTO
 from src.apps.user.exceptions import UserNotFoundByEmailException, UserPasswordException
 from src.apps.user.repositories import IUserRepository
