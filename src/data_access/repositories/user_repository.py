@@ -16,10 +16,10 @@ class UserRepository(IUserRepository):
         self.model = UserModel
 
     async def save(self, user: User) -> None:
-        sql_user = UserMapper.domain_to_model(user)
+        stmt = UserMapper.domain_to_model(user)
         user._created_at = datetime.datetime.now(datetime.timezone.utc)
         user._updated_at = datetime.datetime.now(datetime.timezone.utc)
-        self._session.add(sql_user)
+        self._session.add(stmt)
 
     async def find_by_email(self, email: str) -> Optional[User]:
         query = select(self.model).where(self.model.email == email.lower())
@@ -44,14 +44,14 @@ class UserRepository(IUserRepository):
         return [UserMapper.model_to_domain(sql_user) for sql_user in sql_users]
 
     async def delete(self, email: str) -> None:
-        query = select(self.model).where(self.model.email == email)
-        result = await self._session.execute(query)
+        stmt = select(self.model).where(self.model.email == email)
+        result = await self._session.execute(stmt)
         model = result.scalar_one_or_none()
         if model:
             await self._session.delete(model)
 
     async def update(self, user: User) -> None:
-        query = (
+        stmt = (
             update(self.model)
             .where(self.model.email == user.email)
             .values(
@@ -69,4 +69,4 @@ class UserRepository(IUserRepository):
                 updated_at=datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None),
             )
         )
-        await self._session.execute(query)
+        await self._session.execute(stmt)
