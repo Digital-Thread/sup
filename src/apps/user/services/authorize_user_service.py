@@ -6,7 +6,7 @@ from src.apps.user.exceptions import (
     UserNotFoundError,
     UserPermissionError,
 )
-from src.apps.user.repositories import IUserRepository
+from src.apps.user.repository import IUserRepository
 from src.apps.user.services import GetUserService
 
 

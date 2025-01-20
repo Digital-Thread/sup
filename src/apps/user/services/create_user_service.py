@@ -19,7 +19,7 @@ from src.apps.user.exceptions import (
     UserPermissionError,
 )
 from src.apps.user.protocols import SendMailServiceProtocol
-from src.apps.user.repositories import IUserRepository
+from src.apps.user.repository import IUserRepository
 from src.config import RedisConfig, SMTPConfig
 
 
