@@ -1,13 +1,20 @@
 from datetime import datetime, timezone
 from re import match
+from typing import TypedDict
 
-from src.apps.meet.dtos import MeetResponseDTO
-
-from .participant import Participant
-from .value_objects import AssignedId, CategoryId, MeetId, OwnerId, WorkspaceId
+from .participant import ParticipantEntity
+from .type_ids import AssignedId, CategoryId, MeetId, OwnerId, WorkspaceId
 
 
-class Meet:
+class OptionalMeetUpdateFields(TypedDict, total=False):
+    name: str
+    meet_at: datetime
+    category_id: CategoryId
+    assigned_to: AssignedId
+    participants: list[ParticipantEntity]
+
+
+class MeetEntity:
     _NAME_MAX_LENGHT = 50
 
     def __init__(
@@ -18,7 +25,7 @@ class Meet:
         category_id: CategoryId,
         owner_id: OwnerId,
         assigned_to: AssignedId,
-        participants: list[Participant],
+        participants: list[ParticipantEntity],
     ):
         self._id: MeetId | None = None
         self.workspace_id = workspace_id
@@ -30,6 +37,19 @@ class Meet:
         self.participants = participants if participants else []
         self._created_at = datetime.now(timezone.utc)
         self._updated_at = datetime.now(timezone.utc)
+
+    @property
+    def id(self) -> MeetId:
+        if self._id is None:
+            raise AttributeError('Meet id is not set.')
+        return self._id
+
+    @id.setter
+    def id(self, _id: MeetId) -> None:
+        if self._id is not None:
+            raise AttributeError('Meet id is already set.')
+
+        self._id = _id
 
     @property
     def name(self) -> str:
@@ -61,16 +81,6 @@ class Meet:
         self._meet_at = value
 
     @property
-    def id(self) -> MeetId:
-        if self._id is None:
-            raise ValueError('Meet id is None.')
-        return self._id
-
-    @id.setter
-    def id(self, value: MeetId) -> None:
-        self._id = value
-
-    @property
     def created_at(self) -> datetime:
         return self._created_at
 
@@ -78,17 +88,19 @@ class Meet:
     def updated_at(self) -> datetime:
         return self._updated_at
 
-    def mark_as_updated(self) -> None:
+    def update_fields(self, updates: OptionalMeetUpdateFields) -> None:
+        for field, value in updates.items():
+            setattr(self, field, value)
         self._updated_at = datetime.now(timezone.utc)
 
-    def to_dto(self) -> MeetResponseDTO:
-        participants = [p.to_dto() for p in self.participants] if self.participants else []
-        return MeetResponseDTO(
-            id=self.id,
-            name=self.name,
-            meet_at=self.meet_at,
-            category_id=self.category_id,
-            owner_id=self.owner_id,
-            assigned_to=self.assigned_to,
-            participants=participants,
-        )
+    # def to_dto(self) -> MeetResponseDTO:
+    #     participants = [p.to_dto() for p in self.participants] if self.participants else []
+    #     return MeetResponseDTO(
+    #         id=self.id,
+    #         name=self.name,
+    #         meet_at=self.meet_at,
+    #         category_id=self.category_id,
+    #         owner_id=self.owner_id,
+    #         assigned_to=self.assigned_to,
+    #         participants=participants,
+    #     )
