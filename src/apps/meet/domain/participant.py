@@ -1,24 +1,26 @@
 from datetime import datetime, timezone
-from enum import IntEnum
-from typing import TypedDict
+from enum import Enum
+from typing import Literal, TypedDict
 
 from .type_ids import MeetId, ParticipantId, UserId
 
 
-class Status(IntEnum):
-    UNDEFINED = 0
-    PRESENT = 1
-    ABSENT = 2
-    WARNED = 3
+class Status(Enum):
+    UNDEFINED = 'undefined'
+    PRESENT = 'present'
+    ABSENT = 'absent'
+    WARNED = 'warned'
+
+    @classmethod
+    def from_display(cls, display: str) -> 'Status':
+        try:
+            return cls(display)
+        except ValueError as e:
+            raise ValueError(f'Invalid display value: {display}') from e
 
     @property
-    def display(self) -> str:
-        return {
-            0: 'undefined',
-            1: 'present',
-            2: 'absent',
-            3: 'warned',
-        }[self.value]
+    def display(self) -> Literal['undefined', 'present', 'absent', 'warned']:
+        return self.value
 
 
 class OptionalParticipantUpdateFields(TypedDict, total=False):

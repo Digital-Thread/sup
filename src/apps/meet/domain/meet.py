@@ -25,7 +25,7 @@ class MeetEntity:
         category_id: CategoryId,
         owner_id: OwnerId,
         assigned_to: AssignedId,
-        participants: list[ParticipantEntity],
+        participants: list[ParticipantEntity] | None = None,
     ):
         self._id: MeetId | None = None
         self.workspace_id = workspace_id
@@ -34,7 +34,7 @@ class MeetEntity:
         self.category_id = category_id
         self.owner_id = owner_id
         self.assigned_to = assigned_to
-        self.participants = participants if participants else []
+        self.participants = participants
         self.created_at = datetime.now(timezone.utc)
         self.updated_at = datetime.now(timezone.utc)
 
