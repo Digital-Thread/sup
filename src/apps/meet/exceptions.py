@@ -34,6 +34,14 @@ class MeetCreateError(MeetError):
     DEFAULT_MESSAGE = 'Meet create error'
 
 
+class MeetUpdateError(MeetError):
+    DEFAULT_MESSAGE = 'Meet update error'
+
+
+class MeetDeleteError(MeetError):
+    DEFAULT_MESSAGE = 'Meet delete error'
+
+
 class MeetInviteError(MeetError):
     DEFAULT_MESSAGE = 'Meet invite error'
 
@@ -48,3 +56,7 @@ class ParticipantNotFoundException(MeetError):
 
 class ParticipantCreateError(MeetError):
     DEFAULT_MESSAGE = 'Participant create error'
+
+
+class MeetRepositoryError(MeetError):
+    DEFAULT_MESSAGE = 'Meet repository error'
