@@ -5,7 +5,7 @@ from typing import TypedDict
 from .type_ids import MeetId, ParticipantId, UserId
 
 
-class Status(str, IntEnum):
+class Status(IntEnum):
     UNDEFINED = 0
     PRESENT = 1
     ABSENT = 2
@@ -14,11 +14,11 @@ class Status(str, IntEnum):
     @property
     def display(self) -> str:
         return {
-            self.UNDEFINED: 'undefined',
-            self.PRESENT: 'present',
-            self.ABSENT: 'absent',
-            self.WARNED: 'warned',
-        }
+            0: 'undefined',
+            1: 'present',
+            2: 'absent',
+            3: 'warned',
+        }[self.value]
 
 
 class OptionalParticipantUpdateFields(TypedDict, total=False):
@@ -35,8 +35,8 @@ class ParticipantEntity:
         self.status = status
         self._id: ParticipantId | None = None
         self._meet_id: MeetId | None = None
-        self._created_at = datetime.now(timezone.utc)
-        self._updated_at = datetime.now(timezone.utc)
+        self.created_at = datetime.now(timezone.utc)
+        self.updated_at = datetime.now(timezone.utc)
 
     @property
     def id(self) -> ParticipantId:
@@ -66,11 +66,3 @@ class ParticipantEntity:
         for field, value in updates.items():
             setattr(self, field, value)
         self.updated_at = datetime.now(timezone.utc)
-
-    # def to_dto(self) -> ParticipantResponseDTO:
-    #     return ParticipantResponseDTO(
-    #         id=self.id,
-    #         user_id=self.user_id,
-    #         meet_id=self.meet_id,
-    #         status=self.status.display,
-    #     )

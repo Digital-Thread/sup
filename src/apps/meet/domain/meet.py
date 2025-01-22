@@ -35,8 +35,8 @@ class MeetEntity:
         self.owner_id = owner_id
         self.assigned_to = assigned_to
         self.participants = participants if participants else []
-        self._created_at = datetime.now(timezone.utc)
-        self._updated_at = datetime.now(timezone.utc)
+        self.created_at = datetime.now(timezone.utc)
+        self.updated_at = datetime.now(timezone.utc)
 
     @property
     def id(self) -> MeetId:
@@ -80,27 +80,7 @@ class MeetEntity:
             value = value.replace(tzinfo=None)
         self._meet_at = value
 
-    @property
-    def created_at(self) -> datetime:
-        return self._created_at
-
-    @property
-    def updated_at(self) -> datetime:
-        return self._updated_at
-
     def update_fields(self, updates: OptionalMeetUpdateFields) -> None:
         for field, value in updates.items():
             setattr(self, field, value)
-        self._updated_at = datetime.now(timezone.utc)
-
-    # def to_dto(self) -> MeetResponseDTO:
-    #     participants = [p.to_dto() for p in self.participants] if self.participants else []
-    #     return MeetResponseDTO(
-    #         id=self.id,
-    #         name=self.name,
-    #         meet_at=self.meet_at,
-    #         category_id=self.category_id,
-    #         owner_id=self.owner_id,
-    #         assigned_to=self.assigned_to,
-    #         participants=participants,
-    #     )
+        self.updated_at = datetime.now(timezone.utc)
