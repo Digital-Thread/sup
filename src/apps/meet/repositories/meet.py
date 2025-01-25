@@ -13,7 +13,7 @@ class IMeetRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_list(self, query: MeetListQuery) -> list[MeetEntity]:
+    async def get_list(self, query: MeetListQuery) -> list[MeetEntity] | None:
         raise NotImplementedError
 
     @abstractmethod
