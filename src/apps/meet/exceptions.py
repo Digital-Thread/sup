@@ -50,12 +50,20 @@ class ParticipantCheckError(MeetError):
     DEFAULT_MESSAGE = 'Participant check error'
 
 
-class ParticipantNotFoundException(MeetError):
+class ParticipantNotFoundError(MeetError):
     DEFAULT_MESSAGE = 'Participant not found'
 
 
 class ParticipantCreateError(MeetError):
     DEFAULT_MESSAGE = 'Participant create error'
+
+
+class ParticipantUpdateError(MeetError):
+    DEFAULT_MESSAGE = 'Participant update error'
+
+
+class ParticipantDeleteError(MeetError):
+    DEFAULT_MESSAGE = 'Participant delete error'
 
 
 class MeetRepositoryError(MeetError):
