@@ -6,7 +6,7 @@ from ..repositories import IParticipantRepository
 from .base_interactor import BaseInteractor
 
 
-class GetMeetInteractor(BaseInteractor):
+class GetParticipantInteractor(BaseInteractor):
     def __init__(
         self, participant_repository: IParticipantRepository, participant_id: ParticipantId
     ):

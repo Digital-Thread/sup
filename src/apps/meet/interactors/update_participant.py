@@ -4,7 +4,7 @@ from ..repositories import IParticipantRepository
 from .base_interactor import BaseInteractor
 
 
-class UpdateMeetInteractor(BaseInteractor):
+class UpdateParticipantInteractor(BaseInteractor):
     def __init__(self, participant_repository: IParticipantRepository, dto: ParticipantUpdateDTO):
         self._repository = participant_repository
         self._dto = dto
