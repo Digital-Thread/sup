@@ -9,15 +9,15 @@ from ..query_parameters import MeetListQuery
 
 class IMeetRepository(ABC):
     @abstractmethod
-    async def save(self, meet: MeetEntity) -> None:
+    async def save(self, meet: MeetEntity) -> MeetId:
         raise NotImplementedError
 
     @abstractmethod
-    async def get_list(self, query: MeetListQuery) -> list[MeetEntity] | None:
+    async def get_list(self, query: MeetListQuery) -> list[MeetEntity]:
         raise NotImplementedError
 
     @abstractmethod
-    async def get_by_id(self, meet_id: MeetId) -> MeetEntity | None:
+    async def get_by_id(self, meet_id: MeetId) -> MeetEntity:
         raise NotImplementedError
 
     @abstractmethod
