@@ -16,10 +16,15 @@ from src.apps.feature import (
 )
 from src.apps.meet import (
     CreateMeetInteractor,
+    CreateParticipantInteractor,
     DeleteMeetInteractor,
+    DeleteParticipantInteractor,
     GetListMeetsInteractor,
+    GetListParticipantsInteractor,
     GetMeetInteractor,
+    GetParticipantInteractor,
     UpdateMeetInteractor,
+    UpdateParticipantInteractor,
 )
 from src.apps.project.interactors import (
     CreateProjectInteractor,
@@ -184,3 +189,13 @@ class MeetInteractorProvider(Provider):
     get_meets = provide(GetListMeetsInteractor)
     update_meet = provide(UpdateMeetInteractor)
     delete_meet = provide(DeleteMeetInteractor)
+
+
+class MeetParticipantInteractorProvider(Provider):
+    scope = Scope.REQUEST
+
+    create_participant = provide(CreateParticipantInteractor)
+    get_participant_by_id = provide(GetParticipantInteractor)
+    get_participants = provide(GetListParticipantsInteractor)
+    update_participant = provide(UpdateParticipantInteractor)
+    delete_participant = provide(DeleteParticipantInteractor)
