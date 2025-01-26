@@ -5,17 +5,16 @@ from .base_interactor import BaseInteractor
 
 
 class UpdateMeetInteractor(BaseInteractor):
-    def __init__(self, meet_repository: IMeetRepository, dto: MeetUpdateDTO):
+    def __init__(self, meet_repository: IMeetRepository):
         self._repository = meet_repository
-        self._dto = dto
 
-    async def execute(self) -> None:
-        meet = await self._repository.get_by_id(self._dto.id)
+    async def execute(self, dto: MeetUpdateDTO) -> None:
+        meet = await self._repository.get_by_id(dto.id)
         if not meet:
             raise MeetNotFoundError()
 
         try:
-            meet.update_fields(self._dto.updated_fields)
+            meet.update_fields(dto.updated_fields)
         except ValueError as e:
             raise MeetUpdateError(context=e) from e
 

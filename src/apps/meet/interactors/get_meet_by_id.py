@@ -7,12 +7,11 @@ from .base_interactor import BaseInteractor
 
 
 class GetMeetInteractor(BaseInteractor):
-    def __init__(self, meet_repository: IMeetRepository, meet_id: MeetId):
+    def __init__(self, meet_repository: IMeetRepository):
         self._repository = meet_repository
-        self._meet_id = meet_id
 
-    async def execute(self) -> MeetOutputDTO:
-        meet = await self._repository.get_by_id(self._meet_id)
+    async def execute(self, meet_id: MeetId) -> MeetOutputDTO:
+        meet = await self._repository.get_by_id(meet_id)
         if not meet:
             raise MeetNotFoundError()
 

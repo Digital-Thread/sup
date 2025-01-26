@@ -6,10 +6,9 @@ from .base_interactor import BaseInteractor
 
 
 class GetListMeetsInteractor(BaseInteractor):
-    def __init__(self, meet_repository: IMeetRepository, query: MeetListQuery):
+    def __init__(self, meet_repository: IMeetRepository):
         self._repository = meet_repository
-        self._query = query
 
-    async def execute(self) -> list[MeetOutputDTO] | None:
-        meet = await self._repository.get_list(self._query)
+    async def execute(self, query: MeetListQuery) -> list[MeetOutputDTO] | None:
+        meet = await self._repository.get_list(query)
         return [MeetMapper.entity_to_dto(m) for m in meet] if meet else None

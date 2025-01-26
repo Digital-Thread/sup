@@ -5,12 +5,11 @@ from .base_interactor import BaseInteractor
 
 
 class DeleteMeetInteractor(BaseInteractor):
-    def __init__(self, meet_repository: IMeetRepository, meet_id: MeetId):
+    def __init__(self, meet_repository: IMeetRepository):
         self._repository = meet_repository
-        self._meet_id = meet_id
 
-    async def execute(self):
+    async def execute(self, meet_id: MeetId):
         try:
-            await self._repository.delete(self._meet_id)
+            await self._repository.delete(meet_id)
         except MeetRepositoryError as e:
             raise MeetDeleteError(context=e) from None

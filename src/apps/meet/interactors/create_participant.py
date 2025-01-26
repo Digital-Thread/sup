@@ -9,13 +9,12 @@ from .base_interactor import BaseInteractor
 
 
 class CreateParticipantInteractor(BaseInteractor):
-    def __init__(self, meet_repository: IParticipantRepository, dto: ParticipantInputDTO):
+    def __init__(self, meet_repository: IParticipantRepository):
         self._repository = meet_repository
-        self._dto = dto
 
-    async def execute(self) -> None:
+    async def execute(self, dto: ParticipantInputDTO) -> None:
         try:
-            participant = ParticipantMapper.dto_to_entity(self._dto)
+            participant = ParticipantMapper.dto_to_entity(dto)
         except ValueError as e:
             raise ParticipantCreateError(context=e) from None
 

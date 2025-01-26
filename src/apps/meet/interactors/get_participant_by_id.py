@@ -7,14 +7,11 @@ from .base_interactor import BaseInteractor
 
 
 class GetParticipantInteractor(BaseInteractor):
-    def __init__(
-        self, participant_repository: IParticipantRepository, participant_id: ParticipantId
-    ):
+    def __init__(self, participant_repository: IParticipantRepository):
         self._repository = participant_repository
-        self._participant_id = participant_id
 
-    async def execute(self) -> ParticipantOutputDTO:
-        participant = await self._repository.get_by_id(self._participant_id)
+    async def execute(self, participant_id: ParticipantId) -> ParticipantOutputDTO:
+        participant = await self._repository.get_by_id(participant_id)
         if not participant:
             raise ParticipantNotFoundError()
 

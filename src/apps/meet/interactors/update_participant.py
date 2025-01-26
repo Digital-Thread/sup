@@ -5,17 +5,16 @@ from .base_interactor import BaseInteractor
 
 
 class UpdateParticipantInteractor(BaseInteractor):
-    def __init__(self, participant_repository: IParticipantRepository, dto: ParticipantUpdateDTO):
+    def __init__(self, participant_repository: IParticipantRepository):
         self._repository = participant_repository
-        self._dto = dto
 
-    async def execute(self) -> None:
-        participant = await self._repository.get_by_id(self._dto.id)
+    async def execute(self, dto: ParticipantUpdateDTO) -> None:
+        participant = await self._repository.get_by_id(dto.id)
         if not participant:
             raise ParticipantNotFoundError()
 
         try:
-            participant.update_fields(self._dto.updated_fields)
+            participant.update_fields(dto.updated_fields)
         except ValueError as e:
             raise ParticipantUpdateError(context=e) from e
 

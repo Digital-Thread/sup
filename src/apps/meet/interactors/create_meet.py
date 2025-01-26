@@ -1,3 +1,4 @@
+from ..domain import MeetId
 from ..dtos import MeetInputDTO
 from ..exceptions import (
     MeetCreateError,
@@ -9,17 +10,16 @@ from .base_interactor import BaseInteractor
 
 
 class CreateMeetInteractor(BaseInteractor):
-    def __init__(self, meet_repository: IMeetRepository, dto: MeetInputDTO):
+    def __init__(self, meet_repository: IMeetRepository):
         self._repository = meet_repository
-        self._dto = dto
 
-    async def execute(self) -> None:
+    async def execute(self, dto: MeetInputDTO) -> MeetId:
         try:
-            meet = MeetMapper.dto_to_entity(self._dto)
+            meet = MeetMapper.dto_to_entity(dto)
         except ValueError as e:
             raise MeetCreateError(context=e) from None
 
         try:
-            await self._repository.save(meet=meet)
+            return await self._repository.save(meet=meet)
         except MeetRepositoryError as e:
             raise MeetCreateError(context=e) from None
