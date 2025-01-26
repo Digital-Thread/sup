@@ -13,9 +13,9 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from src.apps.auth import JWTService
-from src.apps.feature import IFeatureRepository
 from src.apps.comment import ICommentRepository
-from src.apps.meet import IMeetRepository, IParticipantRepository, MeetService
+from src.apps.feature import IFeatureRepository
+from src.apps.meet import IMeetRepository, IParticipantRepository
 from src.apps.meet.protocols import WorkspaceService, WorkspaceServiceProtocol
 from src.apps.project.project_repository import IProjectRepository
 from src.apps.send_mail.service import SendMailService
@@ -142,6 +142,8 @@ class RepositoriesProvider(Provider):
     )
     tag_repository = provide(TagRepository, provides=ITagRepository)
     project_repository = provide(ProjectRepository, provides=IProjectRepository)
+    meet_repository = provide(MeetRepository, provides=IMeetRepository)
+    participant_repository = provide(MeetParticipantRepository, provides=IParticipantRepository)
 
     @provide(scope=scope, provides=SendMailServiceProtocol)
     def provide_send_mail_service(self) -> SendMailService:
@@ -250,16 +252,3 @@ class RepositoriesProvider(Provider):
     @provide(scope=scope)
     def provide_temp_workspace_service(self) -> WorkspaceServiceProtocol:
         return WorkspaceService()
-
-    @provide(scope=scope)
-    def provide_meet_service(
-        self,
-        meet_repository: IMeetRepository,
-        participant_repository: IParticipantRepository,
-        workspace_service: WorkspaceServiceProtocol,
-    ) -> MeetService:
-        return MeetService(
-            meet_repository=meet_repository,
-            participant_repository=participant_repository,
-            workspace_service=workspace_service,
-        )
