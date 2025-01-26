@@ -1,5 +1,3 @@
-from query_parameters import MeetListQuery
-
 from .interactors import (
     CreateMeetInteractor,
     CreateParticipantInteractor,
@@ -12,6 +10,7 @@ from .interactors import (
     UpdateMeetInteractor,
     UpdateParticipantInteractor,
 )
+from .query_parameters import MeetListQuery
 from .repositories import IMeetRepository, IParticipantRepository
 from .service import MeetService
 
