@@ -26,6 +26,7 @@ class OrderBy(NamedTuple):
 
 
 class FilterField(TypedDict, total=False):
+    name: str
     category: CategoryId
     assigned_to: AssignedId
     meet_at: datetime
@@ -41,22 +42,3 @@ class MeetListQuery:
     filters: FilterField | None = None
     order_by: OrderBy = OrderBy(OrderByField.MEET_AT, SortOrder.DESC)
     paginate_by: PaginateParams = PaginateParams(offset=0, limit_by=16)
-
-
-# class SortBy(NamedTuple):
-#     field: Literal['name', 'assigned_to', 'meet_at']
-#     order: Literal['ASC', 'DESC']
-
-
-# class MeetFilterFields(TypedDict, total=False):
-#     category: CategoryId
-#     assigned_to: AssignedId
-#     meet_at: datetime
-
-
-# @dataclass
-# class MeetListQuery:
-#     filters: MeetFilterFields | None = None
-#     order_by: SortBy = SortBy('meet_at', 'DESC')
-#     limit: Literal[4, 8, 16, 24] | None = 16
-#     offset: int = 0
