@@ -7,6 +7,6 @@ from src.apps.workspace.repositories.base_repository import IBaseRepository
 
 class ICategoryRepository(IBaseRepository[CategoryEntity, CategoryId]):
     @abstractmethod
-    async def get_by_workspace_id(self) -> list[CategoryEntity]:
+    async def get_by_workspace_id(self, workspace_id: WorkspaceId) -> list[CategoryEntity]:
         raise NotImplementedError
 

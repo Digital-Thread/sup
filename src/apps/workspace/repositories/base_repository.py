@@ -21,5 +21,5 @@ class IBaseRepository[T, ID](ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def delete(self, entity_id: ID) -> None:
+    async def delete(self, entity_id: ID, workspace_id: WorkspaceId) -> None:
         raise NotImplementedError
