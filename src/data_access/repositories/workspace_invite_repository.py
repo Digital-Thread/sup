@@ -42,9 +42,9 @@ class WorkspaceInviteRepository(IWorkspaceInviteRepository):
                 f'Рабочего пространства с id={workspace_invite.workspace_id} не существует'
             )
 
-    async def get_by_id(self, workspace_invite_id: InviteId) -> WorkspaceInviteEntity | None:
+    async def get_by_id(self, workspace_invite_id: InviteId, workspace_id: WorkspaceId | None = None) -> WorkspaceInviteEntity | None:
         query = select(WorkspaceInviteModel).filter_by(
-            id=workspace_invite_id, workspace_id=self._context.workspace_id
+            id=workspace_invite_id, workspace_id=workspace_id if workspace_id else self._context.workspace_id
         )
         result = await self._session.execute(query)
         try:

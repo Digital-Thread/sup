@@ -1,7 +1,7 @@
-import datetime
 import re
-import uuid
 from dataclasses import dataclass, field
+from datetime import datetime
+from uuid import uuid4, UUID
 
 from src.apps.user.exceptions import (
     InvalidEmailFormatError,
@@ -29,20 +29,20 @@ class User:
     avatar: str = field(default=None)
     is_superuser: bool = field(default=False)
     is_active: bool = field(default=False)
-    _created_at: datetime.datetime = field(default_factory=datetime.datetime.now)
-    _updated_at: datetime.datetime = field(default_factory=datetime.datetime.now)
-    _id: uuid.UUID = field(default_factory=uuid.uuid4)
+    _created_at: datetime = field(default_factory=datetime.now)
+    _updated_at: datetime = field(default_factory=datetime.now)
+    _id: UUID = field(default_factory=uuid4)
 
     @property
-    def created_at(self) -> datetime.datetime:
+    def created_at(self) -> datetime:
         return self._created_at
 
     @property
-    def updated_at(self) -> datetime.datetime:
+    def updated_at(self) -> datetime:
         return self._updated_at
 
     @property
-    def id(self) -> uuid.UUID:
+    def id(self) -> UUID:
         return self._id
 
     def __post_init__(self) -> None:
@@ -97,7 +97,7 @@ class User:
             raise InvalidEmailFormatError()
 
     @staticmethod
-    def validate_password(password: str) -> str:
+    def validate_password(password: str) -> str | None:
         if password is None:
             return password
         if not re.search(r'[A-Z]', password):

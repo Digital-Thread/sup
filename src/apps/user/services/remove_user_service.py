@@ -1,5 +1,5 @@
 from src.apps.user.exceptions import UserNotFoundByEmailException
-from src.apps.user.repositories import IUserRepository
+from src.apps.user.repository import IUserRepository
 
 
 class RemoveUserService:

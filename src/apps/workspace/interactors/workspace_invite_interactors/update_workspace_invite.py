@@ -20,7 +20,7 @@ class UpdateWorkspaceInviteInteractor:
     async def execute(
         self, request_data: UpdateWorkspaceInviteAppDTO) -> None:
         existing_invite = await self._get_existing_invite_in_workspace(
-            InviteId(request_data.id_)
+            InviteId(request_data.id_), WorkspaceId(request_data.workspace_id)
         )
         updated_invite = self._map_to_update_data(existing_invite, request_data)
         try:
@@ -29,11 +29,12 @@ class UpdateWorkspaceInviteInteractor:
             raise WorkspaceInviteException(f'{str(error)}')
 
     async def _get_existing_invite_in_workspace(
-        self, invite_id: InviteId
+        self, invite_id: InviteId, workspace_id: WorkspaceId
     ) -> WorkspaceInviteEntity:
         try:
             existing_invite = await self._workspace_invite_repository.get_by_id(
-                invite_id
+                invite_id,
+                workspace_id,
             )
         except (WorkspaceWorkspaceInviteNotFound, WorkspaceInviteNotFound) as error:
             raise WorkspaceInviteException(f'{str(error)}')

@@ -21,7 +21,7 @@ from src.apps.project.project_repository import IProjectRepository
 from src.apps.send_mail.service import SendMailService
 from src.apps.task.repositories import ITaskRepository
 from src.apps.user.protocols import JWTServiceProtocol, SendMailServiceProtocol
-from src.apps.user.repositories import IUserRepository
+from src.apps.user.repository import IUserRepository
 from src.apps.user.services import (
     AuthenticateUserService,
     AuthorizeUserService,
