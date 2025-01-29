@@ -7,5 +7,7 @@ from src.apps.workspace.repositories.base_repository import IBaseRepository
 
 class IRoleRepository(IBaseRepository[RoleEntity, RoleId]):
     @abstractmethod
-    async def get_by_workspace_id(self) -> list[tuple[RoleEntity, int]]:
+    async def get_by_workspace_id(
+        self, workspace_id: WorkspaceId
+    ) -> list[tuple[RoleEntity, list[dict[str, str]] | None]]:
         raise NotImplementedError

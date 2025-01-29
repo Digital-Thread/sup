@@ -51,7 +51,7 @@ from src.apps.workspace.interactors.role_interactors import (
     CreateRoleInteractor,
     DeleteRoleInteractor,
     GetRoleByIdInteractor,
-    GetRoleByWorkspaceInteractor,
+    GetRolesByWorkspaceInteractor,
     UpdateRoleInteractor,
     AssignRoleToWorkspaceMemberInteractor,
     RemoveRoleFromWorkspaceMemberInteractor
@@ -122,7 +122,7 @@ class RoleUseCaseProvider(Provider):
 
     create_role = provide(CreateRoleInteractor)
     get_role_by_id = provide(GetRoleByIdInteractor)
-    get_role_by_workspace = provide(GetRoleByWorkspaceInteractor)
+    get_role_by_workspace = provide(GetRolesByWorkspaceInteractor)
     update_role = provide(UpdateRoleInteractor)
     delete_role = provide(DeleteRoleInteractor)
     assign_role_to_user = provide(AssignRoleToWorkspaceMemberInteractor)

@@ -1,4 +1,7 @@
-from typing import Any, Sequence
+from collections import defaultdict
+from typing import Sequence
+
+from sqlalchemy.engine.row import Row
 
 from src.apps.workspace.domain.entities.role import RoleEntity
 from src.apps.workspace.domain.types_ids import RoleId, WorkspaceId
@@ -36,19 +39,30 @@ class RoleMapper:
         }
 
     @staticmethod
-    def list_to_entity(roles_list: Sequence[Any]) -> list[tuple[RoleEntity, int]]:
-        roles_with_user_count = []
-        for role in roles_list:
-            roles_with_user_count.append(
-                (
-                    RoleEntity(
-                        _id=RoleId(role[0].id),
-                        _name=role[0].name,
-                        _color=role[0].color,
-                        _workspace_id=WorkspaceId(role[0].workspace_id),
-                    ),
-                    role[1],
-                )
-            )
+    def list_to_entity(
+        roles_with_members: Sequence[Row[tuple[RoleModel, str, str, str]]]
+    ) -> list[tuple[RoleEntity, list[dict[str, str]] | None]]:
+        role_member_map = defaultdict(list)
 
-        return roles_with_user_count
+        for role_model, first_name, last_name, avatar in roles_with_members:
+            member_data = (
+                {'first_name': first_name, 'last_name': last_name, 'avatar': avatar}
+                if first_name and last_name
+                else None
+            )
+            role_member_map[role_model].append(member_data)
+
+        roles = [
+            (
+                RoleEntity(
+                    _id=role.id,
+                    _name=role.name,
+                    _color=role.color,
+                    _workspace_id=WorkspaceId(role.workspace_id),
+                ),
+                members if members != [None] else None,
+            )
+            for role, members in role_member_map.items()
+        ]
+
+        return roles

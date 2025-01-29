@@ -45,6 +45,7 @@ from src.apps.user.exceptions import (
 __all__ = ('init_exception_handlers',)
 
 from src.apps.workspace.exceptions.category_exceptions import CategoryException
+from src.apps.workspace.exceptions.role_exceptions import RoleException
 
 from src.apps.workspace.exceptions.workspace_exceptions import WorkspaceException
 
@@ -83,6 +84,7 @@ exception_status_codes = {
     OneOfTheExpire: status.HTTP_400_BAD_REQUEST,
     WorkspaceException: status.HTTP_400_BAD_REQUEST,
     CategoryException: status.HTTP_400_BAD_REQUEST,
+    RoleException: status.HTTP_400_BAD_REQUEST,
 }
 
 

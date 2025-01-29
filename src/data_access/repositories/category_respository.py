@@ -16,13 +16,11 @@ from src.apps.workspace.exceptions.category_exceptions import (
 from src.apps.workspace.repositories.category_repository import ICategoryRepository
 from src.data_access.mappers.category_mapper import CategoryMapper
 from src.data_access.models.workspace_models.category import CategoryModel
-from src.providers.context import WorkspaceContext
 
 
 class CategoryRepository(ICategoryRepository):
-    def __init__(self, session_factory: AsyncSession, context: WorkspaceContext):
+    def __init__(self, session_factory: AsyncSession):
         self._session = session_factory
-        self._context = context
 
     async def save(self, category: CategoryEntity) -> None:
         stmt = CategoryMapper.entity_to_model(category)
@@ -63,9 +61,7 @@ class CategoryRepository(ICategoryRepository):
             CategoryMapper.model_to_entity(category) for category in result.scalars().all()
         ]
         if not categories:
-            raise WorkspaceCategoryNotFound(
-                f'Рабочее пространство с id={self._context.workspace_id} не найдено'
-            )
+            raise WorkspaceCategoryNotFound(f'Рабочее пространство с id={workspace_id} не найдено')
 
         return categories
 
