@@ -38,8 +38,8 @@ async def create_role(
     interactor: FromDishka[CreateRoleInteractor],
     context: FromDishka[WorkspaceContext],
 ) -> None:
-    request = CreateRoleAppDTO(**body.model_dump(), workspace_id=context.workspace_id)
-    await interactor.execute(request)
+    create_role_data = CreateRoleAppDTO(**body.model_dump(), workspace_id=context.workspace_id)
+    await interactor.execute(create_role_data)
 
 
 @role_router.get(
@@ -51,8 +51,8 @@ async def create_role(
 async def get_roles_in_workspace(
     interactor: FromDishka[GetRolesByWorkspaceInteractor], context: FromDishka[WorkspaceContext]
 ) -> list[RoleWithMembersResponseDTO]:
-    response = await interactor.execute(workspace_id=context.workspace_id)
-    return [RoleWithMembersResponseDTO.model_validate(role) for role in response]
+    roles = await interactor.execute(workspace_id=context.workspace_id)
+    return [RoleWithMembersResponseDTO.model_validate(role) for role in roles]
 
 
 @role_router.get('/{role_id}', status_code=status.HTTP_200_OK, response_model=RoleResponseDTO)
@@ -61,8 +61,8 @@ async def get_role_by_id(
     interactor: FromDishka[GetRoleByIdInteractor],
     context: FromDishka[WorkspaceContext],
 ) -> RoleResponseDTO:
-    response = await interactor.execute(role_id=role_id, workspace_id=context.workspace_id)
-    return RoleResponseDTO.model_validate(response)
+    role = await interactor.execute(role_id=role_id, workspace_id=context.workspace_id)
+    return RoleResponseDTO.model_validate(role)
 
 
 @role_router.patch('/{role_id}', status_code=status.HTTP_204_NO_CONTENT)
@@ -72,10 +72,10 @@ async def update_role(
     interactor: FromDishka[UpdateRoleInteractor],
     context: FromDishka[WorkspaceContext],
 ) -> None:
-    request = UpdateRoleAppDTO(
+    updated_role_data = UpdateRoleAppDTO(
         **body.model_dump(exclude_none=True), id=role_id, workspace_id=context.workspace_id
     )
-    await interactor.execute(request)
+    await interactor.execute(updated_role_data=updated_role_data)
 
 
 @role_router.delete('/{role_id}', status_code=status.HTTP_204_NO_CONTENT)

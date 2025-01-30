@@ -2,9 +2,8 @@ from uuid import UUID
 
 from src.apps.workspace.domain.types_ids import RoleId, WorkspaceId
 from src.apps.workspace.exceptions.role_exceptions import (
-    RoleException,
     RoleNotFound,
-    WorkspaceRoleNotFound,
+    RoleNotDeleted,
 )
 from src.apps.workspace.repositories.role_repository import IRoleRepository
 
@@ -18,5 +17,8 @@ class DeleteRoleInteractor:
             await self._role_repository.delete(
                 RoleId(role_id), workspace_id=WorkspaceId(workspace_id)
             )
-        except (RoleNotFound, WorkspaceRoleNotFound) as error:
-            raise RoleException(f'{str(error)}')
+        except RoleNotFound as error:
+            if isinstance(error, RoleNotFound):
+                raise
+
+            raise RoleNotDeleted(f'Роль с id={role_id} не удалена')
