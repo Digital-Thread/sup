@@ -1,14 +1,13 @@
 from logging import warning
 
 from sqlalchemy import delete, select, update
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.apps.workspace.domain.entities.role import RoleEntity
 from src.apps.workspace.domain.types_ids import RoleId, WorkspaceId
 from src.apps.workspace.exceptions.role_exceptions import (
     RoleNotFound,
-    RoleNotUpdated,
     WorkspaceRoleNotFound,
 )
 from src.apps.workspace.repositories.role_repository import IRoleRepository
@@ -36,13 +35,8 @@ class RoleRepository(IRoleRepository):
     async def get_by_id(self, role_id: RoleId, workspace_id: WorkspaceId) -> RoleEntity | None:
         query = select(RoleModel).filter_by(id=role_id, workspace_id=workspace_id)
         result = await self._session.execute(query)
-        try:
-            role_model = result.scalar_one()
-        except NoResultFound as error:
-            warning(error)
-            raise RoleNotFound(f'Роль с id={role_id} не найдена')
-        else:
-            return RoleMapper.model_to_entity(role_model)
+        role_model = result.scalar_one_or_none()
+        return RoleMapper.model_to_entity(role_model) if role_model else None
 
     async def get_by_workspace_id(
         self, workspace_id: WorkspaceId
@@ -60,14 +54,13 @@ class RoleRepository(IRoleRepository):
     async def update(self, role: RoleEntity) -> None:
         update_data = RoleMapper.entity_to_dict(role)
         stmt = update(RoleModel).filter_by(id=role.id).values(**update_data)
-        result = await self._session.execute(stmt)
-
-        if result.rowcount == 0:
-            raise RoleNotUpdated(f'Роль с id={role.id} не обновлена')
+        await self._session.execute(stmt)
 
     async def delete(self, role_id: RoleId, workspace_id: WorkspaceId) -> None:
         stmt = delete(RoleModel).filter_by(id=role_id, workspace_id=workspace_id)
         result = await self._session.execute(stmt)
 
         if result.rowcount == 0:
-            raise RoleNotFound(f'Роль с id={role_id} не найдена в рабочем пространстве')
+            raise RoleNotFound(
+                f'Роль с id={role_id} не найдена в рабочем пространстве с id={workspace_id}'
+            )
