@@ -48,7 +48,8 @@ from src.apps.workspace.exceptions.category_exceptions import CategoryException
 from src.apps.workspace.exceptions.role_exceptions import RoleException, RoleNotFound, RoleNotDeleted
 from src.apps.workspace.exceptions.tag_exceptions import TagNotFound, TagNotDeleted, TagException
 
-from src.apps.workspace.exceptions.workspace_exceptions import WorkspaceException
+from src.apps.workspace.exceptions.workspace_exceptions import WorkspaceException, WorkspaceAlreadyExists, \
+    MemberWorkspaceNotFound, WorkspaceNotFound
 
 exception_status_codes = {
     FeatureCreateError: status.HTTP_400_BAD_REQUEST,
@@ -84,6 +85,9 @@ exception_status_codes = {
     MissingSpecialCharacterError: status.HTTP_400_BAD_REQUEST,
     OneOfTheExpire: status.HTTP_400_BAD_REQUEST,
     WorkspaceException: status.HTTP_400_BAD_REQUEST,
+    WorkspaceAlreadyExists: status.HTTP_400_BAD_REQUEST,
+    WorkspaceNotFound: status.HTTP_404_NOT_FOUND,
+    MemberWorkspaceNotFound: status.HTTP_404_NOT_FOUND,
     CategoryException: status.HTTP_400_BAD_REQUEST,
     RoleException: status.HTTP_400_BAD_REQUEST,
     RoleNotFound: status.HTTP_404_NOT_FOUND,

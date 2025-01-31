@@ -1,8 +1,8 @@
 from logging import warning
 
 from asyncpg.exceptions import ForeignKeyViolationError
-from sqlalchemy import delete, exists, select, update
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy import delete, select, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.apps.workspace.domain.entities.workspace import WorkspaceEntity
@@ -15,17 +15,12 @@ from src.apps.workspace.exceptions.workspace_exceptions import (
 )
 from src.apps.workspace.repositories.workspace_repository import IWorkspaceRepository
 from src.data_access.mappers.workspace_mapper import WorkspaceMapper
-from src.data_access.models import (
-    WorkspaceMemberModel,
-    WorkspaceModel, UserModel,
-)
-from src.providers.context import WorkspaceContext
+from src.data_access.models import UserModel, WorkspaceMemberModel, WorkspaceModel
 
 
 class WorkspaceRepository(IWorkspaceRepository):
-    def __init__(self, session_factory: AsyncSession, context: WorkspaceContext):
+    def __init__(self, session_factory: AsyncSession):
         self._session = session_factory
-        self._context = context
 
     async def save(self, workspace: WorkspaceEntity) -> None:
         stmt = WorkspaceMapper.entity_to_model(workspace)
@@ -41,35 +36,25 @@ class WorkspaceRepository(IWorkspaceRepository):
                 f'Рабочее пространство с именем {workspace.name} уже существует'
             )
 
-    async def find_by_id(self, workspace_id: WorkspaceId) -> WorkspaceEntity | None:
+    async def get_by_id(self, workspace_id: WorkspaceId) -> WorkspaceEntity | None:
         query = select(WorkspaceModel).filter_by(id=workspace_id)
         result = await self._session.execute(query)
-        try:
-            workspace_model = result.scalar_one()
-        except NoResultFound as error:
-            warning(error)
-            raise WorkspaceNotFound(f'Рабочее пространство с id={workspace_id} не найдено')
-        else:
-            workspace_entity = WorkspaceMapper.model_to_entity(workspace_model)
-            return workspace_entity
+        workspace_model = result.scalar_one_or_none()
+        workspace_entity = (
+            WorkspaceMapper.model_to_entity(workspace_model) if workspace_model else None
+        )
+        return workspace_entity
 
-    async def find_by_member_id(self, member_id: MemberId) -> list[WorkspaceEntity]:
+    async def get_by_member_id(self, member_id: MemberId) -> list[WorkspaceEntity]:
         query = (
             select(WorkspaceModel)
             .join(WorkspaceMemberModel, WorkspaceModel.id == WorkspaceMemberModel.workspace_id)
             .filter(WorkspaceMemberModel.user_id == member_id)
         )
         result = await self._session.execute(query)
-        try:
-            workspace_models = result.scalars().all()
-        except NoResultFound as error:
-            warning(error)
-            raise MemberWorkspaceNotFound(f'Участник с id={member_id} не найден.')
-        else:
-            workspaces = [
-                WorkspaceMapper.model_to_entity(workspace) for workspace in workspace_models
-            ]
-            return workspaces
+        workspace_models = result.scalars().all()
+        workspaces = [WorkspaceMapper.model_to_entity(workspace) for workspace in workspace_models]
+        return workspaces
 
     async def update(self, workspace: WorkspaceEntity) -> None:
         update_data = WorkspaceMapper.entity_to_dict(workspace)
@@ -88,20 +73,19 @@ class WorkspaceRepository(IWorkspaceRepository):
                 f'Рабочее пространство с id={workspace_id} не найдено у этого пользователя.'
             )
 
-    async def get_workspace_members(self) -> dict[MemberId, str]:
-        query = select(
-            UserModel.id,
-            UserModel.first_name,
-            UserModel.last_name,
-        ).join(WorkspaceMemberModel).filter(WorkspaceMemberModel.workspace_id == self._context.workspace_id)
-
-        members = await self._session.execute(query)
-
-        return {
-            member.id: f"{member.first_name} {member.last_name}"
-            for member in members
-        }
-
+    async def get_workspace_members(self, workspace_id: WorkspaceId) -> dict[MemberId, str]:
+        query = (
+            select(
+                UserModel.id,
+                UserModel.first_name,
+                UserModel.last_name,
+            )
+            .join(WorkspaceMemberModel)
+            .filter(WorkspaceMemberModel.workspace_id == workspace_id)
+        )
+        results = await self._session.execute(query)
+        members = {member.id: f'{member.first_name} {member.last_name}' for member in results}
+        return members
 
     async def add_member(self, workspace_id: WorkspaceId, user_id: MemberId) -> None:
         stmt = WorkspaceMemberModel(workspace_id=workspace_id, user_id=user_id)

@@ -2,9 +2,6 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from re import match
 
-from src.apps.workspace.domain.validator_mixins import (
-    DescriptionValidatorMixin,
-)
 from src.apps.workspace.domain.types_ids import (
     InviteId,
     MeetId,
@@ -15,6 +12,7 @@ from src.apps.workspace.domain.types_ids import (
     TagId,
     WorkspaceId,
 )
+from src.apps.workspace.domain.validator_mixins import DescriptionValidatorMixin
 
 
 @dataclass

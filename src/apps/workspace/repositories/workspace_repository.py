@@ -10,7 +10,7 @@ class IWorkspaceRepository:
         raise NotImplementedError
 
     @abstractmethod
-    async def find_by_id(self, workspace_id: WorkspaceId) -> WorkspaceEntity | None:
+    async def get_by_id(self, workspace_id: WorkspaceId) -> WorkspaceEntity | None:
         raise NotImplementedError
 
     @abstractmethod
@@ -22,11 +22,11 @@ class IWorkspaceRepository:
         raise NotImplementedError
 
     @abstractmethod
-    async def get_workspace_members(self) -> dict[MemberId, str]:
+    async def get_workspace_members(self, workspace_id: WorkspaceId) -> dict[MemberId, str]:
         raise NotImplementedError
 
     @abstractmethod
-    async def find_by_member_id(self, member_id: MemberId) -> list[WorkspaceEntity]:
+    async def get_by_member_id(self, member_id: MemberId) -> list[WorkspaceEntity]:
         raise NotImplementedError
 
     @abstractmethod

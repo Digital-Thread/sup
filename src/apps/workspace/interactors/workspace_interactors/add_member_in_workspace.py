@@ -1,8 +1,11 @@
 from uuid import UUID
 
 from src.apps.workspace.domain.types_ids import MemberId, WorkspaceId
-from src.apps.workspace.exceptions.workspace_exceptions import WorkspaceNotFound, MemberWorkspaceNotFound, \
-    WorkspaceException
+from src.apps.workspace.exceptions.workspace_exceptions import (
+    MemberWorkspaceNotFound,
+    WorkspaceException,
+    WorkspaceNotFound,
+)
 from src.apps.workspace.repositories import IWorkspaceRepository
 
 
@@ -12,6 +15,8 @@ class AddMemberInWorkspaceInteractor:
 
     async def execute(self, workspace_id: UUID, member_id: UUID) -> None:
         try:
-            await self._workspace_repository.add_member(WorkspaceId(workspace_id), MemberId(member_id))
+            await self._workspace_repository.add_member(
+                WorkspaceId(workspace_id), MemberId(member_id)
+            )
         except (WorkspaceNotFound, MemberWorkspaceNotFound) as error:
             raise WorkspaceException(f'{str(error)}')
