@@ -9,7 +9,6 @@ from src.api.dtos.feature import (
     CreateFeatureRequestDTO,
     FeatureResponseDTO,
     QueryParams,
-    SuccessResponse,
     UpdateFeatureRequestDTO,
 )
 from src.apps.feature.interactors import (
@@ -26,17 +25,15 @@ from src.providers.context import WorkspaceContext
 feature_router = APIRouter(route_class=DishkaRoute)
 
 
-@feature_router.post('/', status_code=status.HTTP_201_CREATED, response_model=SuccessResponse)
+@feature_router.post('/', status_code=status.HTTP_201_CREATED)
 async def create_feature(
         dto: CreateFeatureRequestDTO,
         interactor: FromDishka[CreateFeatureInteractor],
         context: FromDishka[WorkspaceContext],
-) -> SuccessResponse:
+) -> None:
     workspace_id = context.workspace_id
     feature = FeatureInputDTO(WorkspaceId(workspace_id), **dto.model_dump())
     await interactor.execute(dto=feature)
-
-    return SuccessResponse(message='Feature created')
 
 
 @feature_router.get('/', status_code=status.HTTP_200_OK, response_model=list[FeatureResponseDTO])
@@ -66,20 +63,17 @@ async def get_feature_by_id(
     return FeatureResponseDTO(**asdict(feature))
 
 
-@feature_router.patch(
-    '/{feature_id}', status_code=status.HTTP_200_OK, response_model=SuccessResponse
-)
+@feature_router.patch('/{feature_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def update_feature(
         feature_id: FeatureId,
         dto: UpdateFeatureRequestDTO,
         interactor: FromDishka[UpdateFeatureInteractor],
-) -> SuccessResponse:
+) -> None:
     update_data = FeatureUpdateDTO(
         id=feature_id,
         updated_fields=OptionalFeatureUpdateFields(**dto.model_dump(exclude_unset=True)),
     )
     await interactor.execute(update_data)
-    return SuccessResponse(message='Feature updated')
 
 
 @feature_router.delete('/{feature_id}', status_code=status.HTTP_204_NO_CONTENT)

@@ -19,10 +19,6 @@ from src.apps.feature.domain import (
 from src.apps.feature import FeatureUpdateError, FilterField, OrderByField, SortOrder
 
 
-class SuccessResponse(BaseModel):
-    message: str
-
-
 class CreateFeatureRequestDTO(BaseModel):
     name: str
     project_id: ProjectId
