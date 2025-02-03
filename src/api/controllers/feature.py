@@ -15,8 +15,8 @@ from src.api.dtos.feature import (
 from src.apps.feature.interactors import (
     CreateFeatureInteractor,
     DeleteFeatureInteractor,
-    GetAllFeaturesInteractor,
-    GetFeatureInteractor,
+    GetFeaturesByWorkspaceInteractor,
+    GetFeatureByIdInteractor,
     UpdateFeatureInteractor,
 )
 from src.apps.feature.domain import FeatureId, OptionalFeatureUpdateFields, WorkspaceId
@@ -42,7 +42,7 @@ async def create_feature(
 @feature_router.get('/', status_code=status.HTTP_200_OK, response_model=list[FeatureResponseDTO])
 async def get_features(
         query: Annotated[QueryParams, Query()],
-        interactor: FromDishka[GetAllFeaturesInteractor],
+        interactor: FromDishka[GetFeaturesByWorkspaceInteractor],
         context: FromDishka[WorkspaceContext],
 ) -> list[FeatureResponseDTO]:
     workspace_id = WorkspaceId(context.workspace_id)
@@ -60,7 +60,7 @@ async def get_features(
 )
 async def get_feature_by_id(
         feature_id: FeatureId,
-        interactor: FromDishka[GetFeatureInteractor],
+        interactor: FromDishka[GetFeatureByIdInteractor],
 ) -> FeatureResponseDTO:
     feature = await interactor.execute(feature_id=feature_id)
     return FeatureResponseDTO(**asdict(feature))

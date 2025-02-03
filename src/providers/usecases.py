@@ -21,8 +21,8 @@ from src.apps.comment.domain import Interactor
 from src.apps.feature.interactors import (
     CreateFeatureInteractor,
     DeleteFeatureInteractor,
-    GetAllFeaturesInteractor,
-    GetFeatureInteractor,
+    GetFeaturesByWorkspaceInteractor,
+    GetFeatureByIdInteractor,
     UpdateFeatureInteractor,
 )
 from src.apps.project.interactors import (
@@ -174,8 +174,8 @@ class FeatureInteractorProvider(Provider):
     scope = Scope.REQUEST
 
     create_feature = provide(CreateFeatureInteractor)
-    get_feature_by_id = provide(GetFeatureInteractor)
-    get_features = provide(GetAllFeaturesInteractor)
+    get_feature_by_id = provide(GetFeatureByIdInteractor)
+    get_features = provide(GetFeaturesByWorkspaceInteractor)
     update_feature = provide(UpdateFeatureInteractor)
     delete_feature = provide(DeleteFeatureInteractor)
 

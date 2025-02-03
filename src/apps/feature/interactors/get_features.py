@@ -5,7 +5,7 @@ from src.apps.feature.dtos import FeatureOutputDTO
 from src.apps.feature.interactors.base_interactor import BaseInteractor
 
 
-class GetAllFeaturesInteractor(BaseInteractor):
+class GetFeaturesByWorkspaceInteractor(BaseInteractor):
     async def execute(
             self,
             workspace_id: WorkspaceId,
