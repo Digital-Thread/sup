@@ -8,6 +8,7 @@ from fastapi import APIRouter, Query, status
 from src.api.dtos.feature import (
     CreateFeatureRequestDTO,
     FeatureResponseDTO,
+    FeaturesResponseDTO,
     QueryParams,
     UpdateFeatureRequestDTO,
 )
@@ -36,12 +37,12 @@ async def create_feature(
     await interactor.execute(dto=feature)
 
 
-@feature_router.get('/', status_code=status.HTTP_200_OK, response_model=list[FeatureResponseDTO])
+@feature_router.get('/', status_code=status.HTTP_200_OK, response_model=list[FeaturesResponseDTO])
 async def get_features(
         query: Annotated[QueryParams, Query()],
         interactor: FromDishka[GetFeaturesByWorkspaceInteractor],
         context: FromDishka[WorkspaceContext],
-) -> list[FeatureResponseDTO]:
+) -> list[FeaturesResponseDTO]:
     workspace_id = WorkspaceId(context.workspace_id)
     query_params = FeatureListQuery(
         filters=query.filters,
@@ -49,7 +50,7 @@ async def get_features(
         paginate_by=PaginateParams(offset=query.offset, limit_by=query.per_page.limit_by),
     )
     features = await interactor.execute(workspace_id=workspace_id, query=query_params)
-    return [FeatureResponseDTO(**asdict(feature)) for feature in features] if features else []
+    return [FeaturesResponseDTO(**asdict(feature)) for feature in features] if features else []
 
 
 @feature_router.get(

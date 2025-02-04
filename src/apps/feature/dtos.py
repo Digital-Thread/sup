@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from typing import TypedDict
 
 from src.apps.feature.domain import (
     FeatureId,
@@ -51,3 +52,20 @@ class FeatureOutputDTO:
     tags: list[TagId] | None = None
     members: list[UserId] | None = None
     tasks: list[TaskId] | None = None
+
+
+class FeatureMember(TypedDict):
+    id: UserId
+    fullname: str
+    avatar: str
+
+
+@dataclass
+class FeaturesInWorkspaceOutputDTO:
+    id: FeatureId
+    name: str
+    project_name: str
+    created_at: datetime
+    priority: Priority
+    status: Status
+    members: list[FeatureMember] | None

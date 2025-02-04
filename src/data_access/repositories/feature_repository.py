@@ -6,7 +6,11 @@ from sqlalchemy.orm import selectinload
 
 from src.apps.feature.domain import FeatureEntity, FeatureId, WorkspaceId
 from src.apps.feature.exceptions import FeatureRepositoryError
-from src.apps.feature import FeatureListQuery, IFeatureRepository
+from src.apps.feature import (
+    FeatureListQuery,
+    IFeatureRepository,
+    FeaturesInWorkspaceOutputDTO,
+)
 from src.data_access.mappers.feature_mapper import FeatureMapper
 from src.data_access.models import FeatureModel, TagModel, UserModel
 from src.data_access.models.feature import Status, Priority
@@ -17,7 +21,7 @@ class FeatureRepository(IFeatureRepository):
     def __init__(self, session: AsyncSession):
         self._session = session
         self.model = FeatureModel
-        self.converter = FeatureMapper()
+        self.mapper = FeatureMapper()
 
     async def _get_m2m_objects[M, ID](self, list_ids: list[ID] | None, model: type[M]) -> list[M]:
         if list_ids:
@@ -44,7 +48,7 @@ class FeatureRepository(IFeatureRepository):
         return feature_model
 
     async def save(self, feature: FeatureEntity) -> None:
-        feature_model = await self.converter.map_entity_to_model(feature)
+        feature_model = await self.mapper.map_entity_to_model(feature)
         feature_model.tags = await self._get_m2m_objects(feature.tags, TagModel)
         feature_model.members = await self._get_m2m_objects(feature.members, UserModel)
 
@@ -62,7 +66,7 @@ class FeatureRepository(IFeatureRepository):
     async def get_by_id(self, feature_id: FeatureId) -> FeatureEntity | None:
         feature_model = await self.get_model(feature_id=feature_id)
         if feature_model:
-            return self.converter.map_model_to_entity(feature_model=feature_model, with_tasks=True)
+            return self.mapper.map_model_to_entity(feature_model=feature_model, with_tasks=True)
 
         return None
 
@@ -100,7 +104,7 @@ class FeatureRepository(IFeatureRepository):
             self,
             workspace_id: WorkspaceId,
             query: FeatureListQuery,
-    ) -> list[FeatureEntity] | None:
+    ) -> list[FeaturesInWorkspaceOutputDTO] | None:
         conditions = [self.model.workspace_id == workspace_id]
 
         filters = query.filters
@@ -122,7 +126,11 @@ class FeatureRepository(IFeatureRepository):
 
         stmt = (
             select(self.model)
-            .options(selectinload(self.model.tags), selectinload(self.model.members))
+            .options(
+                selectinload(self.model.tags),
+                selectinload(self.model.members),
+                selectinload(self.model.project),
+            )
             .where(*conditions)
             .order_by(
                 getattr(self.model, str(query.order_by.field.value)).asc()
@@ -136,7 +144,7 @@ class FeatureRepository(IFeatureRepository):
         result = await self._session.execute(stmt)
         features = result.scalars().all()
         return (
-            [self.converter.map_model_to_entity(feature_model=f, with_tasks=False) for f in features]
+            [self.mapper.map_model_to_workspace_dto(feature_model=f) for f in features]
             if features
             else None
         )

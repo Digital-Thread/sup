@@ -16,7 +16,13 @@ from src.apps.feature.domain import (
     WorkspaceId,
     TaskId,
 )
-from src.apps.feature import FeatureUpdateError, FilterField, OrderByField, SortOrder
+from src.apps.feature import (
+    FeatureUpdateError,
+    FilterField,
+    OrderByField,
+    SortOrder,
+    FeatureMember,
+)
 
 
 class CreateFeatureRequestDTO(BaseModel):
@@ -65,6 +71,19 @@ class FeatureResponseDTO(BaseModel):
     tags: list[TagId] | None
     members: list[UserId] | None
     tasks: list[TaskId] | None
+    model_config = ConfigDict(
+        from_attributes=True,
+    )
+
+
+class FeaturesResponseDTO(BaseModel):
+    id: FeatureId
+    name: str
+    project_name: str
+    created_at: datetime
+    priority: Priority
+    status: Status
+    members: list[FeatureMember] | None
     model_config = ConfigDict(
         from_attributes=True,
     )

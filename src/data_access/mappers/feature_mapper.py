@@ -1,3 +1,4 @@
+from src.apps.feature import FeaturesInWorkspaceOutputDTO, FeatureMember
 from src.data_access.models.feature import Priority as DB_Priority
 from src.data_access.models.feature import Status as DB_Status
 from src.apps.feature.domain import (
@@ -60,3 +61,22 @@ class FeatureMapper:
         feature.created_at = feature_model.created_at
         feature.updated_at = feature_model.updated_at
         return feature
+
+    @staticmethod
+    def map_model_to_workspace_dto(feature_model: FeatureModel) -> FeaturesInWorkspaceOutputDTO:
+        return FeaturesInWorkspaceOutputDTO(
+            id=FeatureId(feature_model.id),
+            name=feature_model.name,
+            project_name=feature_model.project.name,
+            created_at=feature_model.created_at,
+            priority=Priority[DB_Priority(feature_model.priority).name],
+            status=Status[DB_Status(feature_model.status).name],
+            members=[
+                {'id': UserId(user.id),
+                 'fullname': user.first_name + ' ' + user.last_name,
+                 'avatar': user.avatar
+                 }
+                for user in feature_model.members]
+            if feature_model.members
+            else None
+        )
