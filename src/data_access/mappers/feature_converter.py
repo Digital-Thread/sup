@@ -1,3 +1,5 @@
+from src.data_access.models.feature import Priority as DB_Priority
+from src.data_access.models.feature import Status as DB_Status
 from src.apps.feature.domain import (
     FeatureEntity,
     OwnerId,
@@ -7,6 +9,8 @@ from src.apps.feature.domain import (
     WorkspaceId,
     FeatureId,
     TaskId,
+    Priority,
+    Status,
 )
 from src.data_access.models import FeatureModel
 
@@ -24,8 +28,8 @@ class FeatureConverter:
             updated_at=feature_entity.updated_at,
             assigned_to_id=feature_entity.assigned_to,
             description=feature_entity.description,
-            priority=feature_entity.priority,
-            status=feature_entity.status,
+            priority=DB_Priority[feature_entity.priority.name],
+            status=DB_Status[feature_entity.status.name],
         )
         return feature_model
 
@@ -40,8 +44,8 @@ class FeatureConverter:
                 UserId(feature_model.assigned_to_id) if feature_model.assigned_to_id else None
             ),
             description=feature_model.description,
-            priority=feature_model.priority,
-            status=feature_model.status,
+            priority=Priority[DB_Priority(feature_model.priority).name],
+            status=Status[DB_Status(feature_model.status).name],
             tags=[TagId(tag.id) for tag in feature_model.tags] if feature_model.tags else None,
             members=(
                 [UserId(user.id) for user in feature_model.members]

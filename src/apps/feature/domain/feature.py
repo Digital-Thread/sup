@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from enum import IntEnum
+from enum import StrEnum
 from re import match
 from typing import TypedDict
 
@@ -14,38 +14,19 @@ from src.apps.feature.domain.types_ids import (
 )
 
 
-class Priority(IntEnum):
-    CRITICAL = 5
-    HIGH = 4
-    MEDIUM = 3
-    LOW = 2
-    NO_PRIORITY = 1
-
-    @property
-    def display(self) -> str:
-        return {
-            5: 'Критическая',
-            4: 'Высокая',
-            3: 'Средняя',
-            2: 'Низкая',
-            1: 'Не задана',
-        }[self.value]
+class Priority(StrEnum):
+    CRITICAL = 'Критическая'
+    HIGH = 'Высокая'
+    MEDIUM = 'Средняя'
+    LOW = 'Низкая'
+    NO_PRIORITY = 'Не задана'
 
 
-class Status(IntEnum):
-    FINISH = 4
-    TEST = 3
-    DEVELOPMENT = 2
-    NEW = 1
-
-    @property
-    def display(self) -> str:
-        return {
-            4: 'Готово',
-            3: 'Тестирование',
-            2: 'Разработка',
-            1: 'Новая',
-        }[self.value]
+class Status(StrEnum):
+    FINISH = 'Готово'
+    TEST = 'Тестирование'
+    DEVELOPMENT = 'Разработка'
+    NEW = 'Новая'
 
 
 class OptionalFeatureUpdateFields(TypedDict, total=False):

@@ -9,6 +9,7 @@ from src.apps.feature.exceptions import FeatureRepositoryError
 from src.apps.feature import FeatureListQuery, IFeatureRepository
 from src.data_access.mappers.feature_converter import FeatureConverter
 from src.data_access.models import FeatureModel, TagModel, UserModel
+from src.data_access.models.feature import Status, Priority
 
 
 class FeatureRepository(IFeatureRepository):
@@ -72,8 +73,8 @@ class FeatureRepository(IFeatureRepository):
             feature_model.created_at = feature.created_at
             feature_model.updated_at = feature.updated_at
             feature_model.description = feature.description
-            feature_model.priority = feature.priority
-            feature_model.status = feature.status
+            feature_model.priority = Priority[feature.priority.name]
+            feature_model.status = Status[feature.status.name]
             feature_model.tags = await self._get_m2m_objects(feature.tags, TagModel)
             feature_model.members = await self._get_m2m_objects(feature.members, UserModel)
             try:
@@ -111,8 +112,9 @@ class FeatureRepository(IFeatureRepository):
                 conditions.append(self.model.tags.any(TagModel.id.in_(filters['tags'])))
 
             if 'status' in filters:
+                statuses = [Status[status.name].value for status in filters['status']]
                 conditions.append(
-                    self.model.status.in_([status.value for status in filters['status']])
+                    self.model.status.in_(statuses)
                 )
 
             if 'project' in filters:
