@@ -38,7 +38,7 @@ async def create_feature(
 
 
 @feature_router.get('/', status_code=status.HTTP_200_OK, response_model=list[FeaturesResponseDTO])
-async def get_features(
+async def get_features_by_workspace_id(
         query: Annotated[QueryParams, Query()],
         interactor: FromDishka[GetFeaturesByWorkspaceInteractor],
         context: FromDishka[WorkspaceContext],
