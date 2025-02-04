@@ -8,7 +8,7 @@ from src.apps.workspace.repositories.base_repository import IBaseRepository
 
 class IWorkspaceInviteRepository(IBaseRepository[WorkspaceInviteEntity, InviteId]):
     @abstractmethod
-    async def get_by_workspace_id(self) -> list[WorkspaceInviteEntity]:
+    async def get_by_workspace_id(self, workspace_id: WorkspaceId) -> list[WorkspaceInviteEntity]:
         raise NotImplementedError
 
     @abstractmethod
