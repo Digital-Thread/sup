@@ -9,7 +9,8 @@ from src.apps.feature.exceptions import FeatureRepositoryError
 from src.apps.feature import (
     FeatureListQuery,
     IFeatureRepository,
-    FeaturesInWorkspaceOutputDTO,
+    FeatureInWorkspaceOutputDTO,
+    FeatureOutputDTO,
 )
 from src.data_access.mappers.feature_mapper import FeatureMapper
 from src.data_access.models import FeatureModel, TagModel, UserModel
@@ -39,13 +40,22 @@ class FeatureRepository(IFeatureRepository):
             .options(
                 selectinload(self.model.tags),
                 selectinload(self.model.members),
-                selectinload(self.model.tasks),
+                selectinload(self.model.project),
+                selectinload(self.model.owner),
+                selectinload(self.model.assigned_to),
             )
         )
         result = await self._session.execute(stmt)
         feature_model = result.scalar_one_or_none()
 
         return feature_model
+
+    async def get_entity(self, feature_id: FeatureId) -> FeatureEntity | None:
+        feature_model = await self.get_model(feature_id=feature_id)
+        if feature_model:
+            return self.mapper.map_model_to_entity(feature_model=feature_model)
+        return None
+
 
     async def save(self, feature: FeatureEntity) -> None:
         feature_model = await self.mapper.map_entity_to_model(feature)
@@ -63,10 +73,10 @@ class FeatureRepository(IFeatureRepository):
             else:
                 raise
 
-    async def get_by_id(self, feature_id: FeatureId) -> FeatureEntity | None:
+    async def get_by_id(self, feature_id: FeatureId) -> FeatureOutputDTO | None:
         feature_model = await self.get_model(feature_id=feature_id)
         if feature_model:
-            return self.mapper.map_model_to_entity(feature_model=feature_model, with_tasks=True)
+            return self.mapper.map_model_to_dto(feature_model=feature_model)
 
         return None
 
@@ -104,7 +114,7 @@ class FeatureRepository(IFeatureRepository):
             self,
             workspace_id: WorkspaceId,
             query: FeatureListQuery,
-    ) -> list[FeaturesInWorkspaceOutputDTO] | None:
+    ) -> list[FeatureInWorkspaceOutputDTO] | None:
         conditions = [self.model.workspace_id == workspace_id]
 
         filters = query.filters

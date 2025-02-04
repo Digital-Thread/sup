@@ -12,7 +12,6 @@ from src.apps.feature.domain import (
     TagId,
     UserId,
     WorkspaceId,
-    TaskId,
 )
 
 
@@ -36,32 +35,36 @@ class FeatureUpdateDTO:
     updated_fields: OptionalFeatureUpdateFields
 
 
-@dataclass
-class FeatureOutputDTO:
-    id: FeatureId
-    workspace_id: WorkspaceId
-    name: str
-    project_id: ProjectId
-    owner_id: OwnerId
-    created_at: datetime
-    updated_at: datetime
-    assigned_to: UserId | None = None
-    description: str | None = None
-    priority: Priority = Priority.NO_PRIORITY
-    status: Status = Status.NEW
-    tags: list[TagId] | None = None
-    members: list[UserId] | None = None
-    tasks: list[TaskId] | None = None
-
-
 class FeatureMember(TypedDict):
     id: UserId
     fullname: str
     avatar: str
 
 
+class FeatureTag(TypedDict):
+    id: TagId
+    name: str
+    color: str
+
+
 @dataclass
-class FeaturesInWorkspaceOutputDTO:
+class FeatureOutputDTO:
+    id: FeatureId
+    name: str
+    project_name: str
+    owner: FeatureMember
+    created_at: datetime
+    updated_at: datetime
+    assigned_to: FeatureMember | None
+    description: str | None
+    priority: Priority
+    status: Status
+    tags: list[FeatureTag] | None
+    members: list[FeatureMember] | None
+
+
+@dataclass
+class FeatureInWorkspaceOutputDTO:
     id: FeatureId
     name: str
     project_name: str

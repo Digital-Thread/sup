@@ -1,17 +1,16 @@
-from src.apps.feature import FeaturesInWorkspaceOutputDTO, FeatureMember
+from src.apps.feature import FeatureInWorkspaceOutputDTO, FeatureOutputDTO
 from src.data_access.models.feature import Priority as DB_Priority
 from src.data_access.models.feature import Status as DB_Status
 from src.apps.feature.domain import (
     FeatureEntity,
-    OwnerId,
-    ProjectId,
     TagId,
     UserId,
-    WorkspaceId,
     FeatureId,
-    TaskId,
     Priority,
     Status,
+    WorkspaceId,
+    ProjectId,
+    OwnerId,
 )
 from src.data_access.models import FeatureModel
 
@@ -35,7 +34,7 @@ class FeatureMapper:
         return feature_model
 
     @staticmethod
-    def map_model_to_entity(feature_model: FeatureModel, with_tasks: bool) -> FeatureEntity:
+    def map_model_to_entity(feature_model: FeatureModel) -> FeatureEntity:
         feature = FeatureEntity(
             workspace_id=WorkspaceId(feature_model.workspace_id),
             name=feature_model.name,
@@ -54,8 +53,6 @@ class FeatureMapper:
                 else None
             ),
         )
-        if with_tasks:
-            feature.tasks = ([TaskId(task.id) for task in feature_model.tasks] if feature_model.tasks else None)
 
         feature.id = FeatureId(feature_model.id)
         feature.created_at = feature_model.created_at
@@ -63,8 +60,45 @@ class FeatureMapper:
         return feature
 
     @staticmethod
-    def map_model_to_workspace_dto(feature_model: FeatureModel) -> FeaturesInWorkspaceOutputDTO:
-        return FeaturesInWorkspaceOutputDTO(
+    def map_model_to_dto(feature_model: FeatureModel) -> FeatureOutputDTO:
+        return FeatureOutputDTO(
+            id=FeatureId(feature_model.id),
+            name=feature_model.name,
+            project_name=feature_model.project.name,
+            owner={
+                'id': UserId(feature_model.owner_id),
+                'fullname': feature_model.owner.first_name + ' ' + feature_model.owner.last_name,
+                'avatar': feature_model.owner.avatar
+            },
+            created_at=feature_model.created_at,
+            updated_at=feature_model.updated_at,
+            assigned_to={
+                'id': UserId(feature_model.assigned_to_id),
+                'fullname': feature_model.assigned_to.first_name + ' ' + feature_model.assigned_to.last_name,
+                'avatar': feature_model.assigned_to.avatar
+            } if feature_model.assigned_to else None,
+            description=feature_model.description,
+            priority=Priority[DB_Priority(feature_model.priority).name],
+            status=Status[DB_Status(feature_model.status).name],
+            tags=[
+                {'id': TagId(tag.id),
+                 'name': tag.name,
+                 'color': tag.color}
+                for tag in feature_model.tags]
+            if feature_model.tags else None,
+            members=[
+                {'id': UserId(user.id),
+                 'fullname': user.first_name + ' ' + user.last_name,
+                 'avatar': user.avatar
+                 }
+                for user in feature_model.members]
+            if feature_model.members
+            else None
+        )
+
+    @staticmethod
+    def map_model_to_workspace_dto(feature_model: FeatureModel) -> FeatureInWorkspaceOutputDTO:
+        return FeatureInWorkspaceOutputDTO(
             id=FeatureId(feature_model.id),
             name=feature_model.name,
             project_name=feature_model.project.name,

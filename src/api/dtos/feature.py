@@ -13,8 +13,6 @@ from src.apps.feature.domain import (
     Status,
     TagId,
     UserId,
-    WorkspaceId,
-    TaskId,
 )
 from src.apps.feature import (
     FeatureUpdateError,
@@ -22,6 +20,7 @@ from src.apps.feature import (
     OrderByField,
     SortOrder,
     FeatureMember,
+    FeatureTag,
 )
 
 
@@ -58,19 +57,17 @@ class UpdateFeatureRequestDTO(BaseModel):
 
 class FeatureResponseDTO(BaseModel):
     id: FeatureId
-    workspace_id: WorkspaceId
     name: str
-    project_id: ProjectId
-    owner_id: OwnerId
+    project_name: str
+    owner: FeatureMember
     created_at: datetime
     updated_at: datetime
-    assigned_to: UserId | None
+    assigned_to: FeatureMember | None
     description: str | None
     priority: Priority
     status: Status
-    tags: list[TagId] | None
-    members: list[UserId] | None
-    tasks: list[TaskId] | None
+    tags: list[FeatureTag] | None
+    members: list[FeatureMember] | None
     model_config = ConfigDict(
         from_attributes=True,
     )

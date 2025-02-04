@@ -2,8 +2,9 @@ from src.apps.feature.dtos import (
     FeatureInputDTO,
     FeatureOutputDTO,
     FeatureUpdateDTO,
-    FeaturesInWorkspaceOutputDTO,
+    FeatureInWorkspaceOutputDTO,
     FeatureMember,
+    FeatureTag,
 )
 from src.apps.feature.exceptions import (
     FeatureCreateError,
@@ -27,8 +28,9 @@ __all__ = (
     'FeatureInputDTO',
     'FeatureUpdateDTO',
     'FeatureOutputDTO',
-    'FeaturesInWorkspaceOutputDTO',
+    'FeatureInWorkspaceOutputDTO',
     'FeatureMember',
+    'FeatureTag',
     'FeatureError',
     'FeatureCreateError',
     'FeatureUpdateError',

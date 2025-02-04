@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.apps.feature.dtos import FeaturesInWorkspaceOutputDTO
+from src.apps.feature.dtos import FeatureInWorkspaceOutputDTO, FeatureOutputDTO
 from src.apps.feature.domain import FeatureEntity, FeatureId, WorkspaceId
 from src.apps.feature.query_parameters import FeatureListQuery
 
@@ -12,7 +12,11 @@ class IFeatureRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_by_id(self, feature_id: FeatureId) -> FeatureEntity | None:
+    async def get_by_id(self, feature_id: FeatureId) -> FeatureOutputDTO | None:
+        pass
+
+    @abstractmethod
+    async def get_entity(self, feature_id: FeatureId) -> FeatureEntity | None:
         pass
 
     @abstractmethod
@@ -26,5 +30,5 @@ class IFeatureRepository(ABC):
     @abstractmethod
     async def get_by_workspace_id(
             self, workspace_id: WorkspaceId, query: FeatureListQuery
-    ) -> list[FeaturesInWorkspaceOutputDTO]:
+    ) -> list[FeatureInWorkspaceOutputDTO]:
         pass

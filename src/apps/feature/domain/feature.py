@@ -9,8 +9,7 @@ from src.apps.feature.domain.types_ids import (
     TagId,
     UserId,
     WorkspaceId,
-    FeatureId,
-    TaskId,
+    FeatureId
 )
 
 
@@ -54,7 +53,6 @@ class FeatureEntity:
             status: Status = Status.NEW,
             tags: list[TagId] | None = None,
             members: list[UserId] | None = None,
-            tasks: list[TaskId] | None = None,
     ):
         self._id: FeatureId | None = None
         self.name = name
@@ -67,7 +65,6 @@ class FeatureEntity:
         self.status = status
         self.tags = tags
         self.members = members
-        self.tasks = tasks
         self.created_at = datetime.now(timezone.utc)
         self.updated_at = datetime.now(timezone.utc)
 

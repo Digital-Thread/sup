@@ -9,7 +9,7 @@ from src.apps.feature.interactors.base_interactor import BaseInteractor
 
 class UpdateFeatureInteractor(BaseInteractor):
     async def execute(self, dto: FeatureUpdateDTO) -> None:
-        feature = await self._repository.get_by_id(feature_id=dto.id)
+        feature = await self._repository.get_entity(feature_id=dto.id)
         if not feature:
             raise FeatureDoesNotExistError(dto.id)
 
