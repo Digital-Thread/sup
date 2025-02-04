@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload
 from src.apps.feature.domain import FeatureEntity, FeatureId, WorkspaceId
 from src.apps.feature.exceptions import FeatureRepositoryError
 from src.apps.feature import FeatureListQuery, IFeatureRepository
-from src.data_access.mappers.feature_converter import FeatureConverter
+from src.data_access.mappers.feature_mapper import FeatureMapper
 from src.data_access.models import FeatureModel, TagModel, UserModel
 from src.data_access.models.feature import Status, Priority
 
@@ -17,7 +17,7 @@ class FeatureRepository(IFeatureRepository):
     def __init__(self, session: AsyncSession):
         self._session = session
         self.model = FeatureModel
-        self.converter = FeatureConverter()
+        self.converter = FeatureMapper()
 
     async def _get_m2m_objects[M, ID](self, list_ids: list[ID] | None, model: type[M]) -> list[M]:
         if list_ids:
