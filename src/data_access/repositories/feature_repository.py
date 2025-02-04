@@ -96,7 +96,7 @@ class FeatureRepository(IFeatureRepository):
         else:
             raise FeatureRepositoryError(message=f'Не найдена фича с id: {feature_id}')
 
-    async def get_list(
+    async def get_by_workspace_id(
             self,
             workspace_id: WorkspaceId,
             query: FeatureListQuery,

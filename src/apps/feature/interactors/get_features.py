@@ -11,7 +11,7 @@ class GetFeaturesByWorkspaceInteractor(BaseInteractor):
             workspace_id: WorkspaceId,
             query: FeatureListQuery,
     ) -> list[FeatureOutputDTO] | None:
-        features = await self._repository.get_list(workspace_id=workspace_id, query=query)
+        features = await self._repository.get_by_workspace_id(workspace_id=workspace_id, query=query)
         return (
             [FeatureMapper.entity_to_dto(feature) for feature in features] if features else None
         )

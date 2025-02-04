@@ -23,7 +23,7 @@ class IFeatureRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_list(
+    async def get_by_workspace_id(
         self, workspace_id: WorkspaceId, query: FeatureListQuery
     ) -> list[FeatureEntity]:
         pass
