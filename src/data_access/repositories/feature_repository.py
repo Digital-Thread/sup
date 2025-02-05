@@ -1,5 +1,5 @@
 from asyncpg import ForeignKeyViolationError
-from sqlalchemy import Select
+from sqlalchemy import Select, delete
 from sqlalchemy import select, func, literal
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -115,10 +115,10 @@ class FeatureRepository(IFeatureRepository):
                     raise
 
     async def delete(self, feature_id: FeatureId) -> None:
-        feature_model = await self._session.get(self.model, feature_id)
-        if feature_model:
-            await self._session.delete(feature_model)
-        else:
+        stmt = delete(self.model).where(self.model.id == feature_id)
+        result = await self._session.execute(stmt)
+
+        if result.rowcount == 0:
             raise FeatureRepositoryError(message=f'Не найдена фича с id: {feature_id}')
 
     async def get_by_workspace_id(
