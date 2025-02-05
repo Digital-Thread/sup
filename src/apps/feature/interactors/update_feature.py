@@ -1,11 +1,11 @@
-from src.apps.feature.mapper import FeatureMapper
 from src.apps.feature.dtos import FeatureUpdateDTO
 from src.apps.feature.exceptions import (
     FeatureDoesNotExistError,
-    FeatureUpdateError,
     FeatureRepositoryError,
+    FeatureUpdateError,
 )
 from src.apps.feature.interactors.base_interactor import BaseInteractor
+from src.apps.feature.mapper import FeatureMapper
 
 
 class UpdateFeatureInteractor(BaseInteractor):

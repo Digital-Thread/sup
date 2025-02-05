@@ -1,11 +1,11 @@
 from src.apps.feature.dtos import (
+    FeatureAttrsWithWorkspace,
     FeatureInputDTO,
-    FeatureOutputDTO,
-    FeatureUpdateDTO,
     FeatureInWorkspaceOutputDTO,
     FeatureMember,
+    FeatureOutputDTO,
     FeatureTag,
-    FeatureAttrsWithWorkspace,
+    FeatureUpdateDTO,
 )
 from src.apps.feature.exceptions import (
     FeatureCreateError,

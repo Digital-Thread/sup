@@ -1,5 +1,5 @@
 from src.apps.feature.domain import FeatureEntity
-from src.apps.feature.dtos import FeatureInputDTO, FeatureAttrsWithWorkspace
+from src.apps.feature.dtos import FeatureAttrsWithWorkspace, FeatureInputDTO
 
 
 class FeatureMapper:
@@ -26,5 +26,5 @@ class FeatureMapper:
             owner_id=entity.owner_id,
             assigned_to=entity.assigned_to,
             tags=entity.tags,
-            members=entity.members
+            members=entity.members,
         )

@@ -1,10 +1,16 @@
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, Literal
+from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
-from pydantic_core.core_schema import FieldValidationInfo
+from pydantic import BaseModel, ConfigDict, Field
 
+from src.apps.feature import (
+    FeatureMember,
+    FeatureTag,
+    FilterField,
+    OrderByField,
+    SortOrder,
+)
 from src.apps.feature.domain import (
     FeatureId,
     OwnerId,
@@ -13,14 +19,6 @@ from src.apps.feature.domain import (
     Status,
     TagId,
     UserId,
-)
-from src.apps.feature import (
-    FeatureUpdateError,
-    FilterField,
-    OrderByField,
-    SortOrder,
-    FeatureMember,
-    FeatureTag,
 )
 
 

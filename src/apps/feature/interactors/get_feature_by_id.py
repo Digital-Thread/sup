@@ -1,4 +1,3 @@
-from src.apps.feature.mapper import FeatureMapper
 from src.apps.feature import FeatureOutputDTO
 from src.apps.feature.domain import FeatureId
 from src.apps.feature.exceptions import FeatureDoesNotExistError

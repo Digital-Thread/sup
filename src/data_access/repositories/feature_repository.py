@@ -1,32 +1,27 @@
 from asyncpg import ForeignKeyViolationError
-from sqlalchemy import Select, delete
-from sqlalchemy import select, func, literal
+from sqlalchemy import Select, delete, func, literal, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from src.apps.feature.domain import (
-    FeatureEntity,
-    FeatureId,
-    WorkspaceId,
-)
-from src.apps.feature.exceptions import FeatureRepositoryError
 from src.apps.feature import (
-    FeatureListQuery,
-    IFeatureRepository,
-    FeatureInWorkspaceOutputDTO,
-    FeatureOutputDTO,
     FeatureAttrsWithWorkspace,
+    FeatureInWorkspaceOutputDTO,
+    FeatureListQuery,
+    FeatureOutputDTO,
+    IFeatureRepository,
 )
+from src.apps.feature.domain import FeatureEntity, FeatureId, WorkspaceId
+from src.apps.feature.exceptions import FeatureRepositoryError
 from src.data_access.mappers.feature_mapper import FeatureMapper
 from src.data_access.models import (
     FeatureModel,
+    ProjectModel,
     TagModel,
     UserModel,
-    ProjectModel,
     WorkspaceMemberModel,
 )
-from src.data_access.models.feature import Status, Priority
+from src.data_access.models.feature import Priority, Status
 
 
 class FeatureRepository(IFeatureRepository):
@@ -79,7 +74,7 @@ class FeatureRepository(IFeatureRepository):
         except IntegrityError as e:
             orig_exception = e.orig.__cause__
             if isinstance(orig_exception, ForeignKeyViolationError):
-                detail_message = orig_exception.detail  # noqa
+                detail_message = orig_exception.detail
                 raise FeatureRepositoryError(detail_message)
             else:
                 raise
@@ -109,7 +104,7 @@ class FeatureRepository(IFeatureRepository):
             except IntegrityError as e:
                 orig_exception = e.orig.__cause__
                 if isinstance(orig_exception, ForeignKeyViolationError):
-                    detail_message = orig_exception.detail  # noqa
+                    detail_message = orig_exception.detail
                     raise FeatureRepositoryError(detail_message)
                 else:
                     raise
@@ -122,9 +117,9 @@ class FeatureRepository(IFeatureRepository):
             raise FeatureRepositoryError(message=f'Не найдена фича с id: {feature_id}')
 
     async def get_by_workspace_id(
-            self,
-            workspace_id: WorkspaceId,
-            query: FeatureListQuery,
+        self,
+        workspace_id: WorkspaceId,
+        query: FeatureListQuery,
     ) -> list[FeatureInWorkspaceOutputDTO] | None:
         conditions = [self.model.workspace_id == workspace_id]
 
@@ -138,9 +133,7 @@ class FeatureRepository(IFeatureRepository):
 
             if 'status' in filters:
                 statuses = [Status[status.name].value for status in filters['status']]
-                conditions.append(
-                    self.model.status.in_(statuses)
-                )
+                conditions.append(self.model.status.in_(statuses))
 
             if 'project' in filters:
                 conditions.append(self.model.project_id.in_(filters['project']))
@@ -171,86 +164,115 @@ class FeatureRepository(IFeatureRepository):
         )
 
     def _make_stmt_for_validation(
-            self,
-            attrs: FeatureAttrsWithWorkspace,
+        self,
+        attrs: FeatureAttrsWithWorkspace,
     ) -> 'Select':
-        project_subq = select(func.count()).select_from(ProjectModel).where(
-            ProjectModel.id == attrs["project_id"],
-            ProjectModel.workspace_id == attrs["workspace_id"],
-        ).scalar_subquery()
+        project_subq = (
+            select(func.count())
+            .select_from(ProjectModel)
+            .where(
+                ProjectModel.id == attrs['project_id'],
+                ProjectModel.workspace_id == attrs['workspace_id'],
+            )
+            .scalar_subquery()
+        )
 
-        owner_subq = select(func.count()).select_from(WorkspaceMemberModel).where(
-            WorkspaceMemberModel.user_id == attrs["owner_id"],
-            WorkspaceMemberModel.workspace_id == attrs["workspace_id"],
-        ).scalar_subquery()
+        owner_subq = (
+            select(func.count())
+            .select_from(WorkspaceMemberModel)
+            .where(
+                WorkspaceMemberModel.user_id == attrs['owner_id'],
+                WorkspaceMemberModel.workspace_id == attrs['workspace_id'],
+            )
+            .scalar_subquery()
+        )
 
-        assigned_subq = select(func.count()).select_from(WorkspaceMemberModel).where(
-            WorkspaceMemberModel.user_id == attrs["assigned_to"],
-            WorkspaceMemberModel.workspace_id == attrs["workspace_id"],
-        ).scalar_subquery() if attrs["assigned_to"] else literal(0)
+        assigned_subq = (
+            select(func.count())
+            .select_from(WorkspaceMemberModel)
+            .where(
+                WorkspaceMemberModel.user_id == attrs['assigned_to'],
+                WorkspaceMemberModel.workspace_id == attrs['workspace_id'],
+            )
+            .scalar_subquery()
+            if attrs['assigned_to']
+            else literal(0)
+        )
 
         tag_subq = (
-            select(func.count()).select_from(TagModel).where(
-                TagModel.id.in_(attrs["tags"]),
-                TagModel.workspace_id == attrs["workspace_id"],
-            ).scalar_subquery()
-            if attrs["tags"]
+            select(func.count())
+            .select_from(TagModel)
+            .where(
+                TagModel.id.in_(attrs['tags']),
+                TagModel.workspace_id == attrs['workspace_id'],
+            )
+            .scalar_subquery()
+            if attrs['tags']
             else literal(0)
         )
 
         member_subq = (
-            select(func.count()).select_from(WorkspaceMemberModel).where(
-                WorkspaceMemberModel.user_id.in_(attrs["members"]),
-                WorkspaceMemberModel.workspace_id == attrs["workspace_id"],
-            ).scalar_subquery()
-            if attrs["members"]
+            select(func.count())
+            .select_from(WorkspaceMemberModel)
+            .where(
+                WorkspaceMemberModel.user_id.in_(attrs['members']),
+                WorkspaceMemberModel.workspace_id == attrs['workspace_id'],
+            )
+            .scalar_subquery()
+            if attrs['members']
             else literal(0)
         )
 
         stmt = select(
-            project_subq.label("cnt_project"),
-            owner_subq.label("cnt_owner"),
-            assigned_subq.label("cnt_assigned"),
-            tag_subq.label("cnt_tags"),
-            member_subq.label("cnt_members"),
+            project_subq.label('cnt_project'),
+            owner_subq.label('cnt_owner'),
+            assigned_subq.label('cnt_assigned'),
+            tag_subq.label('cnt_tags'),
+            member_subq.label('cnt_members'),
         )
 
         return stmt
 
     async def validate_workspace_consistency(
-            self,
-            attrs: FeatureAttrsWithWorkspace,
+        self,
+        attrs: FeatureAttrsWithWorkspace,
     ) -> None:
         """
-            Проверяет, что:
-              - проект с id = attrs["project_id"] принадлежит workspace с id = attrs["workspace_id"],
-              - владелец (owner_id) является участником workspace,
-              - назначенный пользователь (assigned_to) является участником workspace,
-              - все переданные теги принадлежат workspace,
-              - все участники (members) числятся в workspace.
+        Проверяет, что:
+          - проект с id = attrs["project_id"] принадлежит workspace с id = attrs["workspace_id"],
+          - владелец (owner_id) является участником workspace,
+          - назначенный пользователь (assigned_to) является участником workspace,
+          - все переданные теги принадлежат workspace,
+          - все участники (members) числятся в workspace.
 
-            Если хоть одна проверка не проходит, выбрасывается FeatureRepositoryError.
-            """
+        Если хоть одна проверка не проходит, выбрасывается FeatureRepositoryError.
+        """
         stmt = self._make_stmt_for_validation(attrs=attrs)
         result = await self._session.execute(stmt)
         row = result.first()
 
         if row is None:
-            raise FeatureRepositoryError(message="Ошибка при проверке целостности workspace.")
+            raise FeatureRepositoryError(message='Ошибка при проверке целостности workspace.')
 
         if row.cnt_project != 1:
-            raise FeatureRepositoryError(message="Проект не принадлежит указанному workspace.")
+            raise FeatureRepositoryError(message='Проект не принадлежит указанному workspace.')
 
         if row.cnt_owner != 1:
-            raise FeatureRepositoryError(message="Владелец не является участником указанного workspace.")
+            raise FeatureRepositoryError(
+                message='Владелец не является участником указанного workspace.'
+            )
 
-        if attrs["assigned_to"] and row.cnt_assigned != 1:
-            raise FeatureRepositoryError(message=
-                                         "Пользователь, назначенный на выполнение, не является участником указанного workspace."
-                                         )
+        if attrs['assigned_to'] and row.cnt_assigned != 1:
+            raise FeatureRepositoryError(
+                message='Пользователь, назначенный на выполнение, не является участником указанного workspace.'
+            )
 
-        if attrs["tags"] and row.cnt_tags != len(attrs["tags"]):
-            raise FeatureRepositoryError(message="Один или несколько тегов не принадлежат указанному workspace.")
+        if attrs['tags'] and row.cnt_tags != len(attrs['tags']):
+            raise FeatureRepositoryError(
+                message='Один или несколько тегов не принадлежат указанному workspace.'
+            )
 
-        if attrs["members"] and row.cnt_members != len(attrs["members"]):
-            raise FeatureRepositoryError(message="Один или несколько участников не состоят в указанном workspace.")
+        if attrs['members'] and row.cnt_members != len(attrs['members']):
+            raise FeatureRepositoryError(
+                message='Один или несколько участников не состоят в указанном workspace.'
+            )

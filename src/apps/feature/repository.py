@@ -1,14 +1,10 @@
 from abc import ABC, abstractmethod
 
+from src.apps.feature.domain import FeatureEntity, FeatureId, WorkspaceId
 from src.apps.feature.dtos import (
+    FeatureAttrsWithWorkspace,
     FeatureInWorkspaceOutputDTO,
     FeatureOutputDTO,
-    FeatureAttrsWithWorkspace,
-)
-from src.apps.feature.domain import (
-    FeatureEntity,
-    FeatureId,
-    WorkspaceId,
 )
 from src.apps.feature.query_parameters import FeatureListQuery
 
@@ -37,13 +33,13 @@ class IFeatureRepository(ABC):
 
     @abstractmethod
     async def get_by_workspace_id(
-            self, workspace_id: WorkspaceId, query: FeatureListQuery
+        self, workspace_id: WorkspaceId, query: FeatureListQuery
     ) -> list[FeatureInWorkspaceOutputDTO]:
         pass
 
     @abstractmethod
     async def validate_workspace_consistency(
-            self,
-            attrs: FeatureAttrsWithWorkspace,
+        self,
+        attrs: FeatureAttrsWithWorkspace,
     ) -> None:
         pass

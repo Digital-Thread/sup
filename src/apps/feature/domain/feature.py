@@ -4,12 +4,12 @@ from re import match
 from typing import TypedDict
 
 from src.apps.feature.domain.types_ids import (
+    FeatureId,
     OwnerId,
     ProjectId,
     TagId,
     UserId,
     WorkspaceId,
-    FeatureId
 )
 
 
@@ -42,17 +42,17 @@ class OptionalFeatureUpdateFields(TypedDict, total=False):
 class FeatureEntity:
 
     def __init__(
-            self,
-            name: str,
-            workspace_id: WorkspaceId,
-            project_id: ProjectId,
-            owner_id: OwnerId,
-            assigned_to: UserId | None = None,
-            description: str | None = None,
-            priority: Priority = Priority.NO_PRIORITY,
-            status: Status = Status.NEW,
-            tags: list[TagId] | None = None,
-            members: list[UserId] | None = None,
+        self,
+        name: str,
+        workspace_id: WorkspaceId,
+        project_id: ProjectId,
+        owner_id: OwnerId,
+        assigned_to: UserId | None = None,
+        description: str | None = None,
+        priority: Priority = Priority.NO_PRIORITY,
+        status: Status = Status.NEW,
+        tags: list[TagId] | None = None,
+        members: list[UserId] | None = None,
     ):
         self._id: FeatureId | None = None
         self.name = name
@@ -69,11 +69,11 @@ class FeatureEntity:
         self.updated_at = datetime.now(timezone.utc)
 
     @property
-    def id(self):
+    def id(self) -> FeatureId:
         return self._id
 
     @id.setter
-    def id(self, _id: FeatureId):
+    def id(self, _id: FeatureId) -> None:
         if self._id is not None:
             raise AttributeError('Идентификатор фичи уже установлен')
 
@@ -129,6 +129,8 @@ class FeatureEntity:
         }
         for field, value in updates.items():
             if field in required_fields.keys() and value is None:
-                raise ValueError(f'{required_fields[field]} обязательное поле и не может быть пустым!')
+                raise ValueError(
+                    f'{required_fields[field]} обязательное поле и не может быть пустым!'
+                )
             setattr(self, field, value)
         self.updated_at = datetime.now(timezone.utc)

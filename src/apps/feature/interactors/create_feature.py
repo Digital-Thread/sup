@@ -1,7 +1,7 @@
-from src.apps.feature.mapper import FeatureMapper
 from src.apps.feature.dtos import FeatureInputDTO
 from src.apps.feature.exceptions import FeatureCreateError, FeatureRepositoryError
 from src.apps.feature.interactors.base_interactor import BaseInteractor
+from src.apps.feature.mapper import FeatureMapper
 
 
 class CreateFeatureInteractor(BaseInteractor):
