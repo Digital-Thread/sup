@@ -46,15 +46,6 @@ class UpdateFeatureRequestDTO(BaseModel):
     tags: list[TagId] | None = None
     members: list[UserId] | None = None
 
-    # нужен для проверки, что в поля не было явным образом передано значение null
-    @field_validator('name', 'project_id', 'priority', 'status')
-    def fields_cannot_be_none(cls, value: Any, info: FieldValidationInfo) -> Any:
-        if value is None:
-            raise FeatureUpdateError(
-                message=f"Для поля '{info.field_name}' не может быть установлено значение None."
-            )
-        return value
-
 
 class FeatureResponseDTO(BaseModel):
     id: FeatureId

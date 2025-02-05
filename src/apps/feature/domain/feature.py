@@ -121,6 +121,14 @@ class FeatureEntity:
         return self._owner_id
 
     def update_fields(self, updates: OptionalFeatureUpdateFields) -> None:
+        required_fields = {
+            'name': 'Название',
+            'project_id': 'Проект',
+            'priority': 'Приоритет',
+            'status': 'Статус',
+        }
         for field, value in updates.items():
+            if field in required_fields.keys() and value is None:
+                raise ValueError(f'{required_fields[field]} обязательное поле и не может быть пустым!')
             setattr(self, field, value)
         self.updated_at = datetime.now(timezone.utc)
