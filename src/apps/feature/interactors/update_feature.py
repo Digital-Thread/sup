@@ -1,3 +1,4 @@
+from src.apps.feature.mapper import FeatureMapper
 from src.apps.feature.dtos import FeatureUpdateDTO
 from src.apps.feature.exceptions import (
     FeatureDoesNotExistError,
@@ -16,6 +17,12 @@ class UpdateFeatureInteractor(BaseInteractor):
         try:
             feature.update_fields(dto.updated_fields)
         except ValueError as e:
+            raise FeatureUpdateError(context=e) from None
+
+        try:
+            attrs = FeatureMapper.entity_to_attrs_dto(feature)
+            await self._repository.validate_workspace_consistency(attrs=attrs)
+        except FeatureRepositoryError as e:
             raise FeatureUpdateError(context=e) from None
 
         try:

@@ -12,6 +12,12 @@ class CreateFeatureInteractor(BaseInteractor):
             raise FeatureCreateError(context=e) from None
 
         try:
+            attrs = FeatureMapper.entity_to_attrs_dto(feature)
+            await self._repository.validate_workspace_consistency(attrs=attrs)
+        except FeatureRepositoryError as e:
+            raise FeatureCreateError(context=e) from None
+
+        try:
             await self._repository.save(feature=feature)
         except FeatureRepositoryError as e:
             raise FeatureCreateError(context=e) from None

@@ -72,3 +72,12 @@ class FeatureInWorkspaceOutputDTO:
     priority: Priority
     status: Status
     members: list[FeatureMember] | None
+
+
+class FeatureAttrsWithWorkspace(TypedDict):
+    workspace_id: WorkspaceId
+    project_id: ProjectId
+    owner_id: OwnerId
+    assigned_to: UserId
+    tags: list[TagId]
+    members: list[UserId]
