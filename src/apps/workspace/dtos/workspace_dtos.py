@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import TypedDict
 from uuid import UUID
 
 
@@ -30,12 +31,16 @@ class GetWorkspacesByMemberIdDTO:
     member_id: UUID
 
 
+class OptionalWorkspaceUpdateFields(TypedDict, total=False):
+    name: str
+    description: str
+    logo: str
+
+
 @dataclass
 class UpdateWorkspaceDTO:
     workspace_id: UUID
-    name: str | None = None
-    description: str | None = None
-    logo: str | None = None
+    updated_fields: OptionalWorkspaceUpdateFields
 
 
 @dataclass

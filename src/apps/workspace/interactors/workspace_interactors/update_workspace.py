@@ -15,9 +15,14 @@ class UpdateWorkspaceInteractor:
         self._workspace_repository = workspace_repository
 
     async def execute(self, workspace_update_data: UpdateWorkspaceDTO) -> None:
-        updated_workspace = await self._map_to_update_data(
-            WorkspaceId(workspace_update_data.workspace_id), workspace_update_data
+        existing_workspace = await self._get_existing_workspace_by_id(
+            workspace_id=WorkspaceId(workspace_update_data.workspace_id)
         )
+        updated_workspace = await self._map_to_update_data(
+            workspace=existing_workspace,
+            updated_data=workspace_update_data.updated_fields
+        )
+
         try:
             await self._workspace_repository.update(updated_workspace)
         except WorkspaceNotUpdated as error:
@@ -32,13 +37,16 @@ class UpdateWorkspaceInteractor:
 
         return existing_workspace
 
+    @staticmethod
     async def _map_to_update_data(
-        self, workspace_id: WorkspaceId, updated_data: UpdateWorkspaceDTO
+            workspace: WorkspaceEntity, updated_data: dict[str, str]
     ) -> WorkspaceEntity:
-        existing_workspace = await self._get_existing_workspace_by_id(workspace_id)
         try:
-            updated_workspace = WorkspaceMapper.update_data(updated_data, existing_workspace)
+            updated_workspace = WorkspaceMapper.update_data(
+                updated_fields=updated_data,
+                existing_workspace=workspace
+            )
         except ValueError as error:
-            raise WorkspaceException(f'{str(error)} при попытке обновить')
+            raise WorkspaceException(str(error))
         else:
             return updated_workspace

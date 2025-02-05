@@ -1,4 +1,3 @@
-from dataclasses import asdict
 from uuid import UUID
 
 from src.apps.workspace.domain.entities.workspace import WorkspaceEntity
@@ -14,7 +13,6 @@ from src.apps.workspace.domain.types_ids import (
 )
 from src.apps.workspace.dtos.workspace_dtos import (
     MemberOutDTO,
-    UpdateWorkspaceDTO,
     WorkspaceOutDTO,
 )
 
@@ -58,11 +56,10 @@ class WorkspaceMapper:
 
     @staticmethod
     def update_data(
-        dto: UpdateWorkspaceDTO, existing_workspace: WorkspaceEntity
+        updated_fields: dict[str, str], existing_workspace: WorkspaceEntity
     ) -> WorkspaceEntity:
-        for field, value in asdict(dto).items():
-            if value is not None and field != 'id':
-                setattr(existing_workspace, field, value)
+        for field, value in updated_fields.items():
+            setattr(existing_workspace, field, value)
 
         return existing_workspace
 

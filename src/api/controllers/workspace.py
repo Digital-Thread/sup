@@ -14,7 +14,7 @@ from src.apps.workspace.dtos.workspace_dtos import (
     CreateWorkspaceDTO,
     DeleteWorkspaceDTO,
     GetWorkspacesByMemberIdDTO,
-    UpdateWorkspaceDTO,
+    UpdateWorkspaceDTO, OptionalWorkspaceUpdateFields,
 )
 from src.apps.workspace.interactors.workspace_interactors import (
     CreateWorkspaceInteractor,
@@ -75,7 +75,8 @@ async def update_workspace(
     interactor: FromDishka[UpdateWorkspaceInteractor],
 ) -> None:
     workspace_update_data = UpdateWorkspaceDTO(
-        **body.model_dump(exclude_none=True), workspace_id=workspace_id
+        updated_fields=OptionalWorkspaceUpdateFields(**body.model_dump(exclude_unset=True)),
+        workspace_id=workspace_id
     )
     await interactor.execute(workspace_update_data=workspace_update_data)
 

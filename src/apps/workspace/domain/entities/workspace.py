@@ -38,7 +38,7 @@ class WorkspaceEntity(DescriptionValidatorMixin):
 
     @staticmethod
     def _is_valid_name(name: str) -> None:
-        if not name.strip():
+        if name is None or not name.strip():
             raise ValueError('Имя рабочего пространства должно содержать хотя бы одну букву')
 
         pattern = r'^[a-zA-Zа-яА-ЯёЁ\s]{1,50}$'
