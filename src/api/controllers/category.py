@@ -2,9 +2,10 @@ from typing import Annotated
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter, Body, Path, status
+from fastapi import APIRouter, Body, Path, status, Query
 
 from src.api.dtos.category import CategoryResponseDTO
+from src.apps.workspace.dtos.category_dtos import GetCategoryDTO
 from src.apps.workspace.interactors.category_interactors import (
     CreateCategoryInteractor,
     DeleteCategoryInteractor,
@@ -30,10 +31,13 @@ async def create_category(
 
 @category_router.get('/', status_code=status.HTTP_200_OK, response_model=list[CategoryResponseDTO])
 async def get_categories_in_workspace(
-    interactor: FromDishka[GetCategoryByWorkspaceInteractor], context: FromDishka[WorkspaceContext]
+    interactor: FromDishka[GetCategoryByWorkspaceInteractor],
+    context: FromDishka[WorkspaceContext],
+    page: int = Query(1, description='Page number', ge=1),
+    page_size: int = Query(10, description='Number of roles per page', ge=5, le=100)
 ) -> list[CategoryResponseDTO]:
-    response = await interactor.execute(workspace_id=context.workspace_id)
-    return [CategoryResponseDTO(**category.__dict__) for category in response]
+    categories = await interactor.execute(GetCategoryDTO(workspace_id=context.workspace_id, page=page, page_size=page_size))
+    return [CategoryResponseDTO.model_validate(category) for category in categories]
 
 
 @category_router.get(
@@ -44,8 +48,8 @@ async def get_category_by_id(
     interactor: FromDishka[GetCategoryByIdInteractor],
     context: FromDishka[WorkspaceContext],
 ) -> CategoryResponseDTO:
-    response = await interactor.execute(category_id=category_id, workspace_id=context.workspace_id)
-    return CategoryResponseDTO(**response.__dict__)
+    category = await interactor.execute(category_id=category_id, workspace_id=context.workspace_id)
+    return CategoryResponseDTO.model_validate(category)
 
 
 @category_router.patch('/{category_id}', status_code=status.HTTP_204_NO_CONTENT)

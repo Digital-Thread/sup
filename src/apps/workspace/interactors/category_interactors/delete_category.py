@@ -2,9 +2,8 @@ from uuid import UUID
 
 from src.apps.workspace.domain.types_ids import CategoryId, WorkspaceId
 from src.apps.workspace.exceptions.category_exceptions import (
-    CategoryException,
     CategoryNotFound,
-    WorkspaceCategoryNotFound,
+    CategoryNotDeleted,
 )
 from src.apps.workspace.repositories.category_repository import ICategoryRepository
 
@@ -18,5 +17,7 @@ class DeleteCategoryInteractor:
             await self._category_repository.delete(
                 CategoryId(category_id), WorkspaceId(workspace_id)
             )
-        except (CategoryNotFound, WorkspaceCategoryNotFound) as error:
-            raise CategoryException(f'{str(error)}')
+        except CategoryNotFound as error:
+            if isinstance(error, CategoryNotFound):
+                raise
+            raise CategoryNotDeleted(f'Тег с id={category_id} не удален')

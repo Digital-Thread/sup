@@ -10,7 +10,6 @@ from src.apps.workspace.domain.types_ids import CategoryId, WorkspaceId
 from src.apps.workspace.exceptions.category_exceptions import (
     CategoryAlreadyExists,
     CategoryNotFound,
-    CategoryNotUpdated,
     WorkspaceCategoryNotFound,
 )
 from src.apps.workspace.repositories.category_repository import ICategoryRepository
@@ -54,15 +53,12 @@ class CategoryRepository(ICategoryRepository):
         else:
             return CategoryMapper.model_to_entity(category_model)
 
-    async def get_by_workspace_id(self, workspace_id: WorkspaceId) -> list[CategoryEntity]:
-        query = select(CategoryModel).filter_by(workspace_id=workspace_id)
+    async def get_by_workspace_id(self, workspace_id: WorkspaceId, page: int, page_size: int) -> list[CategoryEntity]:
+        query = select(CategoryModel).filter_by(workspace_id=workspace_id).limit(page_size).offset((page - 1) * page_size)
         result = await self._session.execute(query)
         categories = [
             CategoryMapper.model_to_entity(category) for category in result.scalars().all()
         ]
-        if not categories:
-            raise WorkspaceCategoryNotFound(f'Рабочее пространство с id={workspace_id} не найдено')
-
         return categories
 
     async def update(self, category: CategoryEntity) -> None:
@@ -72,10 +68,8 @@ class CategoryRepository(ICategoryRepository):
             .filter_by(id=category.id, workspace_id=category.workspace_id)
             .values(**update_data)
         )
-        result = await self._session.execute(stmt)
+        await self._session.execute(stmt)
 
-        if result.rowcount == 0:
-            raise CategoryNotUpdated(f'Категория с id={category.id} не обновлена')
 
     async def delete(self, category_id: CategoryId, workspace_id: WorkspaceId) -> None:
         stmt = delete(CategoryModel).filter_by(id=category_id, workspace_id=workspace_id)

@@ -44,7 +44,7 @@ from src.apps.user.exceptions import (
 
 __all__ = ('init_exception_handlers',)
 
-from src.apps.workspace.exceptions.category_exceptions import CategoryException
+from src.apps.workspace.exceptions.category_exceptions import CategoryException, CategoryNotFound, CategoryNotDeleted
 from src.apps.workspace.exceptions.role_exceptions import (
     RoleException,
     RoleNotDeleted,
@@ -104,6 +104,8 @@ exception_status_codes = {
     WorkspaceNotFound: status.HTTP_404_NOT_FOUND,
     MemberWorkspaceNotFound: status.HTTP_404_NOT_FOUND,
     CategoryException: status.HTTP_400_BAD_REQUEST,
+    CategoryNotFound: status.HTTP_404_NOT_FOUND,
+    CategoryNotDeleted: status.HTTP_400_BAD_REQUEST,
     RoleException: status.HTTP_400_BAD_REQUEST,
     RoleNotFound: status.HTTP_404_NOT_FOUND,
     RoleNotDeleted: status.HTTP_400_BAD_REQUEST,

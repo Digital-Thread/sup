@@ -39,16 +39,32 @@ class RoleRepository(IRoleRepository):
         return RoleMapper.model_to_entity(role_model) if role_model else None
 
     async def get_by_workspace_id(
-        self, workspace_id: WorkspaceId
+        self, workspace_id: WorkspaceId, page:int, page_size:int
     ) -> list[tuple[RoleEntity, list[dict[str, str]] | None]]:
-        query = (
-            select(RoleModel, UserModel.first_name, UserModel.last_name, UserModel.avatar)
-            .outerjoin(UserWorkspaceRoleModel, RoleModel.id == UserWorkspaceRoleModel.role_id)
-            .outerjoin(UserModel, UserWorkspaceRoleModel.user_id == UserModel.id)
+        roles_query = (
+            select(RoleModel)
             .filter(RoleModel.workspace_id == workspace_id)
+            .limit(page_size)
+            .offset((page - 1) * page_size)
         )
-        result = await self._session.execute(query)
-        roles_with_members = RoleMapper.list_to_entity(result.all())
+        roles_result = await self._session.execute(roles_query)
+        roles = roles_result.scalars().all()
+
+        if not roles:
+            return []
+
+        role_ids = [role.id for role in roles]
+
+        members_query = (
+            select(UserWorkspaceRoleModel.role_id, UserModel.first_name, UserModel.last_name, UserModel.avatar)
+            .join(UserModel, UserWorkspaceRoleModel.user_id == UserModel.id)
+            .filter(UserWorkspaceRoleModel.role_id.in_(role_ids))
+        )
+        members_result = await self._session.execute(members_query)
+        members = members_result.all()
+
+        roles_with_members = RoleMapper.list_to_entity(members=members, roles=roles)
+
         return roles_with_members
 
     async def update(self, role: RoleEntity) -> None:

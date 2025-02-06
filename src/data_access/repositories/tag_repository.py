@@ -44,15 +44,16 @@ class TagRepository(ITagRepository):
         tag_model = result.scalar_one_or_none()
         return TagMapper.model_to_entity(tag_model) if tag_model else None
 
-    async def get_by_workspace_id(self, workspace_id: WorkspaceId) -> list[TagEntity]:
-        query = select(TagModel).filter_by(workspace_id=workspace_id)
+    async def get_by_workspace_id(self, workspace_id: WorkspaceId, page: int, page_size: int) -> list[TagEntity]:
+        offset = (page - 1) * page_size
+        query = select(TagModel).filter_by(workspace_id=workspace_id).offset(offset).limit(page_size)
         result = await self._session.execute(query)
         tags = [TagMapper.model_to_entity(tag) for tag in result.scalars().all()]
         return tags
 
     async def update(self, tag: TagEntity) -> None:
         update_data = TagMapper.entity_to_dict(tag)
-        stmt = update(TagModel).filter_by(id=tag.id).values(**update_data)
+        stmt = update(TagModel).filter_by(id=tag.id, workspace_id=tag.workspace_id).values(**update_data)
         await self._session.execute(stmt)
 
     async def delete(self, tag_id: TagId, workspace_id: WorkspaceId) -> None:

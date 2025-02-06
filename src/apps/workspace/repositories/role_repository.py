@@ -8,6 +8,6 @@ from src.apps.workspace.repositories.base_repository import IBaseRepository
 class IRoleRepository(IBaseRepository[RoleEntity, RoleId]):
     @abstractmethod
     async def get_by_workspace_id(
-        self, workspace_id: WorkspaceId
+        self, workspace_id: WorkspaceId, page: int, page_size:int
     ) -> list[tuple[RoleEntity, list[dict[str, str]] | None]]:
         raise NotImplementedError

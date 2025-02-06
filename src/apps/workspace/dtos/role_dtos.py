@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from uuid import UUID
 
+from src.apps.workspace.dtos.pagination_dto import PaginationDTO
+
 
 @dataclass
 class CreateRoleAppDTO:
@@ -22,6 +24,11 @@ class RoleWithMemberOutDTO:
     name: str
     color: str
     members: list[MemberOutDTO] | None
+
+
+@dataclass
+class GetRolesDTO(PaginationDTO):
+    workspace_id: UUID
 
 
 @dataclass

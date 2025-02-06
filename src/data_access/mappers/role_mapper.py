@@ -40,19 +40,17 @@ class RoleMapper:
 
     @staticmethod
     def list_to_entity(
-        roles_with_members: Sequence[Row[tuple[RoleModel, str, str, str]]]
+            roles: Sequence[RoleModel],
+            members: Sequence[Row[tuple[int, str, str, str]]]
     ) -> list[tuple[RoleEntity, list[dict[str, str]] | None]]:
         role_member_map = defaultdict(list)
 
-        for role_model, first_name, last_name, avatar in roles_with_members:
-            member_data = (
-                {'first_name': first_name, 'last_name': last_name, 'avatar': avatar}
-                if first_name and last_name
-                else None
+        for role_id, first_name, last_name, avatar in members:
+            role_member_map[role_id].append(
+                {"first_name": first_name, "last_name": last_name, "avatar": avatar}
             )
-            role_member_map[role_model].append(member_data)
 
-        roles = [
+        roles_with_members = [
             (
                 RoleEntity(
                     _id=role.id,
@@ -60,9 +58,9 @@ class RoleMapper:
                     _color=role.color,
                     _workspace_id=WorkspaceId(role.workspace_id),
                 ),
-                members if members != [None] else None,
+                role_member_map.get(role.id, None),
             )
-            for role, members in role_member_map.items()
+            for role in roles
         ]
 
-        return roles
+        return roles_with_members
