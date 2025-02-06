@@ -44,7 +44,11 @@ from src.apps.user.exceptions import (
 
 __all__ = ('init_exception_handlers',)
 
-from src.apps.workspace.exceptions.category_exceptions import CategoryException, CategoryNotFound, CategoryNotDeleted
+from src.apps.workspace.exceptions.category_exceptions import (
+    CategoryException,
+    CategoryNotDeleted,
+    CategoryNotFound,
+)
 from src.apps.workspace.exceptions.role_exceptions import (
     RoleException,
     RoleNotDeleted,

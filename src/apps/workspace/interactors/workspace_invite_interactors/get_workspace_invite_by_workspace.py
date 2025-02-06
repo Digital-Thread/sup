@@ -1,5 +1,8 @@
 from src.apps.workspace.domain.types_ids import WorkspaceId
-from src.apps.workspace.dtos.workspace_invite_dtos import WorkspaceInviteOutDTO, GetWorkspaceInvitesDTO
+from src.apps.workspace.dtos.workspace_invite_dtos import (
+    GetWorkspaceInvitesDTO,
+    WorkspaceInviteOutDTO,
+)
 from src.apps.workspace.mappers.workspace_invite_mapper import WorkspaceInviteMapper
 from src.apps.workspace.repositories.workspace_invite_repository import (
     IWorkspaceInviteRepository,

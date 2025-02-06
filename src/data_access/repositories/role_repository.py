@@ -39,7 +39,7 @@ class RoleRepository(IRoleRepository):
         return RoleMapper.model_to_entity(role_model) if role_model else None
 
     async def get_by_workspace_id(
-        self, workspace_id: WorkspaceId, page:int, page_size:int
+        self, workspace_id: WorkspaceId, page: int, page_size: int
     ) -> list[tuple[RoleEntity, list[dict[str, str]] | None]]:
         roles_query = (
             select(RoleModel)
@@ -56,7 +56,12 @@ class RoleRepository(IRoleRepository):
         role_ids = [role.id for role in roles]
 
         members_query = (
-            select(UserWorkspaceRoleModel.role_id, UserModel.first_name, UserModel.last_name, UserModel.avatar)
+            select(
+                UserWorkspaceRoleModel.role_id,
+                UserModel.first_name,
+                UserModel.last_name,
+                UserModel.avatar,
+            )
             .join(UserModel, UserWorkspaceRoleModel.user_id == UserModel.id)
             .filter(UserWorkspaceRoleModel.role_id.in_(role_ids))
         )

@@ -30,5 +30,7 @@ class UpdateCategoryInteractor:
     ) -> CategoryEntity:
         existing_category = await self._category_repository.get_by_id(category_id, workspace_id)
         if not existing_category:
-            raise CategoryNotFound(f'Категория с id={category_id}, в рабочем пространстве с id={workspace_id} не найдена')
+            raise CategoryNotFound(
+                f'Категория с id={category_id}, в рабочем пространстве с id={workspace_id} не найдена'
+            )
         return existing_category

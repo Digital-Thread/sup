@@ -2,7 +2,7 @@ from typing import Annotated
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter, Body, Path, status, Query
+from fastapi import APIRouter, Body, Path, Query, status
 
 from src.api.dtos.category import CategoryResponseDTO
 from src.apps.workspace.dtos.category_dtos import GetCategoryDTO
@@ -34,9 +34,11 @@ async def get_categories_in_workspace(
     interactor: FromDishka[GetCategoryByWorkspaceInteractor],
     context: FromDishka[WorkspaceContext],
     page: int = Query(1, description='Page number', ge=1),
-    page_size: int = Query(10, description='Number of roles per page', ge=5, le=100)
+    page_size: int = Query(10, description='Number of roles per page', ge=5, le=100),
 ) -> list[CategoryResponseDTO]:
-    categories = await interactor.execute(GetCategoryDTO(workspace_id=context.workspace_id, page=page, page_size=page_size))
+    categories = await interactor.execute(
+        GetCategoryDTO(workspace_id=context.workspace_id, page=page, page_size=page_size)
+    )
     return [CategoryResponseDTO.model_validate(category) for category in categories]
 
 

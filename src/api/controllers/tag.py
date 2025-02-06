@@ -2,10 +2,10 @@ from typing import Annotated
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter, Path, status, Query
+from fastapi import APIRouter, Path, Query, status
 
 from src.api.dtos.tag import CreateTagRequestDTO, TagResponseDTO, UpdateTagDTO
-from src.apps.workspace.dtos.tag_dtos import CreateTagDTO, UpdateTagAppDTO, GetTagsDTO
+from src.apps.workspace.dtos.tag_dtos import CreateTagDTO, GetTagsDTO, UpdateTagAppDTO
 from src.apps.workspace.interactors.tag_interactors import (
     CreateTagInteractor,
     DeleteTagInteractor,
@@ -33,9 +33,11 @@ async def get_tags_in_workspace(
     interactor: FromDishka[GetTagByWorkspaceInteractor],
     context: FromDishka[WorkspaceContext],
     page: int = Query(1, description='Page number', ge=1),
-    page_size: int = Query(10, description='Number of tags per page', ge=5, le=100)
+    page_size: int = Query(10, description='Number of tags per page', ge=5, le=100),
 ) -> list[TagResponseDTO]:
-    tags = await interactor.execute(GetTagsDTO(workspace_id=context.workspace_id, page=page, page_size=page_size))
+    tags = await interactor.execute(
+        GetTagsDTO(workspace_id=context.workspace_id, page=page, page_size=page_size)
+    )
     return [TagResponseDTO.model_validate(tag) for tag in tags]
 
 

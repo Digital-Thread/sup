@@ -40,20 +40,19 @@ class RoleMapper:
 
     @staticmethod
     def list_to_entity(
-            roles: Sequence[RoleModel],
-            members: Sequence[Row[tuple[int, str, str, str]]]
+        roles: Sequence[RoleModel], members: Sequence[Row[tuple[int, str, str, str]]]
     ) -> list[tuple[RoleEntity, list[dict[str, str]] | None]]:
         role_member_map = defaultdict(list)
 
         for role_id, first_name, last_name, avatar in members:
             role_member_map[role_id].append(
-                {"first_name": first_name, "last_name": last_name, "avatar": avatar}
+                {'first_name': first_name, 'last_name': last_name, 'avatar': avatar}
             )
 
         roles_with_members = [
             (
                 RoleEntity(
-                    _id=role.id,
+                    _id=RoleId(role.id),
                     _name=role.name,
                     _color=role.color,
                     _workspace_id=WorkspaceId(role.workspace_id),

@@ -10,7 +10,7 @@ class CreateTagDTO:
     color: str
     workspace_id: UUID
 
-    
+
 @dataclass
 class TagOutDTO:
     id: int

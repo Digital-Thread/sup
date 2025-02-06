@@ -2,8 +2,8 @@ from uuid import UUID
 
 from src.apps.workspace.domain.types_ids import CategoryId, WorkspaceId
 from src.apps.workspace.exceptions.category_exceptions import (
-    CategoryNotFound,
     CategoryNotDeleted,
+    CategoryNotFound,
 )
 from src.apps.workspace.repositories.category_repository import ICategoryRepository
 

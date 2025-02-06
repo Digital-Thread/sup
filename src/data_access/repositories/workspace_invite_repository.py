@@ -47,8 +47,15 @@ class WorkspaceInviteRepository(IWorkspaceInviteRepository):
         invite_model = result.scalar_one_or_none()
         return WorkspaceInviteMapper.model_to_entity(invite_model) if invite_model else None
 
-    async def get_by_workspace_id(self, workspace_id: WorkspaceId, page: int, page_size: int) -> list[WorkspaceInviteEntity]:
-        query = select(WorkspaceInviteModel).filter_by(workspace_id=workspace_id).limit(page_size).offset((page- 1) * page_size)
+    async def get_by_workspace_id(
+        self, workspace_id: WorkspaceId, page: int, page_size: int
+    ) -> list[WorkspaceInviteEntity]:
+        query = (
+            select(WorkspaceInviteModel)
+            .filter_by(workspace_id=workspace_id)
+            .limit(page_size)
+            .offset((page - 1) * page_size)
+        )
         result = await self._session.execute(query)
         invites = [
             WorkspaceInviteMapper.model_to_entity(invite) for invite in result.scalars().all()

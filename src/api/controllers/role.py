@@ -3,7 +3,7 @@ from uuid import UUID
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter, Body, Path, status, Query
+from fastapi import APIRouter, Body, Path, Query, status
 
 from src.api.dtos.role import (
     CreateRoleDTO,
@@ -14,7 +14,8 @@ from src.api.dtos.role import (
 from src.apps.workspace.dtos.role_dtos import (
     AssignRoleToWorkspaceMemberDTO,
     CreateRoleAppDTO,
-    UpdateRoleAppDTO, GetRolesDTO,
+    GetRolesDTO,
+    UpdateRoleAppDTO,
 )
 from src.apps.workspace.interactors.role_interactors import (
     AssignRoleToWorkspaceMemberInteractor,
@@ -52,7 +53,7 @@ async def get_roles_in_workspace(
     interactor: FromDishka[GetRolesByWorkspaceInteractor],
     context: FromDishka[WorkspaceContext],
     page: int = Query(1, description='Page number', ge=1),
-    page_size: int = Query(10, description='Number of roles per page', ge=5, le=100)
+    page_size: int = Query(10, description='Number of roles per page', ge=5, le=100),
 ) -> list[RoleWithMembersResponseDTO]:
     roles = await interactor.execute(
         request_data=GetRolesDTO(workspace_id=context.workspace_id, page=page, page_size=page_size)

@@ -53,8 +53,15 @@ class CategoryRepository(ICategoryRepository):
         else:
             return CategoryMapper.model_to_entity(category_model)
 
-    async def get_by_workspace_id(self, workspace_id: WorkspaceId, page: int, page_size: int) -> list[CategoryEntity]:
-        query = select(CategoryModel).filter_by(workspace_id=workspace_id).limit(page_size).offset((page - 1) * page_size)
+    async def get_by_workspace_id(
+        self, workspace_id: WorkspaceId, page: int, page_size: int
+    ) -> list[CategoryEntity]:
+        query = (
+            select(CategoryModel)
+            .filter_by(workspace_id=workspace_id)
+            .limit(page_size)
+            .offset((page - 1) * page_size)
+        )
         result = await self._session.execute(query)
         categories = [
             CategoryMapper.model_to_entity(category) for category in result.scalars().all()
@@ -69,7 +76,6 @@ class CategoryRepository(ICategoryRepository):
             .values(**update_data)
         )
         await self._session.execute(stmt)
-
 
     async def delete(self, category_id: CategoryId, workspace_id: WorkspaceId) -> None:
         stmt = delete(CategoryModel).filter_by(id=category_id, workspace_id=workspace_id)
