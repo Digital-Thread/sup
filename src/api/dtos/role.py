@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -8,11 +6,19 @@ class CreateRoleDTO(BaseModel):
     color: str
 
 
-class RoleWithUserCountResponseDTO(BaseModel):
+class MemberResponseDTO(BaseModel):
+    first_name: str
+    last_name: str
+    avatar: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class RoleWithMembersResponseDTO(BaseModel):
     id: int
     name: str
     color: str
-    user_count: int
+    members: list[MemberResponseDTO] | None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -21,6 +27,8 @@ class RoleResponseDTO(BaseModel):
     id: int
     name: str
     color: str
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UpdateRoleDTO(BaseModel):

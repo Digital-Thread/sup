@@ -1,17 +1,17 @@
 from dataclasses import dataclass, field
 
+from src.apps.workspace.domain.types_ids import TagId, WorkspaceId
 from src.apps.workspace.domain.validator_mixins import (
     ColorValidatorMixin,
     NameValidatorMixin,
 )
-from src.apps.workspace.domain.types_ids import TagId, WorkspaceId
 
 
 @dataclass
 class TagEntity(NameValidatorMixin, ColorValidatorMixin):
     _name: str
     _color: str
-    _workspace_id: WorkspaceId | None = field(default=None)
+    _workspace_id: WorkspaceId
     _id: TagId | None = field(default=None)
 
     def __post_init__(self) -> None:

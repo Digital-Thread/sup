@@ -1,30 +1,26 @@
 from logging import warning
 
-from sqlalchemy import delete, exists, func, select, update
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy import delete, select, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.apps.workspace.domain.entities.role import RoleEntity
-from src.apps.workspace.domain.types_ids import RoleId
+from src.apps.workspace.domain.types_ids import RoleId, WorkspaceId
 from src.apps.workspace.exceptions.role_exceptions import (
     RoleNotFound,
-    RoleNotUpdated,
     WorkspaceRoleNotFound,
 )
 from src.apps.workspace.repositories.role_repository import IRoleRepository
 from src.data_access.mappers.role_mapper import RoleMapper
-from src.data_access.models import UserWorkspaceRoleModel
+from src.data_access.models import UserModel, UserWorkspaceRoleModel
 from src.data_access.models.workspace_models.role import RoleModel
-from src.providers.context import WorkspaceContext
 
 
 class RoleRepository(IRoleRepository):
-    def __init__(self, session_factory: AsyncSession, context: WorkspaceContext):
+    def __init__(self, session_factory: AsyncSession):
         self._session = session_factory
-        self._context = context
 
     async def save(self, role: RoleEntity) -> None:
-        role.workspace_id = self._context.workspace_id
         stmt = RoleMapper.entity_to_model(role)
         self._session.add(stmt)
 
@@ -36,41 +32,56 @@ class RoleRepository(IRoleRepository):
                 f'Рабочего пространства с id={role.workspace_id} не существует'
             )
 
-    async def get_by_id(self, role_id: RoleId) -> RoleEntity | None:
-        query = select(RoleModel).filter_by(id=role_id, workspace_id=self._context.workspace_id)
+    async def get_by_id(self, role_id: RoleId, workspace_id: WorkspaceId) -> RoleEntity | None:
+        query = select(RoleModel).filter_by(id=role_id, workspace_id=workspace_id)
         result = await self._session.execute(query)
-        try:
-            role_model = result.scalar_one()
-        except NoResultFound as error:
-            warning(error)
-            raise RoleNotFound(f'Роль с id={role_id} не найдена')
-        else:
-            return RoleMapper.model_to_entity(role_model)
+        role_model = result.scalar_one_or_none()
+        return RoleMapper.model_to_entity(role_model) if role_model else None
 
-    async def get_by_workspace_id(self) -> list[tuple[RoleEntity, int]]:
-        query = (
-            select(RoleModel, func.count(UserWorkspaceRoleModel.user_id).label('user_count'))
-            .outerjoin(UserWorkspaceRoleModel, RoleModel.id == UserWorkspaceRoleModel.role_id)
-            .filter(RoleModel.workspace_id == self._context.workspace_id)
-            .group_by(RoleModel.id)
+    async def get_by_workspace_id(
+        self, workspace_id: WorkspaceId, page: int, page_size: int
+    ) -> list[tuple[RoleEntity, list[dict[str, str]] | None]]:
+        roles_query = (
+            select(RoleModel)
+            .filter(RoleModel.workspace_id == workspace_id)
+            .limit(page_size)
+            .offset((page - 1) * page_size)
         )
+        roles_result = await self._session.execute(roles_query)
+        roles = roles_result.scalars().all()
 
-        result = await self._session.execute(query)
-        roles_with_user_count = result.all()
-        roles = RoleMapper.list_to_entity(roles_with_user_count)
-        return roles
+        if not roles:
+            return []
+
+        role_ids = [role.id for role in roles]
+
+        members_query = (
+            select(
+                UserWorkspaceRoleModel.role_id,
+                UserModel.first_name,
+                UserModel.last_name,
+                UserModel.avatar,
+            )
+            .join(UserModel, UserWorkspaceRoleModel.user_id == UserModel.id)
+            .filter(UserWorkspaceRoleModel.role_id.in_(role_ids))
+        )
+        members_result = await self._session.execute(members_query)
+        members = members_result.all()
+
+        roles_with_members = RoleMapper.list_to_entity(members=members, roles=roles)
+
+        return roles_with_members
 
     async def update(self, role: RoleEntity) -> None:
         update_data = RoleMapper.entity_to_dict(role)
         stmt = update(RoleModel).filter_by(id=role.id).values(**update_data)
+        await self._session.execute(stmt)
+
+    async def delete(self, role_id: RoleId, workspace_id: WorkspaceId) -> None:
+        stmt = delete(RoleModel).filter_by(id=role_id, workspace_id=workspace_id)
         result = await self._session.execute(stmt)
 
         if result.rowcount == 0:
-            raise RoleNotUpdated(f'Роль с id={role.id} не обновлена')
-
-    async def delete(self, role_id: RoleId) -> None:
-        stmt = delete(RoleModel).filter_by(id=role_id, workspace_id=self._context.workspace_id)
-        result = await self._session.execute(stmt)
-
-        if result.rowcount == 0:
-            raise RoleNotFound(f'Роль с id={role_id} не найдена в рабочем пространстве')
+            raise RoleNotFound(
+                f'Роль с id={role_id} не найдена в рабочем пространстве с id={workspace_id}'
+            )

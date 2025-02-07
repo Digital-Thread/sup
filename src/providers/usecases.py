@@ -51,7 +51,7 @@ from src.apps.workspace.interactors.role_interactors import (
     CreateRoleInteractor,
     DeleteRoleInteractor,
     GetRoleByIdInteractor,
-    GetRoleByWorkspaceInteractor,
+    GetRolesByWorkspaceInteractor,
     UpdateRoleInteractor,
     AssignRoleToWorkspaceMemberInteractor,
     RemoveRoleFromWorkspaceMemberInteractor
@@ -63,14 +63,6 @@ from src.apps.workspace.interactors.tag_interactors import (
     GetTagByWorkspaceInteractor,
     UpdateTagInteractor,
 )
-from src.apps.workspace.interactors.workspace_interactors.get_workspace_members import GetWorkspaceMembersInteractor
-from src.apps.workspace.interactors.workspace_invite_interactors import (
-    CreateWorkspaceInviteInteractor,
-    DeleteWorkspaceInviteInteractor,
-    GetWorkspaceIdByInviteCodeInteractor,
-    GetWorkspaceInviteByWorkspaceInteractor,
-    UpdateWorkspaceInviteInteractor,
-)
 from src.apps.workspace.interactors.workspace_interactors import (
     AddMemberInWorkspaceInteractor,
     CreateWorkspaceInteractor,
@@ -78,6 +70,14 @@ from src.apps.workspace.interactors.workspace_interactors import (
     GetWorkspaceByIdInteractor,
     GetWorkspaceByMemberInteractor,
     UpdateWorkspaceInteractor,
+)
+from src.apps.workspace.interactors.workspace_interactors.get_workspace_members import GetWorkspaceMembersInteractor
+from src.apps.workspace.interactors.workspace_invite_interactors import (
+    CreateWorkspaceInviteInteractor,
+    DeleteWorkspaceInviteInteractor,
+    GetWorkspaceIdByInviteCodeInteractor,
+    GetWorkspaceInvitesByWorkspaceInteractor,
+    UpdateWorkspaceInviteInteractor,
 )
 
 
@@ -122,7 +122,7 @@ class RoleUseCaseProvider(Provider):
 
     create_role = provide(CreateRoleInteractor)
     get_role_by_id = provide(GetRoleByIdInteractor)
-    get_role_by_workspace = provide(GetRoleByWorkspaceInteractor)
+    get_role_by_workspace = provide(GetRolesByWorkspaceInteractor)
     update_role = provide(UpdateRoleInteractor)
     delete_role = provide(DeleteRoleInteractor)
     assign_role_to_user = provide(AssignRoleToWorkspaceMemberInteractor)
@@ -154,7 +154,7 @@ class WorkspaceInviteUseCaseProvider(Provider):
 
     create_workspace_invite = provide(CreateWorkspaceInviteInteractor)
     get_workspace_invite_by_id = provide(GetWorkspaceIdByInviteCodeInteractor)
-    get_workspace_invite_by_workspace = provide(GetWorkspaceInviteByWorkspaceInteractor)
+    get_workspace_invite_by_workspace = provide(GetWorkspaceInvitesByWorkspaceInteractor)
     update_workspace_invite = provide(UpdateWorkspaceInviteInteractor)
     delete_workspace_invite = provide(DeleteWorkspaceInviteInteractor)
 

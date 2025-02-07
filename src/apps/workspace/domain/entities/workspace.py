@@ -2,9 +2,6 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from re import match
 
-from src.apps.workspace.domain.validator_mixins import (
-    DescriptionValidatorMixin,
-)
 from src.apps.workspace.domain.types_ids import (
     InviteId,
     MeetId,
@@ -15,6 +12,7 @@ from src.apps.workspace.domain.types_ids import (
     TagId,
     WorkspaceId,
 )
+from src.apps.workspace.domain.validator_mixins import DescriptionValidatorMixin
 
 
 @dataclass
@@ -40,7 +38,7 @@ class WorkspaceEntity(DescriptionValidatorMixin):
 
     @staticmethod
     def _is_valid_name(name: str) -> None:
-        if not name.strip():
+        if name is None or not name.strip():
             raise ValueError('Имя рабочего пространства должно содержать хотя бы одну букву')
 
         pattern = r'^[a-zA-Zа-яА-ЯёЁ\s]{1,50}$'
