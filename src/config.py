@@ -1,4 +1,5 @@
 import dataclasses
+from datetime import timedelta
 
 from environs import Env
 from sqlalchemy import URL
@@ -140,7 +141,7 @@ class SMTPConfig:
     port: int
     password: str
     email: str
-    TLS: bool = True
+    tls: bool
 
     @staticmethod
     def from_env(env: Env) -> 'SMTPConfig':
@@ -148,11 +149,31 @@ class SMTPConfig:
         port = env.int('SMTP_PORT')
         password = env.str('SMTP_PASS')
         email = env.str('SMTP_EMAIL')
+        tls = env.bool('SMTP_TLS')
         return SMTPConfig(
             host=host,
             port=port,
             password=password,
             email=email,
+            tls=tls,
+        )
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class JWTConfig:
+    secret_key: str
+    algorithm: str
+    access_token_lifetime: timedelta = timedelta(minutes=15)
+    refresh_token_lifetime: timedelta = timedelta(days=7)
+
+    @staticmethod
+    def from_env(env: Env) -> 'JWTConfig':
+        secret_key = env.str('SECRET_KEY')
+        algorithm = env.str('ALGORITHM')
+
+        return JWTConfig(
+            secret_key=secret_key,
+            algorithm=algorithm,
         )
 
 
@@ -186,3 +207,6 @@ class Config:
     """
 
     db: DbConfig
+    smtp: SMTPConfig
+    redis: RedisConfig
+    jwt: JWTConfig

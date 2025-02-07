@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import IntEnum
 from typing import TYPE_CHECKING
 from uuid import UUID
 
@@ -7,15 +8,14 @@ from sqlalchemy import UUID as SQL_UUID
 from sqlalchemy import Column, ForeignKey, Index, Integer, String, Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.apps.feature.domain import Priority, Status
 from src.data_access.models import Base
 
-# пока нет по указанным путям
 if TYPE_CHECKING:
+    from . import TaskModel
     from .project import ProjectModel
-    from .tag import TagModel
     from .user import UserModel
-    from .workspace import WorkspaceModel
+    from .workspace_models.tag import TagModel
+    from .workspace_models.workspace import WorkspaceModel
 
 feature_tag = Table(
     'feature_tag',
@@ -30,6 +30,21 @@ feature_member = Table(
     Column('feature_id', ForeignKey('features.id', ondelete='CASCADE'), primary_key=True),
     Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), primary_key=True),
 )
+
+
+class Priority(IntEnum):
+    CRITICAL = 5
+    HIGH = 4
+    MEDIUM = 3
+    LOW = 2
+    NO_PRIORITY = 1
+
+
+class Status(IntEnum):
+    FINISH = 4
+    TEST = 3
+    DEVELOPMENT = 2
+    NEW = 1
 
 
 class FeatureModel(Base):
@@ -70,9 +85,13 @@ class FeatureModel(Base):
         back_populates='features',
     )
 
-    owner: Mapped['UserModel'] = relationship(back_populates='owned_features')
+    owner: Mapped['UserModel'] = relationship(
+        back_populates='owned_features', foreign_keys=[owner_id]
+    )
 
-    assigned_to: Mapped['UserModel'] = relationship(back_populates='assigned_features')
+    assigned_to: Mapped['UserModel'] = relationship(
+        back_populates='assigned_features', foreign_keys=[assigned_to_id]
+    )
 
     tags: Mapped[list['TagModel'] | None] = relationship(
         secondary=feature_tag,
@@ -82,6 +101,8 @@ class FeatureModel(Base):
 
     members: Mapped[list['UserModel'] | None] = relationship(
         secondary=feature_member,
-        back_populates='features',
+        back_populates='member_features',
         passive_deletes=True,
     )
+
+    tasks: Mapped[list['TaskModel']] = relationship('TaskModel', back_populates='feature')
