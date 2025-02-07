@@ -23,6 +23,9 @@ class DescriptionValidatorMixin:
 
     @staticmethod
     def _is_valid_description(description: str, entity_name: str) -> None:
+        if not description:
+            return
+
         pattern = r'^[a-zA-Zа-яА-ЯёЁ\s\.\-]{1,500}$'
         if not bool(match(pattern, description)):
             raise ValueError(

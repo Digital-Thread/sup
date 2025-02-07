@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class CreateTagDTO(BaseModel):
+class CreateTagRequestDTO(BaseModel):
     name: str
     color: str
 

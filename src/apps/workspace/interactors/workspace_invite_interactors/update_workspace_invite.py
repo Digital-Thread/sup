@@ -5,7 +5,6 @@ from src.apps.workspace.exceptions.workspace_invite_exceptions import (
     WorkspaceInviteException,
     WorkspaceInviteNotFound,
     WorkspaceInviteNotUpdated,
-    WorkspaceWorkspaceInviteNotFound,
 )
 from src.apps.workspace.mappers.workspace_invite_mapper import WorkspaceInviteMapper
 from src.apps.workspace.repositories.workspace_invite_repository import (
@@ -17,8 +16,7 @@ class UpdateWorkspaceInviteInteractor:
     def __init__(self, workspace_invite_repository: IWorkspaceInviteRepository):
         self._workspace_invite_repository = workspace_invite_repository
 
-    async def execute(
-        self, request_data: UpdateWorkspaceInviteAppDTO) -> None:
+    async def execute(self, request_data: UpdateWorkspaceInviteAppDTO) -> None:
         existing_invite = await self._get_existing_invite_in_workspace(
             InviteId(request_data.id_), WorkspaceId(request_data.workspace_id)
         )
@@ -31,15 +29,15 @@ class UpdateWorkspaceInviteInteractor:
     async def _get_existing_invite_in_workspace(
         self, invite_id: InviteId, workspace_id: WorkspaceId
     ) -> WorkspaceInviteEntity:
-        try:
-            existing_invite = await self._workspace_invite_repository.get_by_id(
-                invite_id,
-                workspace_id,
+        existing_invite = await self._workspace_invite_repository.get_by_id(
+            invite_id,
+            workspace_id,
+        )
+        if not existing_invite:
+            raise WorkspaceInviteNotFound(
+                f'Ссылка приглашения с id={invite_id} не найдена при обновлении статуса'
             )
-        except (WorkspaceWorkspaceInviteNotFound, WorkspaceInviteNotFound) as error:
-            raise WorkspaceInviteException(f'{str(error)}')
-        else:
-            return existing_invite
+        return existing_invite
 
     @staticmethod
     def _map_to_update_data(
