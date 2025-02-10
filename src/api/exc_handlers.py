@@ -13,6 +13,7 @@ from src.apps.feature.exceptions import (
     FeatureDoesNotExistError,
     FeatureUpdateError,
 )
+from src.apps.project.exceptions import ProjectException, ProjectNotFound, WorkspaceForProjectNotFound
 from src.apps.task.exceptions import (
     TaskCreateError,
     TaskDeleteError,
@@ -118,6 +119,9 @@ exception_status_codes = {
     TagNotDeleted: status.HTTP_400_BAD_REQUEST,
     WorkspaceInviteNotFound: status.HTTP_404_NOT_FOUND,
     WorkspaceWorkspaceInviteNotFound: status.HTTP_404_NOT_FOUND,
+    WorkspaceForProjectNotFound: status.HTTP_404_NOT_FOUND,
+    ProjectException: status.HTTP_400_BAD_REQUEST,
+    ProjectNotFound: status.HTTP_404_NOT_FOUND,
 }
 
 
