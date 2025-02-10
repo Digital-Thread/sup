@@ -51,7 +51,7 @@ async def get_projects_in_workspace(
     interactor: FromDishka[GetProjectByWorkspaceInteractor],
     context: FromDishka[WorkspaceContext],
     page: int = Query(1, description='Page number', ge=1),
-    page_size: int = Query(10, description='Number of roles per page', ge=5, le=100),
+    page_size: int = Query(10, description='Number of projects per page', ge=5, le=100),
 ) -> list[ProjectResponseDTO]:
     projects_with_participants = await interactor.execute(
         workspace_id=context.workspace_id,
