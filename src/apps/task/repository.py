@@ -25,5 +25,5 @@ class ITaskRepository(ABC):
     @abstractmethod
     async def get_list(
             self, feature_id: FeatureId, query: TaskListQuery
-    ) -> list[tuple[TaskId, TaskEntity]]:
+    ) -> list[TaskEntity]:
         pass

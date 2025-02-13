@@ -10,5 +10,5 @@ class GetTaskInteractor(BaseInteractor):
         if not task:
             raise TaskDoesNotExistError(task_id)
 
-        task_dto = TaskOutputDTO.from_entity(task_id=task_id, entity=task)
+        task_dto = TaskOutputDTO.from_entity(entity=task)
         return task_dto

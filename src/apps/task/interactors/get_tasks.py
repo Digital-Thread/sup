@@ -10,5 +10,5 @@ class GetAllTasksInteractor(BaseInteractor):
     ) -> list[TaskOutputDTO] | None:
         tasks = await self._repository.get_list(feature_id=feature_id, query=query)
         return (
-            [TaskOutputDTO.from_entity(*task) for task in tasks] if tasks else None
+            [TaskOutputDTO.from_entity(task) for task in tasks] if tasks else None
         )

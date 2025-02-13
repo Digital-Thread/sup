@@ -96,7 +96,7 @@ class TaskRepository(ITaskRepository):
 
     async def get_list(
             self, feature_id: FeatureId, query: TaskListQuery
-    ) -> list[tuple[TaskId, TaskEntity]] | None:
+    ) -> list[TaskEntity] | None:
 
         stmt = (
             select(self.model)
@@ -114,7 +114,7 @@ class TaskRepository(ITaskRepository):
         result = await self._session.execute(stmt)
         tasks = result.scalars().all()
         return (
-            [(TaskId(t.id), self.converter.map_model_to_entity(t)) for t in tasks]
+            [self.converter.map_model_to_entity(t) for t in tasks]
             if tasks
             else None
         )

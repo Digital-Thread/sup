@@ -48,6 +48,7 @@ class TaskConverter:
             status=Status[DB_Status(task_model.status).name],
             tags=[TagId(tag.id) for tag in task_model.tags] if task_model.tags else None,
         )
+        task.id = task_model.id
         task.created_at = task_model.created_at
         task.updated_at = task_model.updated_at
         return task

@@ -53,9 +53,9 @@ class TaskOutputDTO:
     tags: list[TagId] | None = None
 
     @classmethod
-    def from_entity(cls, task_id: TaskId, entity: TaskEntity) -> Self:
+    def from_entity(cls, entity: TaskEntity) -> Self:
         return cls(
-            id=task_id,
+            id=entity.id,
             workspace_id=entity.workspace_id,
             name=entity.name,
             feature_id=entity.feature_id,

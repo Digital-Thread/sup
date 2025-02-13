@@ -9,6 +9,7 @@ from src.apps.task.domain.types_ids import (
     OwnerId,
     TagId,
     WorkspaceId,
+    TaskId,
 )
 
 
@@ -54,6 +55,7 @@ class TaskEntity:
             status: Status = Status.NEW,
             tags: list[TagId] | None = None,
     ):
+        self._id: TaskId | None = None
         self.name = name
         self._workspace_id = workspace_id
         self.feature_id = feature_id
@@ -66,6 +68,17 @@ class TaskEntity:
         self.tags = tags
         self.created_at = datetime.now(timezone.utc)
         self.updated_at = datetime.now(timezone.utc)
+
+    @property
+    def id(self) -> TaskId:
+        return self._id
+
+    @id.setter
+    def id(self, _id: TaskId) -> None:
+        if self._id is not None:
+            raise AttributeError('Идентификатор задачи уже установлен')
+
+        self._id = _id
 
     @property
     def name(self) -> str:
