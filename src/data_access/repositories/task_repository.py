@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from src.data_access.models.task import Priority, Status
 from src.apps.task.domain import FeatureId, TagId, TaskEntity, TaskId
 from src.apps.task.exceptions import RepositoryError
 from src.apps.task import ITaskRepository, TaskListQuery
@@ -71,8 +72,8 @@ class TaskRepository(ITaskRepository):
             task_model.updated_at = task.updated_at
             task_model.due_date = task.due_date
             task_model.description = task.description
-            task_model.priority = task.priority
-            task_model.status = task.status
+            task_model.priority = Priority[task.priority.name]
+            task_model.status = Status[task.status.name]
             task_model.tags = await self._get_tags(task.tags)
             try:
                 task_model.feature_id = task.feature_id

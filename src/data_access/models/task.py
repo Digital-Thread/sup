@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from enum import IntEnum
 from typing import TYPE_CHECKING
 from uuid import UUID
 
@@ -6,7 +7,6 @@ from sqlalchemy import TIMESTAMP, Column, Date, ForeignKey, Index, Integer, Stri
 from sqlalchemy import UUID as SQL_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.apps.task.domain import Priority, Status
 from src.data_access.models import Base
 
 if TYPE_CHECKING:
@@ -21,6 +21,22 @@ task_tag = Table(
     Column('task_id', ForeignKey('tasks.id', ondelete='CASCADE'), primary_key=True),
     Column('tag_id', ForeignKey('tags.id', ondelete='CASCADE'), primary_key=True),
 )
+
+
+class Priority(IntEnum):
+    CRITICAL = 5
+    HIGH = 4
+    MEDIUM = 3
+    LOW = 2
+    NO_PRIORITY = 1
+
+
+class Status(IntEnum):
+    FINISH = 5
+    BACKLOG = 4
+    TEST = 3
+    DEVELOPMENT = 2
+    NEW = 1
 
 
 class TaskModel(Base):

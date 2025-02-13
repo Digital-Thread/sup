@@ -1,5 +1,16 @@
-from src.apps.task.domain import AssignedId, FeatureId, OwnerId, TagId, TaskEntity, WorkspaceId
+from src.apps.task.domain import (
+    AssignedId,
+    FeatureId,
+    OwnerId,
+    TagId,
+    TaskEntity,
+    WorkspaceId,
+    Priority,
+    Status,
+)
 from src.data_access.models import TaskModel
+from src.data_access.models.task import Priority as DB_Priority
+from src.data_access.models.task import Status as DB_Status
 
 
 class TaskConverter:
@@ -16,8 +27,8 @@ class TaskConverter:
             created_at=task_entity.created_at,
             updated_at=task_entity.updated_at,
             description=task_entity.description,
-            priority=task_entity.priority,
-            status=task_entity.status,
+            priority=DB_Priority[task_entity.priority.name],
+            status=DB_Status[task_entity.status.name],
         )
         return task_model
 
@@ -33,8 +44,8 @@ class TaskConverter:
             ),
             due_date=task_model.due_date,
             description=task_model.description,
-            priority=task_model.priority,
-            status=task_model.status,
+            priority=Priority[DB_Priority(task_model.priority).name],
+            status=Status[DB_Status(task_model.status).name],
             tags=[TagId(tag.id) for tag in task_model.tags] if task_model.tags else None,
         )
         task.created_at = task_model.created_at

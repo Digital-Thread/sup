@@ -1,45 +1,31 @@
 from datetime import date, datetime, timezone
-from enum import IntEnum
+from enum import StrEnum
 from re import match
 from typing import TypedDict
 
-from src.apps.task.domain.types_ids import AssignedId, FeatureId, OwnerId, TagId, WorkspaceId
+from src.apps.task.domain.types_ids import (
+    AssignedId,
+    FeatureId,
+    OwnerId,
+    TagId,
+    WorkspaceId,
+)
 
 
-class Priority(IntEnum):
-    CRITICAL = 5
-    HIGH = 4
-    MEDIUM = 3
-    LOW = 2
-    NO_PRIORITY = 1
-
-    @property
-    def display(self) -> str:
-        return {
-            5: 'Критическая',
-            4: 'Высокая',
-            3: 'Средняя',
-            2: 'Низкая',
-            1: 'Не задана',
-        }[self.value]
+class Priority(StrEnum):
+    CRITICAL = 'Критическая'
+    HIGH = 'Высокая'
+    MEDIUM = 'Средняя'
+    LOW = 'Низкая'
+    NO_PRIORITY = 'Не задана'
 
 
-class Status(IntEnum):
-    FINISH = 5
-    BACKLOG = 4
-    TEST = 3
-    DEVELOPMENT = 2
-    NEW = 1
-
-    @property
-    def display(self) -> str:
-        return {
-            5: 'Готово',
-            4: 'Бэклог',
-            3: 'Тестирование',
-            2: 'Разработка',
-            1: 'Новая',
-        }[self.value]
+class Status(StrEnum):
+    FINISH = 'Готово'
+    BACKLOG = 'Бэклог'
+    TEST = 'Тестирование'
+    DEVELOPMENT = 'Разработка'
+    NEW = 'Новая'
 
 
 class OptionalTaskUpdateFields(TypedDict, total=False):
