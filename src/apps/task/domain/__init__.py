@@ -1,3 +1,18 @@
+from src.apps.task.domain.types_ids import (
+    AssignedId,
+    FeatureId,
+    OwnerId,
+    TagId,
+    TaskId,
+    WorkspaceId,
+)
+from src.apps.task.domain.task import (
+    OptionalTaskUpdateFields,
+    Priority,
+    Status,
+    TaskEntity,
+)
+
 __all__ = (
     'TaskEntity',
     'Priority',
@@ -10,6 +25,3 @@ __all__ = (
     'TagId',
     'WorkspaceId',
 )
-
-from src.apps.task.domain.types_ids import AssignedId, FeatureId, OwnerId, TagId, TaskId, WorkspaceId
-from apps.task.domain.task import OptionalTaskUpdateFields, Priority, Status, TaskEntity
