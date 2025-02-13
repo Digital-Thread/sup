@@ -3,7 +3,7 @@ from enum import IntEnum
 from re import match
 from typing import TypedDict
 
-from src.apps.task.domain.aliases import AssignedId, FeatureId, OwnerId, TagId, WorkspaceId
+from src.apps.task.domain.types_ids import AssignedId, FeatureId, OwnerId, TagId, WorkspaceId
 
 
 class Priority(IntEnum):

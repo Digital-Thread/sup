@@ -11,5 +11,5 @@ __all__ = (
     'WorkspaceId',
 )
 
-from src.apps.task.domain.aliases import AssignedId, FeatureId, OwnerId, TagId, TaskId, WorkspaceId
+from src.apps.task.domain.types_ids import AssignedId, FeatureId, OwnerId, TagId, TaskId, WorkspaceId
 from apps.task.domain.task import OptionalTaskUpdateFields, Priority, Status, Task
