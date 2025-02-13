@@ -69,3 +69,4 @@ class TaskOutputDTO:
             status=entity.status,
             tags=entity.tags,
         )
+
