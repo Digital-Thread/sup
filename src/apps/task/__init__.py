@@ -1,3 +1,11 @@
+from src.apps.task.query_parameters import (
+    TaskListQuery,
+    OrderByField,
+    SortOrder,
+    OrderBy,
+    PaginateParams
+)
+from src.apps.task.repository import ITaskRepository
 from src.apps.task.dtos import TaskInputDTO, TaskOutputDTO, TaskUpdateDTO
 from src.apps.task.exceptions import TaskError
 from src.apps.task.interactors.create_task import CreateTaskInteractor
@@ -16,4 +24,10 @@ __all__ = (
     'GetAllTasksInteractor',
     'UpdateTaskInteractor',
     'DeleteTaskInteractor',
+    'ITaskRepository',
+    'TaskListQuery',
+    'OrderByField',
+    'SortOrder',
+    'OrderBy',
+    'PaginateParams',
 )

@@ -16,7 +16,7 @@ from src.apps.task.domain import (
     WorkspaceId,
 )
 from src.apps.task.exceptions import TaskUpdateError
-from src.apps.task.repositories import OrderByField, SortOrder
+from src.apps.task import OrderByField, SortOrder
 
 
 class SuccessResponse(BaseModel):

@@ -1,7 +1,7 @@
 from src.apps.task.domain import FeatureId
 from src.apps.task.dtos import TaskOutputDTO
 from src.apps.task.interactors.base_interactor import BaseInteractor
-from src.apps.task.repositories import TaskListQuery
+from src.apps.task.query_parameters import TaskListQuery
 
 
 class GetAllTasksInteractor(BaseInteractor):

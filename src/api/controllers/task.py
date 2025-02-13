@@ -22,8 +22,7 @@ from src.apps.task import (
     UpdateTaskInteractor,
 )
 from src.apps.task.domain import OptionalTaskUpdateFields, TaskId
-from src.apps.task.repositories import TaskListQuery
-from apps.task.repository import OrderBy, PaginateParams
+from src.apps.task import TaskListQuery, OrderBy, PaginateParams
 
 task_router = APIRouter(route_class=DishkaRoute)
 
