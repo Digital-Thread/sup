@@ -5,6 +5,7 @@ from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter, Query, status
 
+from src.providers.context import WorkspaceContext
 from src.api.dtos.task import (
     CreateTaskRequestDTO,
     QueryParams,
@@ -21,7 +22,7 @@ from src.apps.task import (
     TaskUpdateDTO,
     UpdateTaskInteractor,
 )
-from src.apps.task.domain import OptionalTaskUpdateFields, TaskId
+from src.apps.task.domain import OptionalTaskUpdateFields, TaskId, WorkspaceId
 from src.apps.task import TaskListQuery, OrderBy, PaginateParams
 
 task_router = APIRouter(route_class=DishkaRoute)
@@ -31,8 +32,10 @@ task_router = APIRouter(route_class=DishkaRoute)
 async def create_task(
         dto: CreateTaskRequestDTO,
         interactor: FromDishka[CreateTaskInteractor],
+        context: FromDishka[WorkspaceContext],
 ) -> SuccessResponse:
-    task = TaskInputDTO(**dto.model_dump())
+    workspace_id = context.workspace_id
+    task = TaskInputDTO(WorkspaceId(workspace_id), **dto.model_dump())
     await interactor.execute(dto=task)
 
     return SuccessResponse(message='Task created')

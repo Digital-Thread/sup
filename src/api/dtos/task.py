@@ -22,7 +22,6 @@ class SuccessResponse(BaseModel):
 
 
 class CreateTaskRequestDTO(BaseModel):
-    workspace_id: WorkspaceId
     name: str
     feature_id: FeatureId
     owner_id: OwnerId
