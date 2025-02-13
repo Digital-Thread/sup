@@ -12,4 +12,4 @@ __all__ = (
 )
 
 from src.apps.task.domain.aliases import AssignedId, FeatureId, OwnerId, TagId, TaskId, WorkspaceId
-from src.apps.task.domain.entities.task import OptionalTaskUpdateFields, Priority, Status, Task
+from apps.task.domain.task import OptionalTaskUpdateFields, Priority, Status, Task
