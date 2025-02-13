@@ -1,11 +1,16 @@
-from typing import Any, Sequence
+from collections import defaultdict
+from typing import Sequence
+from uuid import UUID
+
+from sqlalchemy import Row
 
 from src.apps.project.domain.project import ProjectEntity, StatusProject
 from src.apps.project.domain.types_ids import (
     AssignedId,
     OwnerId,
+    ParticipantId,
     ProjectId,
-    WorkspaceId, ParticipantId,
+    WorkspaceId,
 )
 from src.data_access.models.project import ProjectModel
 from src.data_access.models.project_participants import ProjectParticipantsModel
@@ -63,24 +68,37 @@ class ProjectMapper:
         }
 
     @staticmethod
-    def list_to_entity(projects_list: Sequence[Any]) -> list[tuple[ProjectEntity, int]]:
-        projects_with_user_count = []
-        for project in projects_list:
-            projects_with_user_count.append(
-                (
-                    ProjectEntity(
-                        _id=ProjectId(project[0].id),
-                        _workspace_id=WorkspaceId(project[0].workspace_id),
-                        _owner_id=OwnerId(project[0].owner_id),
-                        _name=project[0].name,
-                        _description=project[0].description,
-                        logo=project[0].logo,
-                        _status=project[0].status,
-                        created_at=project[0].created_at,
-                        assigned_to=project[0].assigned_to,
-                    ),
-                    project[1],
-                )
-            )
+    def list_to_entity(
+        projects: Sequence[ProjectModel],
+        participants: Sequence[Row[tuple[int, UUID, str, str, str]]]
+    ) -> list[tuple[ProjectEntity, list[dict[str, str]] | None]]:
+        project_participants_map = defaultdict(list)
 
-        return projects_with_user_count
+        for project_id, participant_id, first_name, last_name, avatar in participants:
+             project_participants_map[project_id].append(
+                {
+                     'participant_id': participant_id,
+                     'first_name': first_name,
+                     'last_name': last_name,
+                     'avatar': avatar
+                }
+             )
+
+        projects_with_participants = [
+            (
+                ProjectEntity(
+                   _id=ProjectId(project.id),
+                   _name=project.name,
+                   _owner_id=OwnerId(project.owner_id),
+                   _workspace_id=WorkspaceId(project.workspace_id),
+                   _description=project.description,
+                   logo=project.logo,
+                   _status=StatusProject(project.status),
+                   created_at=project.created_at,
+                   assigned_to=project.assigned_to,
+                ),
+                project_participants_map.get(project.id, None)
+            ) for project in projects
+        ]
+
+        return projects_with_participants

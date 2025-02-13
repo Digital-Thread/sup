@@ -1,5 +1,5 @@
 from src.apps.project.domain.project import ProjectEntity
-from src.apps.project.domain.types_ids import ParticipantId
+from src.apps.project.domain.types_ids import ParticipantId, WorkspaceId
 from src.apps.project.dtos import ProjectUpdateDTO
 from src.apps.project.exceptions import ParticipantNotFound, ProjectException
 from src.apps.project.project_repository import IProjectRepository
@@ -17,6 +17,7 @@ class UpdateParticipantsInteractor:
                 await self._project_repository.update_participants(
                     existing_project.id,
                     [ParticipantId(participant) for participant in update_data.participant_ids],
+                    WorkspaceId(update_data.workspace_id),
                 )
             except ParticipantNotFound as error:
                 raise ProjectException(str(error)) from error
