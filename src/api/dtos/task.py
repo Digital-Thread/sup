@@ -1,9 +1,8 @@
 from datetime import date, datetime
 from enum import StrEnum
-from typing import Any, Literal
+from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
-from pydantic_core.core_schema import FieldValidationInfo
+from pydantic import BaseModel, ConfigDict, Field
 
 from src.apps.task.domain import (
     AssignedId,
@@ -15,7 +14,6 @@ from src.apps.task.domain import (
     TaskId,
     WorkspaceId,
 )
-from src.apps.task.exceptions import TaskUpdateError
 from src.apps.task import OrderByField, SortOrder
 
 
@@ -45,14 +43,6 @@ class UpdateTaskRequestDTO(BaseModel):
     status: Status | None = None
     due_date: date | None = None
     tags: list[TagId] | None = None
-
-    @field_validator('name', 'feature_id', 'assigned_to', 'priority', 'status', 'due_date')
-    def fields_cannot_be_none(cls, value: Any, info: FieldValidationInfo) -> Any:
-        if value is None:
-            raise TaskUpdateError(
-                message=f"Для поля '{info.field_name}' не может быть установлено значение None."
-            )
-        return value
 
 
 class TaskResponseDTO(BaseModel):

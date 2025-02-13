@@ -122,6 +122,20 @@ class TaskEntity:
         return self._owner_id
 
     def update_fields(self, updates: OptionalTaskUpdateFields) -> None:
+        required_fields = {
+            'name': 'Название',
+            'feature_id': 'Фича',
+            'assigned_to': 'Исполнитель',
+            'priority': 'Приоритет',
+            'status': 'Статус',
+            'due_date': 'Дата завершения',
+        }
+
         for field, value in updates.items():
+            if field in required_fields.keys() and value is None:
+                raise ValueError(
+                    f'{required_fields[field]} обязательное поле и не может быть пустым!'
+                )
             setattr(self, field, value)
+
         self.updated_at = datetime.now(timezone.utc)
