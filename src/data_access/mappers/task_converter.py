@@ -1,11 +1,11 @@
-from src.apps.task.domain import AssignedId, FeatureId, OwnerId, TagId, Task, WorkspaceId
+from src.apps.task.domain import AssignedId, FeatureId, OwnerId, TagId, TaskEntity, WorkspaceId
 from src.data_access.models import TaskModel
 
 
 class TaskConverter:
     MODEL = TaskModel
 
-    async def map_entity_to_model(self, task_entity: Task) -> TaskModel:
+    async def map_entity_to_model(self, task_entity: TaskEntity) -> TaskModel:
         task_model = self.MODEL(
             workspace_id=task_entity.workspace_id,
             name=task_entity.name,
@@ -22,8 +22,8 @@ class TaskConverter:
         return task_model
 
     @staticmethod
-    def map_model_to_entity(task_model: TaskModel) -> Task:
-        task = Task(
+    def map_model_to_entity(task_model: TaskModel) -> TaskEntity:
+        task = TaskEntity(
             workspace_id=WorkspaceId(task_model.workspace_id),
             name=task_model.name,
             feature_id=FeatureId(task_model.feature_id),

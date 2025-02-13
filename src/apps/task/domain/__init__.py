@@ -1,5 +1,5 @@
 __all__ = (
-    'Task',
+    'TaskEntity',
     'Priority',
     'Status',
     'OptionalTaskUpdateFields',
@@ -12,4 +12,4 @@ __all__ = (
 )
 
 from src.apps.task.domain.types_ids import AssignedId, FeatureId, OwnerId, TagId, TaskId, WorkspaceId
-from apps.task.domain.task import OptionalTaskUpdateFields, Priority, Status, Task
+from apps.task.domain.task import OptionalTaskUpdateFields, Priority, Status, TaskEntity

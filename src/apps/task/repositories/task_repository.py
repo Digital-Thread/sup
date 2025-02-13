@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Literal, NamedTuple
 
-from src.apps.task.domain import FeatureId, Task, TaskId
+from src.apps.task.domain import FeatureId, TaskEntity, TaskId
 
 
 class OrderByField(Enum):
@@ -39,15 +39,15 @@ class TaskListQuery:
 class ITaskRepository(ABC):
 
     @abstractmethod
-    async def save(self, task: Task) -> None:
+    async def save(self, task: TaskEntity) -> None:
         pass
 
     @abstractmethod
-    async def get_by_id(self, task_id: TaskId) -> Task | None:
+    async def get_by_id(self, task_id: TaskId) -> TaskEntity | None:
         pass
 
     @abstractmethod
-    async def update(self, task_id: TaskId, task: Task) -> None:
+    async def update(self, task_id: TaskId, task: TaskEntity) -> None:
         pass
 
     @abstractmethod
@@ -57,5 +57,5 @@ class ITaskRepository(ABC):
     @abstractmethod
     async def get_list(
             self, feature_id: FeatureId, query: TaskListQuery
-    ) -> list[tuple[TaskId, Task]]:
+    ) -> list[tuple[TaskId, TaskEntity]]:
         pass

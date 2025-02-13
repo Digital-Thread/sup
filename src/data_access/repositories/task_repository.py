@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from src.apps.task.domain import FeatureId, TagId, Task, TaskId
+from src.apps.task.domain import FeatureId, TagId, TaskEntity, TaskId
 from src.apps.task.exceptions import RepositoryError
 from src.apps.task.repositories import ITaskRepository, TaskListQuery
 from src.data_access.mappers.task_converter import TaskConverter
@@ -41,7 +41,7 @@ class TaskRepository(ITaskRepository):
 
         return task_model
 
-    async def save(self, task: Task) -> None:
+    async def save(self, task: TaskEntity) -> None:
         task_model = await self.converter.map_entity_to_model(task)
         task_model.tags = await self._get_tags(task.tags)
 
@@ -56,14 +56,14 @@ class TaskRepository(ITaskRepository):
             else:
                 raise
 
-    async def get_by_id(self, task_id: TaskId) -> Task | None:
+    async def get_by_id(self, task_id: TaskId) -> TaskEntity | None:
         task_model = await self.get_model(task_id=task_id)
         if task_model:
             return self.converter.map_model_to_entity(task_model)
         else:
             return None
 
-    async def update(self, task_id: TaskId, task: Task) -> None:
+    async def update(self, task_id: TaskId, task: TaskEntity) -> None:
         task_model = await self.get_model(task_id=task_id)
         if task_model:
             task_model.name = task.name
@@ -95,7 +95,7 @@ class TaskRepository(ITaskRepository):
 
     async def get_list(
             self, feature_id: FeatureId, query: TaskListQuery
-    ) -> list[tuple[TaskId, Task]] | None:
+    ) -> list[tuple[TaskId, TaskEntity]] | None:
 
         stmt = (
             select(self.model)

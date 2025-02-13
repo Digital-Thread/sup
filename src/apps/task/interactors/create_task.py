@@ -1,5 +1,5 @@
 from src.apps.task import TaskInputDTO
-from src.apps.task.domain import Task
+from src.apps.task.domain import TaskEntity
 from src.apps.task.exceptions import RepositoryError, TaskCreateError
 from src.apps.task.interactors.base_interactor import BaseInteractor
 
@@ -7,7 +7,7 @@ from src.apps.task.interactors.base_interactor import BaseInteractor
 class CreateTaskInteractor(BaseInteractor):
     async def execute(self, dto: TaskInputDTO) -> None:
         try:
-            task = Task(
+            task = TaskEntity(
                 workspace_id=dto.workspace_id,
                 name=dto.name,
                 feature_id=dto.feature_id,

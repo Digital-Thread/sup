@@ -53,7 +53,7 @@ class OptionalTaskUpdateFields(TypedDict, total=False):
     tags: list[TagId] | None
 
 
-class Task:
+class TaskEntity:
 
     def __init__(
             self,

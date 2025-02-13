@@ -10,7 +10,7 @@ from src.apps.task.domain import (
     Priority,
     Status,
     TagId,
-    Task,
+    TaskEntity,
     TaskId,
     WorkspaceId,
 )
@@ -53,7 +53,7 @@ class TaskOutputDTO:
     tags: list[TagId] | None = None
 
     @classmethod
-    def from_entity(cls, task_id: TaskId, entity: Task) -> Self:
+    def from_entity(cls, task_id: TaskId, entity: TaskEntity) -> Self:
         return cls(
             id=task_id,
             workspace_id=entity.workspace_id,
