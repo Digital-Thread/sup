@@ -12,9 +12,14 @@ from src.apps.task.domain import (
     Status,
     TagId,
     TaskId,
-    WorkspaceId,
 )
-from src.apps.task import OrderByField, SortOrder
+from src.apps.task import (
+    OrderByField,
+    SortOrder,
+    TaskMember,
+    TaskTag,
+    FeatureInfo,
+)
 
 
 class SuccessResponse(BaseModel):
@@ -46,18 +51,31 @@ class UpdateTaskRequestDTO(BaseModel):
 
 class TaskResponseDTO(BaseModel):
     id: TaskId
-    workspace_id: WorkspaceId
     name: str
-    feature_id: FeatureId
-    owner_id: OwnerId
-    assigned_to: AssignedId
-    due_date: date
+    owner: TaskMember
+    feature: FeatureInfo
+    feature_lead: TaskMember
+    assigned_to: TaskMember
     created_at: datetime
     updated_at: datetime
+    due_date: date
     description: str | None
     priority: Priority
     status: Status
-    tags: list[TagId] | None
+    tags: list[TaskTag] | None
+    model_config = ConfigDict(
+        from_attributes=True,
+    )
+
+
+class TaskForFeatureResponseDTO(BaseModel):
+    id: TaskId
+    name: str
+    assigned_to: TaskMember
+    created_at: datetime
+    due_date: date
+    priority: Priority = Priority.NO_PRIORITY
+    status: Status = Status.NEW
     model_config = ConfigDict(
         from_attributes=True,
     )

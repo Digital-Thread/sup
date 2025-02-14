@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import date, datetime
-from typing import Self
+from typing import TypedDict
 
 from src.apps.task.domain import (
     AssignedId,
@@ -10,9 +10,9 @@ from src.apps.task.domain import (
     Priority,
     Status,
     TagId,
-    TaskEntity,
     TaskId,
     WorkspaceId,
+    UserId,
 )
 
 
@@ -36,37 +36,46 @@ class TaskUpdateDTO:
     updated_fields: OptionalTaskUpdateFields
 
 
+class TaskMember(TypedDict):
+    id: UserId
+    fullname: str
+    avatar: str
+
+
+class FeatureInfo(TypedDict):
+    id: FeatureId
+    name: str
+
+
+class TaskTag(TypedDict):
+    id: TagId
+    name: str
+    color: str
+
+
 @dataclass
 class TaskOutputDTO:
     id: TaskId
-    workspace_id: WorkspaceId
     name: str
-    feature_id: FeatureId
-    owner_id: OwnerId
-    assigned_to: AssignedId
-    due_date: date
+    owner: TaskMember
+    feature: FeatureInfo
+    feature_lead: TaskMember
+    assigned_to: TaskMember
     created_at: datetime
     updated_at: datetime
+    due_date: date
     description: str | None = None
     priority: Priority = Priority.NO_PRIORITY
     status: Status = Status.NEW
-    tags: list[TagId] | None = None
+    tags: list[TaskTag] | None = None
 
-    @classmethod
-    def from_entity(cls, entity: TaskEntity) -> Self:
-        return cls(
-            id=entity.id,
-            workspace_id=entity.workspace_id,
-            name=entity.name,
-            feature_id=entity.feature_id,
-            owner_id=entity.owner_id,
-            assigned_to=entity.assigned_to,
-            due_date=entity.due_date,
-            created_at=entity.created_at,
-            updated_at=entity.updated_at,
-            description=entity.description,
-            priority=entity.priority,
-            status=entity.status,
-            tags=entity.tags,
-        )
 
+@dataclass
+class TaskInFeatureOutputDTO:
+    id: TaskId
+    name: str
+    assigned_to: TaskMember
+    created_at: datetime
+    due_date: date
+    priority: Priority = Priority.NO_PRIORITY
+    status: Status = Status.NEW

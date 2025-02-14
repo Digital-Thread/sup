@@ -11,6 +11,7 @@ from src.api.dtos.task import (
     QueryParams,
     SuccessResponse,
     TaskResponseDTO,
+    TaskForFeatureResponseDTO,
     UpdateTaskRequestDTO,
 )
 from src.apps.task import (
@@ -41,18 +42,18 @@ async def create_task(
     return SuccessResponse(message='Task created')
 
 
-@task_router.get('/', status_code=status.HTTP_200_OK, response_model=list[TaskResponseDTO])
+@task_router.get('/', status_code=status.HTTP_200_OK, response_model=list[TaskForFeatureResponseDTO])
 async def get_tasks_by_feature_id(
         query: Annotated[QueryParams, Query()],
         interactor: FromDishka[GetTasksByFeatureIdInteractor],
-) -> list[TaskResponseDTO]:
+) -> list[TaskForFeatureResponseDTO]:
     feature_id = query.feature_id
     query_params = TaskListQuery(
         order_by=OrderBy(field=query.order_by_field, order=query.sort_order),
         paginate_by=PaginateParams(offset=query.offset, limit_by=query.per_page.limit_by),
     )
     tasks = await interactor.execute(feature_id=feature_id, query=query_params)
-    return [TaskResponseDTO(**asdict(task)) for task in tasks] if tasks else []
+    return [TaskForFeatureResponseDTO(**asdict(task)) for task in tasks] if tasks else []
 
 
 @task_router.get(

@@ -5,6 +5,7 @@ from src.apps.task.domain.types_ids import (
     TagId,
     TaskId,
     WorkspaceId,
+    UserId,
 )
 from src.apps.task.domain.task import (
     OptionalTaskUpdateFields,
@@ -24,4 +25,5 @@ __all__ = (
     'AssignedId',
     'TagId',
     'WorkspaceId',
+    'UserId',
 )

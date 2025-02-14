@@ -7,7 +7,12 @@ from sqlalchemy.orm import selectinload
 from src.data_access.models.task import Priority, Status
 from src.apps.task.domain import FeatureId, TagId, TaskEntity, TaskId
 from src.apps.task.exceptions import RepositoryError
-from src.apps.task import ITaskRepository, TaskListQuery
+from src.apps.task import (
+    ITaskRepository,
+    TaskListQuery,
+    TaskOutputDTO,
+    TaskInFeatureOutputDTO,
+)
 from src.data_access.mappers.task_mapper import TaskMapper
 from src.data_access.models import TagModel, TaskModel
 
@@ -17,7 +22,7 @@ class TaskRepository(ITaskRepository):
     def __init__(self, session: AsyncSession):
         self._session = session
         self.model = TaskModel
-        self.converter = TaskMapper()
+        self.mapper = TaskMapper()
 
     async def _get_tags(
             self,
@@ -35,7 +40,12 @@ class TaskRepository(ITaskRepository):
         stmt = (
             select(self.model)
             .where(self.model.id == task_id)
-            .options(selectinload(self.model.tags))
+            .options(
+                selectinload(self.model.tags),
+                selectinload(self.model.feature),
+                selectinload(self.model.owner),
+                selectinload(self.model.assigned_to),
+            )
         )
         result = await self._session.execute(stmt)
         task_model = result.scalar_one_or_none()
@@ -43,7 +53,7 @@ class TaskRepository(ITaskRepository):
         return task_model
 
     async def save(self, task: TaskEntity) -> None:
-        task_model = await self.converter.map_entity_to_model(task)
+        task_model = await self.mapper.map_entity_to_model(task)
         task_model.tags = await self._get_tags(task.tags)
 
         try:
@@ -57,10 +67,10 @@ class TaskRepository(ITaskRepository):
             else:
                 raise
 
-    async def get_by_id(self, task_id: TaskId) -> TaskEntity | None:
+    async def get_by_id(self, task_id: TaskId) -> TaskOutputDTO | None:
         task_model = await self.get_model(task_id=task_id)
         if task_model:
-            return self.converter.map_model_to_entity(task_model)
+            return self.mapper.map_model_to_dto(task_model)
         else:
             return None
 
@@ -94,13 +104,16 @@ class TaskRepository(ITaskRepository):
         else:
             raise RepositoryError(message=f'Не найдена задача с id: {task_id}')
 
-    async def get_list(
+    async def get_by_feature_id(
             self, feature_id: FeatureId, query: TaskListQuery
-    ) -> list[TaskEntity] | None:
+    ) -> list[TaskInFeatureOutputDTO] | None:
 
         stmt = (
             select(self.model)
-            .options(selectinload(self.model.tags))
+            .options(
+                selectinload(self.model.tags),
+                selectinload(self.model.assigned_to),
+            )
             .where(self.model.feature_id == feature_id)
             .order_by(
                 getattr(self.model, str(query.order_by.field.value)).asc()
@@ -114,7 +127,7 @@ class TaskRepository(ITaskRepository):
         result = await self._session.execute(stmt)
         tasks = result.scalars().all()
         return (
-            [self.converter.map_model_to_entity(t) for t in tasks]
+            [self.mapper.map_model_to_for_feature_dto(t) for t in tasks]
             if tasks
             else None
         )

@@ -6,8 +6,16 @@ from src.apps.task.query_parameters import (
     PaginateParams
 )
 from src.apps.task.repository import ITaskRepository
-from src.apps.task.dtos import TaskInputDTO, TaskOutputDTO, TaskUpdateDTO
 from src.apps.task.exceptions import TaskError
+from src.apps.task.dtos import (
+    TaskInputDTO,
+    TaskOutputDTO,
+    TaskUpdateDTO,
+    TaskInFeatureOutputDTO,
+    TaskTag,
+    FeatureInfo,
+    TaskMember,
+)
 from src.apps.task.interactors.create_task import CreateTaskInteractor
 from src.apps.task.interactors.delete_task import DeleteTaskInteractor
 from src.apps.task.interactors.get_task_by_id import GetTaskByIdInteractor
@@ -18,6 +26,7 @@ __all__ = (
     'TaskInputDTO',
     'TaskUpdateDTO',
     'TaskOutputDTO',
+    'TaskInFeatureOutputDTO',
     'TaskError',
     'CreateTaskInteractor',
     'GetTaskByIdInteractor',
@@ -30,4 +39,7 @@ __all__ = (
     'SortOrder',
     'OrderBy',
     'PaginateParams',
+    'TaskTag',
+    'FeatureInfo',
+    'TaskMember',
 )

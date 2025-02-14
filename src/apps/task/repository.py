@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 from src.apps.task.query_parameters import TaskListQuery
 from src.apps.task.domain import FeatureId, TaskEntity, TaskId
+from src.apps.task.dtos import TaskOutputDTO, TaskInFeatureOutputDTO
 
 
 class ITaskRepository(ABC):
@@ -11,7 +12,7 @@ class ITaskRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_by_id(self, task_id: TaskId) -> TaskEntity | None:
+    async def get_by_id(self, task_id: TaskId) -> TaskOutputDTO | None:
         pass
 
     @abstractmethod
@@ -23,7 +24,7 @@ class ITaskRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_list(
+    async def get_by_feature_id(
             self, feature_id: FeatureId, query: TaskListQuery
-    ) -> list[TaskEntity]:
+    ) -> list[TaskInFeatureOutputDTO]:
         pass
