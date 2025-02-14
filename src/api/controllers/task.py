@@ -9,7 +9,6 @@ from src.providers.context import WorkspaceContext
 from src.api.dtos.task import (
     CreateTaskRequestDTO,
     QueryParams,
-    SuccessResponse,
     TaskResponseDTO,
     TaskForFeatureResponseDTO,
     UpdateTaskRequestDTO,
@@ -29,17 +28,15 @@ from src.apps.task import TaskListQuery, OrderBy, PaginateParams
 task_router = APIRouter(route_class=DishkaRoute)
 
 
-@task_router.post('/', status_code=status.HTTP_201_CREATED, response_model=SuccessResponse)
+@task_router.post('/', status_code=status.HTTP_201_CREATED)
 async def create_task(
         dto: CreateTaskRequestDTO,
         interactor: FromDishka[CreateTaskInteractor],
         context: FromDishka[WorkspaceContext],
-) -> SuccessResponse:
+) -> None:
     workspace_id = context.workspace_id
     task = TaskInputDTO(WorkspaceId(workspace_id), **dto.model_dump())
     await interactor.execute(dto=task)
-
-    return SuccessResponse(message='Task created')
 
 
 @task_router.get('/', status_code=status.HTTP_200_OK, response_model=list[TaskForFeatureResponseDTO])
@@ -68,19 +65,18 @@ async def get_task_by_id(
 
 
 @task_router.patch(
-    '/{task_id}', status_code=status.HTTP_200_OK, response_model=SuccessResponse
+    '/{task_id}', status_code=status.HTTP_204_NO_CONTENT
 )
 async def update_task(
         task_id: TaskId,
         dto: UpdateTaskRequestDTO,
         interactor: FromDishka[UpdateTaskInteractor],
-) -> SuccessResponse:
+) -> None:
     update_data = TaskUpdateDTO(
         id=task_id,
         updated_fields=OptionalTaskUpdateFields(**dto.model_dump(exclude_unset=True)),
     )
     await interactor.execute(update_data)
-    return SuccessResponse(message='Task updated')
 
 
 @task_router.delete('/{task_id}', status_code=status.HTTP_204_NO_CONTENT)

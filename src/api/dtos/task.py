@@ -22,10 +22,6 @@ from src.apps.task import (
 )
 
 
-class SuccessResponse(BaseModel):
-    message: str
-
-
 class CreateTaskRequestDTO(BaseModel):
     name: str
     feature_id: FeatureId
