@@ -1,5 +1,5 @@
 from asyncpg import ForeignKeyViolationError
-from sqlalchemy import select, Select, func, literal
+from sqlalchemy import select, Select, func, literal, delete
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -106,10 +106,10 @@ class TaskRepository(ITaskRepository):
                     raise
 
     async def delete(self, task_id: TaskId) -> None:
-        task_model = await self._session.get(self.model, task_id)
-        if task_model:
-            await self._session.delete(task_model)
-        else:
+        stmt = delete(self.model).where(self.model.id == task_id)
+        result = await self._session.execute(stmt)
+
+        if result.rowcount == 0:
             raise TaskRepositoryError(message=f'Не найдена задача с id: {task_id}')
 
     async def get_by_feature_id(
