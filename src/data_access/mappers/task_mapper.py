@@ -13,7 +13,7 @@ from src.data_access.models.task import Priority as DB_Priority
 from src.data_access.models.task import Status as DB_Status
 
 
-class TaskConverter:
+class TaskMapper:
     MODEL = TaskModel
 
     async def map_entity_to_model(self, task_entity: TaskEntity) -> TaskModel:

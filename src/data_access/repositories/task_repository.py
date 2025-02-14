@@ -8,7 +8,7 @@ from src.data_access.models.task import Priority, Status
 from src.apps.task.domain import FeatureId, TagId, TaskEntity, TaskId
 from src.apps.task.exceptions import RepositoryError
 from src.apps.task import ITaskRepository, TaskListQuery
-from src.data_access.mappers.task_mapper import TaskConverter
+from src.data_access.mappers.task_mapper import TaskMapper
 from src.data_access.models import TagModel, TaskModel
 
 
@@ -17,7 +17,7 @@ class TaskRepository(ITaskRepository):
     def __init__(self, session: AsyncSession):
         self._session = session
         self.model = TaskModel
-        self.converter = TaskConverter()
+        self.converter = TaskMapper()
 
     async def _get_tags(
             self,

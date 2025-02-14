@@ -4,7 +4,7 @@ from src.apps.task.interactors.base_interactor import BaseInteractor
 from src.apps.task.query_parameters import TaskListQuery
 
 
-class GetAllTasksInteractor(BaseInteractor):
+class GetTasksByFeatureIdInteractor(BaseInteractor):
     async def execute(
             self, feature_id: FeatureId, query: TaskListQuery
     ) -> list[TaskOutputDTO] | None:

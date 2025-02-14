@@ -4,7 +4,7 @@ from src.apps.task.exceptions import TaskDoesNotExistError
 from src.apps.task.interactors.base_interactor import BaseInteractor
 
 
-class GetTaskInteractor(BaseInteractor):
+class GetTaskByIdInteractor(BaseInteractor):
     async def execute(self, task_id: TaskId) -> TaskOutputDTO:
         task = await self._repository.get_by_id(task_id=task_id)
         if not task:

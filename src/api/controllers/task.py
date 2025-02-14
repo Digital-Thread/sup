@@ -16,8 +16,8 @@ from src.api.dtos.task import (
 from src.apps.task import (
     CreateTaskInteractor,
     DeleteTaskInteractor,
-    GetAllTasksInteractor,
-    GetTaskInteractor,
+    GetTasksByFeatureIdInteractor,
+    GetTaskByIdInteractor,
     TaskInputDTO,
     TaskUpdateDTO,
     UpdateTaskInteractor,
@@ -42,9 +42,9 @@ async def create_task(
 
 
 @task_router.get('/', status_code=status.HTTP_200_OK, response_model=list[TaskResponseDTO])
-async def get_tasks(
+async def get_tasks_by_feature_id(
         query: Annotated[QueryParams, Query()],
-        interactor: FromDishka[GetAllTasksInteractor],
+        interactor: FromDishka[GetTasksByFeatureIdInteractor],
 ) -> list[TaskResponseDTO]:
     feature_id = query.feature_id
     query_params = TaskListQuery(
@@ -60,7 +60,7 @@ async def get_tasks(
 )
 async def get_task_by_id(
         task_id: TaskId,
-        interactor: FromDishka[GetTaskInteractor],
+        interactor: FromDishka[GetTaskByIdInteractor],
 ) -> TaskResponseDTO:
     task = await interactor.execute(task_id=task_id)
     return TaskResponseDTO(**asdict(task))
