@@ -6,7 +6,7 @@ from src.apps.task.query_parameters import (
     PaginateParams
 )
 from src.apps.task.repository import ITaskRepository
-from src.apps.task.exceptions import TaskError
+from src.apps.task.exceptions import TaskError, TaskRepositoryError
 from src.apps.task.dtos import (
     TaskInputDTO,
     TaskOutputDTO,
@@ -15,6 +15,7 @@ from src.apps.task.dtos import (
     TaskTag,
     FeatureInfo,
     TaskMember,
+    TaskAttrsWithWorkspace,
 )
 from src.apps.task.interactors.create_task import CreateTaskInteractor
 from src.apps.task.interactors.delete_task import DeleteTaskInteractor
@@ -42,4 +43,6 @@ __all__ = (
     'TaskTag',
     'FeatureInfo',
     'TaskMember',
+    'TaskAttrsWithWorkspace',
+    'TaskRepositoryError',
 )

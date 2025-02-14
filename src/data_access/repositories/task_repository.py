@@ -1,17 +1,19 @@
 from asyncpg import ForeignKeyViolationError
-from sqlalchemy import select
+from sqlalchemy import select, Select, func, literal
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from src.data_access.models import FeatureModel, WorkspaceMemberModel
 from src.data_access.models.task import Priority, Status
 from src.apps.task.domain import FeatureId, TagId, TaskEntity, TaskId
-from src.apps.task.exceptions import RepositoryError
 from src.apps.task import (
     ITaskRepository,
     TaskListQuery,
     TaskOutputDTO,
     TaskInFeatureOutputDTO,
+    TaskRepositoryError,
+    TaskAttrsWithWorkspace,
 )
 from src.data_access.mappers.task_mapper import TaskMapper
 from src.data_access.models import TagModel, TaskModel
@@ -63,9 +65,15 @@ class TaskRepository(ITaskRepository):
             orig_exception = e.orig.__cause__
             if isinstance(orig_exception, ForeignKeyViolationError):
                 detail_message = orig_exception.detail
-                raise RepositoryError(detail_message)
+                raise TaskRepositoryError(detail_message)
             else:
                 raise
+
+    async def get_entity(self, task_id: TaskId) -> TaskEntity | None:
+        task_model = await self.get_model(task_id=task_id)
+        if task_model:
+            return self.mapper.map_model_to_entity(task_model=task_model)
+        return None
 
     async def get_by_id(self, task_id: TaskId) -> TaskOutputDTO | None:
         task_model = await self.get_model(task_id=task_id)
@@ -93,7 +101,7 @@ class TaskRepository(ITaskRepository):
                 orig_exception = e.orig.__cause__
                 if isinstance(orig_exception, ForeignKeyViolationError):
                     detail_message = orig_exception.detail
-                    raise RepositoryError(detail_message)
+                    raise TaskRepositoryError(detail_message)
                 else:
                     raise
 
@@ -102,7 +110,7 @@ class TaskRepository(ITaskRepository):
         if task_model:
             await self._session.delete(task_model)
         else:
-            raise RepositoryError(message=f'Не найдена задача с id: {task_id}')
+            raise TaskRepositoryError(message=f'Не найдена задача с id: {task_id}')
 
     async def get_by_feature_id(
             self, feature_id: FeatureId, query: TaskListQuery
@@ -131,3 +139,96 @@ class TaskRepository(ITaskRepository):
             if tasks
             else None
         )
+
+    def _make_stmt_for_validation(
+            self,
+            attrs: TaskAttrsWithWorkspace,
+    ) -> 'Select':
+        feature_subq = (
+            select(func.count())
+            .select_from(FeatureModel)
+            .where(
+                FeatureModel.id == attrs['feature_id'],
+                FeatureModel.workspace_id == attrs['workspace_id'],
+            )
+            .scalar_subquery()
+        )
+
+        owner_subq = (
+            select(func.count())
+            .select_from(WorkspaceMemberModel)
+            .where(
+                WorkspaceMemberModel.user_id == attrs['owner_id'],
+                WorkspaceMemberModel.workspace_id == attrs['workspace_id'],
+            )
+            .scalar_subquery()
+        )
+
+        assigned_subq = (
+            select(func.count())
+            .select_from(WorkspaceMemberModel)
+            .where(
+                WorkspaceMemberModel.user_id == attrs['assigned_to'],
+                WorkspaceMemberModel.workspace_id == attrs['workspace_id'],
+            )
+            .scalar_subquery()
+        )
+
+        tag_subq = (
+            select(func.count())
+            .select_from(TagModel)
+            .where(
+                TagModel.id.in_(attrs['tags']),
+                TagModel.workspace_id == attrs['workspace_id'],
+            )
+            .scalar_subquery()
+            if attrs['tags']
+            else literal(0)
+        )
+
+        stmt = select(
+            feature_subq.label('cnt_feature'),
+            owner_subq.label('cnt_owner'),
+            assigned_subq.label('cnt_assigned'),
+            tag_subq.label('cnt_tags'),
+        )
+
+        return stmt
+
+    async def validate_workspace_consistency(
+            self,
+            attrs: TaskAttrsWithWorkspace,
+    ) -> None:
+        """
+        Проверяет, что:
+          - фича с id = attrs["feature_id"] принадлежит workspace с id = attrs["workspace_id"],
+          - владелец (owner_id) является участником workspace,
+          - назначенный пользователь (assigned_to) является участником workspace,
+          - все переданные теги принадлежат workspace,
+
+        Если хоть одна проверка не проходит, выбрасывается TaskRepositoryError.
+        """
+        stmt = self._make_stmt_for_validation(attrs=attrs)
+        result = await self._session.execute(stmt)
+        row = result.first()
+
+        if row is None:
+            raise TaskRepositoryError(message='Ошибка при проверке целостности workspace.')
+
+        if row.cnt_feature != 1:
+            raise TaskRepositoryError(message='Фича не принадлежит указанному workspace.')
+
+        if row.cnt_owner != 1:
+            raise TaskRepositoryError(
+                message='Владелец не является участником указанного workspace.'
+            )
+
+        if row.cnt_assigned != 1:
+            raise TaskRepositoryError(
+                message='Пользователь, назначенный на выполнение, не является участником указанного workspace.'
+            )
+
+        if attrs['tags'] and row.cnt_tags != len(attrs['tags']):
+            raise TaskRepositoryError(
+                message='Один или несколько тегов не принадлежат указанному workspace.'
+            )

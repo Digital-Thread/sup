@@ -1,6 +1,6 @@
 from src.apps.task.mapper import TaskMapper
 from src.apps.task import TaskInputDTO
-from src.apps.task.exceptions import RepositoryError, TaskCreateError
+from src.apps.task.exceptions import TaskRepositoryError, TaskCreateError
 from src.apps.task.interactors.base_interactor import BaseInteractor
 
 
@@ -12,6 +12,12 @@ class CreateTaskInteractor(BaseInteractor):
             raise TaskCreateError(context=e) from None
 
         try:
+            attrs = TaskMapper.entity_to_attrs_dto(task)
+            await self._repository.validate_workspace_consistency(attrs=attrs)
+        except TaskRepositoryError as e:
+            raise TaskCreateError(context=e) from None
+
+        try:
             await self._repository.save(task=task)
-        except RepositoryError as e:
+        except TaskRepositoryError as e:
             raise TaskCreateError(context=e) from None

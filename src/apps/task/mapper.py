@@ -1,5 +1,5 @@
 from src.apps.task.domain import TaskEntity
-from src.apps.task.dtos import TaskInputDTO
+from src.apps.task.dtos import TaskInputDTO, TaskAttrsWithWorkspace
 
 
 class TaskMapper:
@@ -17,3 +17,13 @@ class TaskMapper:
                 status=dto.status,
                 tags=dto.tags,
             )
+
+    @staticmethod
+    def entity_to_attrs_dto(entity: TaskEntity) -> TaskAttrsWithWorkspace:
+        return TaskAttrsWithWorkspace(
+            workspace_id=entity.workspace_id,
+            feature_id=entity.feature_id,
+            owner_id=entity.owner_id,
+            assigned_to=entity.assigned_to,
+            tags=entity.tags,
+        )

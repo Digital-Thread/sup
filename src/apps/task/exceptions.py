@@ -48,5 +48,5 @@ class TaskDoesNotExistError(TaskError):
         self.args = (self.task_id, self.context, self.message)
 
 
-class RepositoryError(TaskError):
+class TaskRepositoryError(TaskError):
     DEFAULT_MESSAGE = 'Ошибка репозитория.'

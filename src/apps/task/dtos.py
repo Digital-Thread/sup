@@ -79,3 +79,11 @@ class TaskInFeatureOutputDTO:
     due_date: date
     priority: Priority = Priority.NO_PRIORITY
     status: Status = Status.NEW
+
+
+class TaskAttrsWithWorkspace(TypedDict):
+    workspace_id: WorkspaceId
+    feature_id: FeatureId
+    owner_id: OwnerId
+    assigned_to: AssignedId
+    tags: list[TagId]
