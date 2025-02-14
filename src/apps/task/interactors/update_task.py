@@ -1,5 +1,9 @@
 from src.apps.task.dtos import TaskUpdateDTO
-from src.apps.task.exceptions import TaskRepositoryError, TaskDoesNotExistError, TaskUpdateError
+from src.apps.task.exceptions import (
+    TaskDoesNotExistError,
+    TaskRepositoryError,
+    TaskUpdateError,
+)
 from src.apps.task.interactors.base_interactor import BaseInteractor
 from src.apps.task.mapper import TaskMapper
 

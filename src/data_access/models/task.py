@@ -3,8 +3,9 @@ from enum import IntEnum
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import TIMESTAMP, Column, Date, ForeignKey, Index, Integer, String, Table
+from sqlalchemy import TIMESTAMP
 from sqlalchemy import UUID as SQL_UUID
+from sqlalchemy import Column, Date, ForeignKey, Index, Integer, String, Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.data_access.models import Base
@@ -42,9 +43,7 @@ class Status(IntEnum):
 class TaskModel(Base):
     __tablename__ = 'tasks'
 
-    __table_args__ = (
-        Index('ix_tasks_feature_id', 'feature_id'),
-    )
+    __table_args__ = (Index('ix_tasks_feature_id', 'feature_id'),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50))
@@ -64,9 +63,7 @@ class TaskModel(Base):
 
     owner_id: Mapped[UUID] = mapped_column(SQL_UUID(as_uuid=True), ForeignKey('users.id'))
 
-    assigned_to_id: Mapped[UUID] = mapped_column(
-        SQL_UUID(as_uuid=True), ForeignKey('users.id')
-    )
+    assigned_to_id: Mapped[UUID] = mapped_column(SQL_UUID(as_uuid=True), ForeignKey('users.id'))
 
     workspace: Mapped['WorkspaceModel'] = relationship(
         back_populates='tasks',
@@ -76,9 +73,7 @@ class TaskModel(Base):
         back_populates='tasks',
     )
 
-    owner: Mapped['UserModel'] = relationship(
-        back_populates='owned_tasks', foreign_keys=[owner_id]
-    )
+    owner: Mapped['UserModel'] = relationship(back_populates='owned_tasks', foreign_keys=[owner_id])
 
     assigned_to: Mapped['UserModel'] = relationship(
         back_populates='assigned_tasks', foreign_keys=[assigned_to_id]

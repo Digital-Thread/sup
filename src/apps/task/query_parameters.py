@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import NamedTuple, Literal
+from typing import Literal, NamedTuple
 
 
 class OrderByField(Enum):

@@ -4,6 +4,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from src.apps.task import FeatureInfo, OrderByField, SortOrder, TaskMember, TaskTag
 from src.apps.task.domain import (
     AssignedId,
     FeatureId,
@@ -12,13 +13,6 @@ from src.apps.task.domain import (
     Status,
     TagId,
     TaskId,
-)
-from src.apps.task import (
-    OrderByField,
-    SortOrder,
-    TaskMember,
-    TaskTag,
-    FeatureInfo,
 )
 
 

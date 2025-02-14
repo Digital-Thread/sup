@@ -11,8 +11,8 @@ from src.apps.task.domain import (
     Status,
     TagId,
     TaskId,
-    WorkspaceId,
     UserId,
+    WorkspaceId,
 )
 
 

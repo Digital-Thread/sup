@@ -8,8 +8,8 @@ from src.apps.task.domain.types_ids import (
     FeatureId,
     OwnerId,
     TagId,
-    WorkspaceId,
     TaskId,
+    WorkspaceId,
 )
 
 
@@ -43,17 +43,17 @@ class OptionalTaskUpdateFields(TypedDict, total=False):
 class TaskEntity:
 
     def __init__(
-            self,
-            name: str,
-            workspace_id: WorkspaceId,
-            feature_id: FeatureId,
-            owner_id: OwnerId,
-            assigned_to: AssignedId,
-            due_date: date,
-            description: str | None = None,
-            priority: Priority = Priority.NO_PRIORITY,
-            status: Status = Status.NEW,
-            tags: list[TagId] | None = None,
+        self,
+        name: str,
+        workspace_id: WorkspaceId,
+        feature_id: FeatureId,
+        owner_id: OwnerId,
+        assigned_to: AssignedId,
+        due_date: date,
+        description: str | None = None,
+        priority: Priority = Priority.NO_PRIORITY,
+        status: Status = Status.NEW,
+        tags: list[TagId] | None = None,
     ):
         self._id: TaskId | None = None
         self.name = name

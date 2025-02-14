@@ -1,7 +1,7 @@
-from src.apps.task.mapper import TaskMapper
 from src.apps.task import TaskInputDTO
-from src.apps.task.exceptions import TaskRepositoryError, TaskCreateError
+from src.apps.task.exceptions import TaskCreateError, TaskRepositoryError
 from src.apps.task.interactors.base_interactor import BaseInteractor
+from src.apps.task.mapper import TaskMapper
 
 
 class CreateTaskInteractor(BaseInteractor):

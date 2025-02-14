@@ -1,8 +1,12 @@
 from abc import ABC, abstractmethod
 
-from src.apps.task.query_parameters import TaskListQuery
 from src.apps.task.domain import FeatureId, TaskEntity, TaskId
-from src.apps.task.dtos import TaskOutputDTO, TaskInFeatureOutputDTO, TaskAttrsWithWorkspace
+from src.apps.task.dtos import (
+    TaskAttrsWithWorkspace,
+    TaskInFeatureOutputDTO,
+    TaskOutputDTO,
+)
+from src.apps.task.query_parameters import TaskListQuery
 
 
 class ITaskRepository(ABC):
@@ -29,13 +33,13 @@ class ITaskRepository(ABC):
 
     @abstractmethod
     async def get_by_feature_id(
-            self, feature_id: FeatureId, query: TaskListQuery
+        self, feature_id: FeatureId, query: TaskListQuery
     ) -> list[TaskInFeatureOutputDTO]:
         pass
 
     @abstractmethod
     async def validate_workspace_consistency(
-            self,
-            attrs: TaskAttrsWithWorkspace,
+        self,
+        attrs: TaskAttrsWithWorkspace,
     ) -> None:
         pass

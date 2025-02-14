@@ -1,22 +1,26 @@
 from asyncpg import ForeignKeyViolationError
-from sqlalchemy import select, Select, func, literal, delete
+from sqlalchemy import Select, delete, func, literal, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from src.data_access.models import FeatureModel, WorkspaceMemberModel
-from src.data_access.models.task import Priority, Status
-from src.apps.task.domain import FeatureId, TagId, TaskEntity, TaskId
 from src.apps.task import (
     ITaskRepository,
+    TaskAttrsWithWorkspace,
+    TaskInFeatureOutputDTO,
     TaskListQuery,
     TaskOutputDTO,
-    TaskInFeatureOutputDTO,
     TaskRepositoryError,
-    TaskAttrsWithWorkspace,
 )
+from src.apps.task.domain import FeatureId, TagId, TaskEntity, TaskId
 from src.data_access.mappers.task_mapper import TaskMapper
-from src.data_access.models import TagModel, TaskModel
+from src.data_access.models import (
+    FeatureModel,
+    TagModel,
+    TaskModel,
+    WorkspaceMemberModel,
+)
+from src.data_access.models.task import Priority, Status
 
 
 class TaskRepository(ITaskRepository):
@@ -27,8 +31,8 @@ class TaskRepository(ITaskRepository):
         self.mapper = TaskMapper()
 
     async def _get_tags(
-            self,
-            list_ids: list[TagId] | None,
+        self,
+        list_ids: list[TagId] | None,
     ) -> list[TagModel]:
         if list_ids:
             query = select(TagModel).where(TagModel.id.in_(list_ids))
@@ -113,7 +117,7 @@ class TaskRepository(ITaskRepository):
             raise TaskRepositoryError(message=f'Не найдена задача с id: {task_id}')
 
     async def get_by_feature_id(
-            self, feature_id: FeatureId, query: TaskListQuery
+        self, feature_id: FeatureId, query: TaskListQuery
     ) -> list[TaskInFeatureOutputDTO] | None:
 
         stmt = (
@@ -134,15 +138,11 @@ class TaskRepository(ITaskRepository):
 
         result = await self._session.execute(stmt)
         tasks = result.scalars().all()
-        return (
-            [self.mapper.map_model_to_for_feature_dto(t) for t in tasks]
-            if tasks
-            else None
-        )
+        return [self.mapper.map_model_to_for_feature_dto(t) for t in tasks] if tasks else None
 
     def _make_stmt_for_validation(
-            self,
-            attrs: TaskAttrsWithWorkspace,
+        self,
+        attrs: TaskAttrsWithWorkspace,
     ) -> 'Select':
         feature_subq = (
             select(func.count())
@@ -196,8 +196,8 @@ class TaskRepository(ITaskRepository):
         return stmt
 
     async def validate_workspace_consistency(
-            self,
-            attrs: TaskAttrsWithWorkspace,
+        self,
+        attrs: TaskAttrsWithWorkspace,
     ) -> None:
         """
         Проверяет, что:

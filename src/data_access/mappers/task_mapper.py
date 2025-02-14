@@ -1,23 +1,22 @@
 from src.apps.task import (
-    TaskOutputDTO,
-    TaskInFeatureOutputDTO,
-    TaskTag,
     FeatureInfo,
+    TaskInFeatureOutputDTO,
     TaskMember,
+    TaskOutputDTO,
+    TaskTag,
 )
 from src.apps.task.domain import (
     AssignedId,
     FeatureId,
     OwnerId,
-    TagId,
-    TaskEntity,
-    WorkspaceId,
     Priority,
     Status,
-    UserId,
+    TagId,
+    TaskEntity,
     TaskId,
+    UserId,
+    WorkspaceId,
 )
-
 from src.data_access.models import TaskModel
 from src.data_access.models.task import Priority as DB_Priority
 from src.data_access.models.task import Status as DB_Status
@@ -58,7 +57,7 @@ class TaskMapper:
             status=Status[DB_Status(task_model.status).name],
             tags=[TagId(tag.id) for tag in task_model.tags] if task_model.tags else None,
         )
-        task.id = task_model.id
+        task.id = TaskId(task_model.id)
         task.created_at = task_model.created_at
         task.updated_at = task_model.updated_at
         return task
@@ -73,13 +72,12 @@ class TaskMapper:
                 fullname=task_model.owner.first_name + ' ' + task_model.owner.last_name,
                 avatar=task_model.owner.avatar,
             ),
-            feature=FeatureInfo(
-                id=FeatureId(task_model.feature_id),
-                name=task_model.feature.name
-            ),
+            feature=FeatureInfo(id=FeatureId(task_model.feature_id), name=task_model.feature.name),
             feature_lead=TaskMember(
                 id=UserId(task_model.feature.owner_id),
-                fullname=task_model.feature.owner.first_name + ' ' + task_model.feature.owner.last_name,
+                fullname=task_model.feature.owner.first_name
+                + ' '
+                + task_model.feature.owner.last_name,
                 avatar=task_model.feature.owner.avatar,
             ),
             assigned_to=TaskMember(
@@ -95,10 +93,7 @@ class TaskMapper:
             status=Status[DB_Status(task_model.status).name],
             tags=(
                 [
-                    TaskTag(
-                        id=TagId(tag.id),
-                        name=tag.name,
-                        color=tag.color)
+                    TaskTag(id=TagId(tag.id), name=tag.name, color=tag.color)
                     for tag in task_model.tags
                 ]
                 if task_model.tags

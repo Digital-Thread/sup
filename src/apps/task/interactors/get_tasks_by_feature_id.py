@@ -6,7 +6,7 @@ from src.apps.task.query_parameters import TaskListQuery
 
 class GetTasksByFeatureIdInteractor(BaseInteractor):
     async def execute(
-            self, feature_id: FeatureId, query: TaskListQuery
+        self, feature_id: FeatureId, query: TaskListQuery
     ) -> list[TaskInFeatureOutputDTO]:
         tasks = await self._repository.get_by_feature_id(feature_id=feature_id, query=query)
         return tasks

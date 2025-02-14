@@ -1,5 +1,5 @@
 from src.apps.task.domain import TaskId
-from src.apps.task.exceptions import TaskRepositoryError, TaskDeleteError
+from src.apps.task.exceptions import TaskDeleteError, TaskRepositoryError
 from src.apps.task.interactors.base_interactor import BaseInteractor
 
 
