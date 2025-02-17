@@ -7,7 +7,6 @@ from src.apps.comment import CommentAssociatedWithBothError, CommentNotAssociate
 from .types_ids import (
     AuthorId,
     CommentId,
-    Content,
     FeatureId,
     TaskId,
 )
@@ -19,7 +18,7 @@ class CommentEntity:
     user_id: AuthorId
     task_id: TaskId | None
     feature_id: FeatureId | None
-    content: Content
+    content: str
     created_at: datetime
     updated_at: datetime
 
@@ -29,7 +28,7 @@ class CommentEntity:
             task_id: TaskId | None,
             feature_id: FeatureId | None,
             user_id: AuthorId,
-            content: Content,
+            content: str,
     ) -> 'Self':
         if not task_id and not feature_id:
             raise CommentNotAssociatedError()
@@ -47,6 +46,6 @@ class CommentEntity:
 
         return instance
 
-    def update_content(self: Self, new_content: Content) -> None:
+    def update_content(self: Self, new_content: str) -> None:
         self.content = new_content
         self.updated_at = datetime.now(timezone.utc)

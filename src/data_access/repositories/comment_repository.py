@@ -9,7 +9,6 @@ from src.apps.comment import CommentNotFoundError
 from src.apps.comment.domain import (
     CommentEntity,
     CommentId,
-    Content,
     FeatureId,
     TaskId,
 )
@@ -35,7 +34,7 @@ class CommentRepository(ICommentRepository):
             raise ValueError('User does not exist')
 
     async def fetch_by_id(self, comment_id: CommentId) -> CommentEntity | None:
-        stmt = select(CommentModel).where(CommentModel.id == comment_id.to_raw())
+        stmt = select(CommentModel).where(CommentModel.id == comment_id)
         result = await self._session.execute(stmt)
         comment: CommentModel = result.scalar_one_or_none()
         if comment is None:
@@ -58,17 +57,17 @@ class CommentRepository(ICommentRepository):
     async def fetch_task_comments(
         self, task_id: TaskId, page: int, page_size: int
     ) -> list[CommentEntity]:
-        query = select(CommentModel).where(CommentModel.task_id == task_id.to_raw())
+        query = select(CommentModel).where(CommentModel.task_id == task_id)
         return await self._fetch_comments(query, page, page_size)
 
     async def fetch_feature_comments(
         self, feature_id: FeatureId, page: int, page_size: int
     ) -> list[CommentEntity]:
-        query = select(CommentModel).where(CommentModel.feature_id == feature_id.to_raw())
+        query = select(CommentModel).where(CommentModel.feature_id == feature_id)
         return await self._fetch_comments(query, page, page_size)
 
     async def update_comment(
-        self, comment_id: CommentId, new_content: Content
+        self, comment_id: CommentId, new_content: str
     ) -> CommentEntity | None:
         comment = await self.fetch_by_id(comment_id)
         if comment is None:
@@ -76,8 +75,8 @@ class CommentRepository(ICommentRepository):
         comment.update_content(new_content)
         stmt = (
             update(CommentModel)
-            .where(CommentModel.id == comment_id.to_raw())
-            .values(content=new_content.to_raw())
+            .where(CommentModel.id == comment_id)
+            .values(content=new_content)
         )
         await self._session.execute(stmt)
 
@@ -85,7 +84,7 @@ class CommentRepository(ICommentRepository):
 
     async def delete_comment(self, comment_id: CommentId) -> None:
         result = await self._session.execute(
-            select(CommentModel).where(CommentModel.id == comment_id.to_raw())
+            select(CommentModel).where(CommentModel.id == comment_id)
         )
         comment = result.scalar_one_or_none()
         if comment is None:

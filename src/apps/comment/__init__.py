@@ -12,11 +12,7 @@ from .exceptions import (
     CommentAssociatedWithBothError,
     CommentNotAssociatedError,
     CommentNotFoundError,
-    InvalidAuthorIdError,
-    InvalidCommentIdError,
     InvalidContentError,
-    InvalidFeatureIdError,
-    InvalidTaskIdError,
 )
 from .interactors import (
     AddCommentInteractor,
@@ -31,10 +27,6 @@ from .repository import ICommentRepository
 
 __all__ = (
     'CommentOutDto',
-    'InvalidCommentIdError',
-    'InvalidAuthorIdError',
-    'InvalidTaskIdError',
-    'InvalidFeatureIdError',
     'InvalidContentError',
     'CommentNotAssociatedError',
     'CommentAssociatedWithBothError',

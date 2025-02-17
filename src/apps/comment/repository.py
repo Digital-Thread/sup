@@ -4,7 +4,6 @@ from typing import Protocol
 from src.apps.comment.domain import (
     CommentEntity,
     CommentId,
-    Content,
     TaskId,
     FeatureId,
 )
@@ -39,7 +38,7 @@ class ICommentRepository(Protocol):
         pass
 
     @abc.abstractmethod
-    async def update_comment(self, comment_id: CommentId, new_content: Content) -> CommentEntity:
+    async def update_comment(self, comment_id: CommentId, new_content: str) -> CommentEntity:
         """
         Обновить данные комментария по его ID
         :param comment_id: Идентификатор комментария

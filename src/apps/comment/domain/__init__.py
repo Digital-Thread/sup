@@ -2,7 +2,6 @@ from .comment import CommentEntity
 from .types_ids import (
     AuthorId,
     CommentId,
-    Content,
     FeatureId,
     TaskId,
 )
@@ -13,5 +12,4 @@ __all__ = (
     'AuthorId',
     'TaskId',
     'FeatureId',
-    'Content',
 )

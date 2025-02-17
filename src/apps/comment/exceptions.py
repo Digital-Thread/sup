@@ -30,34 +30,6 @@ class CommentNotFoundError(BaseCommentException):
 
 
 @dataclass
-class InvalidCommentIdError(BaseCommentException):
-    """Выбрасывается, когда идентификатор комментария некорректный"""
-
-    message: str = 'CommentId must be a positive integer.'
-
-
-@dataclass
-class InvalidAuthorIdError(BaseCommentException):
-    """Выбрасывается, когда идентификатор автора некорректный"""
-
-    message: str = 'AuthorId must be a uuid object.'
-
-
-@dataclass
-class InvalidTaskIdError(BaseCommentException):
-    """Выбрасывается, когда идентификатор задачи некорректный"""
-
-    message: str = 'TaskId must be a positive integer.'
-
-
-@dataclass
-class InvalidFeatureIdError(BaseCommentException):
-    """Выбрасывается, когда идентификатор фичи некорректный"""
-
-    message: str = 'FeatureId must be a positive integer.'
-
-
-@dataclass
 class InvalidContentError(BaseCommentException):
     """Выбрасывается, когда контент комментария некорректный"""
 
