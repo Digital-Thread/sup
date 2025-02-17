@@ -8,10 +8,10 @@ from src.apps.comment.mapper import CommentMapper
 from src.apps.comment.domain import (
     CommentId,
     FeatureId,
-    ICommentRepository,
-    Interactor,
     TaskId,
 )
+from src.apps.comment.interactors.base_interactor import Interactor
+from src.apps.comment.repository import ICommentRepository
 from src.apps.comment.dtos import FetchFeatureCommentDto
 
 

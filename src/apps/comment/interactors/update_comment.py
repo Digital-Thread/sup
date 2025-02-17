@@ -1,6 +1,8 @@
 from src.apps.comment import CommentOutDto, UpdateCommentDto
 from src.apps.comment.mapper import CommentMapper
-from src.apps.comment.domain import CommentId, Content, ICommentRepository, Interactor
+from src.apps.comment.domain import CommentId, Content
+from src.apps.comment.interactors.base_interactor import Interactor
+from src.apps.comment.repository import ICommentRepository
 
 
 class UpdateCommentInteractor(Interactor[UpdateCommentDto, CommentOutDto]):

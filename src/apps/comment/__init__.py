@@ -27,6 +27,7 @@ from .interactors import (
     FetchCommentInteractor,
     UpdateCommentInteractor,
 )
+from .repository import ICommentRepository
 
 __all__ = (
     'CommentOutDto',
@@ -53,4 +54,5 @@ __all__ = (
     'FetchAllFeatureCommentsInteractor',
     'FetchAllTaskCommentsInteractor',
     'FetchFeatureCommentDto',
+    'ICommentRepository',
 )

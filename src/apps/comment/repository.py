@@ -1,8 +1,13 @@
 import abc
 from typing import Protocol
 
-from .comment import CommentEntity
-from .types_ids import CommentId, Content, FeatureId, TaskId
+from src.apps.comment.domain import (
+    CommentEntity,
+    CommentId,
+    Content,
+    TaskId,
+    FeatureId,
+)
 
 
 class ICommentRepository(Protocol):
@@ -54,7 +59,7 @@ class ICommentRepository(Protocol):
 
     @abc.abstractmethod
     async def fetch_task_comments(
-        self, task_id: TaskId, page: int, page_size: int
+            self, task_id: TaskId, page: int, page_size: int
     ) -> list[CommentEntity]:
         """
         Получить список комментариев для задачи
@@ -67,7 +72,7 @@ class ICommentRepository(Protocol):
 
     @abc.abstractmethod
     async def fetch_feature_comments(
-        self, feature_id: FeatureId, page: int, page_size: int
+            self, feature_id: FeatureId, page: int, page_size: int
     ) -> list[CommentEntity]:
         """
         Получить список комментариев для фичи
@@ -77,10 +82,3 @@ class ICommentRepository(Protocol):
         :return: Список сущностей комментариев
         """
         pass
-
-
-class Interactor[Request, Response](Protocol):
-
-    @abc.abstractmethod
-    async def execute(self, request: Request) -> Response:
-        raise NotImplementedError

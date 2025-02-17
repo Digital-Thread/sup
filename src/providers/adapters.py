@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from src.apps.auth import JWTService
-from src.apps.comment.domain import ICommentRepository
+from src.apps.comment import ICommentRepository
 from src.apps.feature.repositories import IFeatureRepository
 from src.apps.meet import IMeetRepository, IParticipantRepository, MeetService
 from src.apps.meet.protocols import WorkspaceService, WorkspaceServiceProtocol

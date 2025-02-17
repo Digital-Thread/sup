@@ -1,5 +1,4 @@
 from .comment import CommentEntity
-from .protocols import ICommentRepository, Interactor
 from .types_ids import (
     AuthorId,
     CommentId,
@@ -12,8 +11,6 @@ from .types_ids import (
 
 __all__ = (
     'CommentEntity',
-    'Interactor',
-    'ICommentRepository',
     'CommentId',
     'AuthorId',
     'TaskId',

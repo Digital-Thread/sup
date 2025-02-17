@@ -11,9 +11,9 @@ from src.apps.comment.domain import (
     CommentId,
     Content,
     FeatureId,
-    ICommentRepository,
     TaskId,
 )
+from src.apps.comment.repository import ICommentRepository
 from src.data_access.mappers import CommentMapper
 from src.data_access.models import CommentModel
 

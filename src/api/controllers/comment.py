@@ -18,7 +18,7 @@ from src.apps.comment import (
     FetchTaskCommentDto,
     UpdateCommentDto,
 )
-from src.apps.comment.domain import Interactor
+from src.apps.comment.interactors.base_interactor import Interactor
 from src.apps.comment.dtos import FetchFeatureCommentDto
 
 comment_router = APIRouter()
