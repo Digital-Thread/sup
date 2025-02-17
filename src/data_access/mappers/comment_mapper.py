@@ -10,35 +10,36 @@ from src.data_access.models import CommentModel
 
 class CommentMapper:
     @staticmethod
-    def convert_comment_entity_to_db_model(comment: CommentEntity) -> CommentModel:
-        if comment.comment_id is None:
+    def convert_comment_entity_to_db_model(entity: CommentEntity) -> CommentModel:
+        if entity.id is None:
             return CommentModel(
-                user_id=comment.user_id,
-                task_id=getattr(comment.task_id, 'to_raw', lambda: None)(),
-                feature_id=getattr(comment.feature_id, 'to_raw', lambda: None)(),
-                content=comment.content,
-                created_at=comment.created_at,
-                updated_at=comment.updated_at,
+                user_id=entity.user_id,
+                task_id=entity.task_id,
+                feature_id=entity.feature_id,
+                content=entity.content,
+                created_at=entity.created_at,
+                updated_at=entity.updated_at,
             )
         else:
             return CommentModel(
-                id=comment.comment_id,
-                user_id=comment.user_id,
-                task_id=getattr(comment.task_id, 'to_raw', lambda: None)(),
-                feature_id=getattr(comment.feature_id, 'to_raw', lambda: None)(),
-                content=comment.content,
-                created_at=comment.created_at,
-                updated_at=comment.updated_at,
+                id=entity.id,
+                user_id=entity.user_id,
+                task_id=entity.task_id,
+                feature_id=entity.feature_id,
+                content=entity.content,
+                created_at=entity.created_at,
+                updated_at=entity.updated_at,
             )
 
     @staticmethod
-    def convert_db_model_to_comment_entity(comment: CommentModel) -> CommentEntity:
-        return CommentEntity(
-            comment_id=CommentId(comment.id),
-            user_id=AuthorId(comment.user_id),  # type: ignore
-            task_id=TaskId(comment.task_id) if comment.task_id else None,
-            feature_id=FeatureId(comment.feature_id) if comment.feature_id else None,
-            content=comment.content,
-            created_at=comment.created_at,
-            updated_at=comment.updated_at,
+    def convert_db_model_to_comment_entity(model: CommentModel) -> CommentEntity:
+        comment = CommentEntity(
+            user_id=AuthorId(model.user_id),  # type: ignore
+            task_id=TaskId(model.task_id) if model.task_id else None,
+            feature_id=FeatureId(model.feature_id) if model.feature_id else None,
+            content=model.content,
         )
+        comment.id = CommentId(model.id)
+        comment.created_at = model.created_at
+        comment.updated_at = model.updated_at
+        return comment

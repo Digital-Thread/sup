@@ -27,7 +27,7 @@ class CommentRepository(ICommentRepository):
         self._session.add(comment)
         try:
             await self._session.flush()
-            entity.comment_id = CommentId(comment.id)
+            entity.id = CommentId(comment.id)
             return entity
         except IntegrityError as err:
             logging.warning(err)
