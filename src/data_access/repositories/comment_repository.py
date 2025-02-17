@@ -64,16 +64,14 @@ class CommentRepository(ICommentRepository):
         return await self._fetch_comments(query, page, page_size)
 
     async def update_comment(
-        self, comment_id: CommentId, new_content: str
+            self, comment: CommentEntity
     ) -> CommentEntity | None:
-        comment = await self.get_by_id(comment_id)
-        if comment is None:
-            raise CommentNotFoundError()
-        comment.update_content(new_content)
         stmt = (
             update(CommentModel)
-            .where(CommentModel.id == comment_id)
-            .values(content=new_content)
+            .where(CommentModel.id == comment.id)
+            .values(
+                content=comment.content,
+                updated_at=comment.updated_at)
         )
         await self._session.execute(stmt)
 

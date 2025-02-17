@@ -30,11 +30,10 @@ class ICommentRepository(ABC):
 
 
     @abstractmethod
-    async def update_comment(self, comment_id: CommentId, new_content: str) -> CommentEntity:
+    async def update_comment(self, comment: CommentEntity) -> CommentEntity:
         """
         Обновить данные комментария по его ID
-        :param comment_id: Идентификатор комментария
-        :param new_content: Новый комментарий
+        :param comment: Сущность комментария с новым контентом
         :return: Обновленная сущность комментария
         """
         pass

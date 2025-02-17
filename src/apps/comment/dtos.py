@@ -23,8 +23,8 @@ class FetchCommentDto:
 
 @dataclasses.dataclass
 class UpdateCommentDto:
-    comment_id: int | None = None
-    new_content: str | None = None
+    comment_id: int
+    new_content: str
 
 
 @dataclasses.dataclass
