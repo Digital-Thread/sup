@@ -33,7 +33,7 @@ class CommentRepository(ICommentRepository):
             logging.warning(err)
             raise ValueError('User does not exist')
 
-    async def fetch_by_id(self, comment_id: CommentId) -> CommentEntity | None:
+    async def get_by_id(self, comment_id: CommentId) -> CommentEntity | None:
         stmt = select(CommentModel).where(CommentModel.id == comment_id)
         result = await self._session.execute(stmt)
         comment: CommentModel = result.scalar_one_or_none()
@@ -54,13 +54,13 @@ class CommentRepository(ICommentRepository):
         query = select(CommentModel)
         return await self._fetch_comments(query, page, page_size)
 
-    async def fetch_task_comments(
+    async def get_by_task_id(
         self, task_id: TaskId, page: int, page_size: int
     ) -> list[CommentEntity]:
         query = select(CommentModel).where(CommentModel.task_id == task_id)
         return await self._fetch_comments(query, page, page_size)
 
-    async def fetch_feature_comments(
+    async def get_by_feature_id(
         self, feature_id: FeatureId, page: int, page_size: int
     ) -> list[CommentEntity]:
         query = select(CommentModel).where(CommentModel.feature_id == feature_id)
@@ -69,7 +69,7 @@ class CommentRepository(ICommentRepository):
     async def update_comment(
         self, comment_id: CommentId, new_content: str
     ) -> CommentEntity | None:
-        comment = await self.fetch_by_id(comment_id)
+        comment = await self.get_by_id(comment_id)
         if comment is None:
             raise CommentNotFoundError()
         comment.update_content(new_content)

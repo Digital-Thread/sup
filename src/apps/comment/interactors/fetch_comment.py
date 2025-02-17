@@ -21,7 +21,7 @@ class FetchCommentInteractor(Interactor[FetchCommentDto, CommentOutDto]):
         self._repository = comment_repository
 
     async def execute(self, request: FetchCommentDto) -> CommentOutDto:
-        comment = await self._repository.fetch_by_id(comment_id=CommentId(request.comment_id))
+        comment = await self._repository.get_by_id(comment_id=CommentId(request.comment_id))
         return CommentMapper.entity_to_dto(comment)
 
 
@@ -40,7 +40,7 @@ class FetchAllTaskCommentsInteractor(Interactor[FetchTaskCommentDto, list[Commen
         self._repository = comment_repository
 
     async def execute(self, request: FetchTaskCommentDto) -> list[CommentOutDto]:
-        comments = await self._repository.fetch_task_comments(
+        comments = await self._repository.get_by_task_id(
             task_id=TaskId(request.task_id),
             page=request.page,
             page_size=request.page_size,
@@ -53,7 +53,7 @@ class FetchAllFeatureCommentsInteractor(Interactor[FetchFeatureCommentDto, list[
         self._repository = comment_repository
 
     async def execute(self, request: FetchFeatureCommentDto) -> list[CommentOutDto]:
-        comments = await self._repository.fetch_feature_comments(
+        comments = await self._repository.get_by_feature_id(
             feature_id=FeatureId(request.feature_id),
             page=request.page,
             page_size=request.page_size,

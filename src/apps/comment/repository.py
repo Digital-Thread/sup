@@ -1,5 +1,4 @@
-import abc
-from typing import Protocol
+from abc import ABC, abstractmethod
 
 from src.apps.comment.domain import (
     CommentEntity,
@@ -9,9 +8,9 @@ from src.apps.comment.domain import (
 )
 
 
-class ICommentRepository(Protocol):
+class ICommentRepository(ABC):
 
-    @abc.abstractmethod
+    @abstractmethod
     async def save(self, entity: CommentEntity) -> CommentEntity | None:
         """
         Сохранить комментарий в базе данных
@@ -20,8 +19,8 @@ class ICommentRepository(Protocol):
         """
         pass
 
-    @abc.abstractmethod
-    async def fetch_by_id(self, comment_id: CommentId) -> CommentEntity | None:
+    @abstractmethod
+    async def get_by_id(self, comment_id: CommentId) -> CommentEntity | None:
         """
         Получить комментарий по его ID
         :param comment_id: Идентификатор комментария
@@ -29,7 +28,7 @@ class ICommentRepository(Protocol):
         """
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     async def fetch_all(self, page: int, page_size: int) -> list[CommentEntity]:
         """
         Получить список всех комментариев
@@ -37,7 +36,7 @@ class ICommentRepository(Protocol):
         """
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     async def update_comment(self, comment_id: CommentId, new_content: str) -> CommentEntity:
         """
         Обновить данные комментария по его ID
@@ -47,7 +46,7 @@ class ICommentRepository(Protocol):
         """
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     async def delete_comment(self, comment_id: CommentId) -> None:
         """
         Удалить комментарий по его ID
@@ -56,8 +55,8 @@ class ICommentRepository(Protocol):
         """
         pass
 
-    @abc.abstractmethod
-    async def fetch_task_comments(
+    @abstractmethod
+    async def get_by_task_id(
             self, task_id: TaskId, page: int, page_size: int
     ) -> list[CommentEntity]:
         """
@@ -69,8 +68,8 @@ class ICommentRepository(Protocol):
         """
         pass
 
-    @abc.abstractmethod
-    async def fetch_feature_comments(
+    @abstractmethod
+    async def get_by_feature_id(
             self, feature_id: FeatureId, page: int, page_size: int
     ) -> list[CommentEntity]:
         """
