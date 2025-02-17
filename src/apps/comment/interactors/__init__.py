@@ -1,4 +1,4 @@
-from .add_comment import AddCommentInteractor
+from .create_comment import AddCommentInteractor
 from .delete_comment import DeleteCommentInteractor
 from .fetch_comment import (
     FetchAllCommentsInteractor,

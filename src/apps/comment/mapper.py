@@ -1,6 +1,6 @@
 from src.apps.comment import CommentOutDto
 from src.apps.comment.domain import AuthorId, Content, FeatureId, TaskId
-from src.apps.comment.domain.entity import CommentEntity
+from src.apps.comment.domain.comment import CommentEntity
 from src.apps.comment.dtos import BaseCommentDto
 
 

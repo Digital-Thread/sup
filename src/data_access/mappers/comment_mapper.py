@@ -11,7 +11,7 @@ from src.apps.comment.domain import (
 from src.data_access.models import CommentModel
 
 
-class CommentConverter:
+class CommentMapper:
     @staticmethod
     def convert_comment_entity_to_db_model(comment: CommentEntity) -> CommentModel:
         if comment.comment_id is None:

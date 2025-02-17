@@ -1,9 +1,9 @@
 import abc
 from typing import Protocol
 
-from .entity import CommentEntity
+from .comment import CommentEntity
 from .event import Event
-from .value_objects import CommentId, Content, FeatureId, TaskId
+from .types_ids import CommentId, Content, FeatureId, TaskId
 
 
 class ICommentRepository(Protocol):

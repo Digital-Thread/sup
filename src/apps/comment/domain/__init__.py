@@ -1,7 +1,7 @@
-from .entity import CommentEntity
+from .comment import CommentEntity
 from .event import CommentCreatedEvent, CommentDeletedEvent, CommentUpdatedEvent, Event
 from .protocols import ICommentRepository, IEventHandler, Interactor
-from .value_objects import (
+from .types_ids import (
     AuthorId,
     CommentId,
     Content,

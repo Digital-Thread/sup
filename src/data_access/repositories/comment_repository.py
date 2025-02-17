@@ -14,7 +14,7 @@ from src.apps.comment.domain import (
     ICommentRepository,
     TaskId,
 )
-from src.data_access.mappers import CommentConverter
+from src.data_access.mappers import CommentMapper
 from src.data_access.models import CommentModel
 
 
@@ -25,7 +25,7 @@ class CommentRepository(ICommentRepository):
         # self._event = event_handler
 
     async def save(self, entity: CommentEntity) -> CommentEntity | None:
-        comment = CommentConverter.convert_comment_entity_to_db_model(entity)
+        comment = CommentMapper.convert_comment_entity_to_db_model(entity)
         self._session.add(comment)
         try:
             await self._session.flush()
@@ -43,7 +43,7 @@ class CommentRepository(ICommentRepository):
         comment: CommentModel = result.scalar_one_or_none()
         if comment is None:
             raise CommentNotFoundError()
-        return CommentConverter.convert_db_model_to_comment_entity(comment)
+        return CommentMapper.convert_db_model_to_comment_entity(comment)
 
     async def _fetch_comments(self, query: Any, page: int, page_size: int) -> list[CommentEntity]:
         offset = (page - 1) * page_size
@@ -51,7 +51,7 @@ class CommentRepository(ICommentRepository):
         result = await self._session.execute(stmt)
         comments = result.scalars().all()
         return [
-            CommentConverter.convert_db_model_to_comment_entity(comment) for comment in comments
+            CommentMapper.convert_db_model_to_comment_entity(comment) for comment in comments
         ]
 
     async def fetch_all(self, page: int, page_size: int) -> list[CommentEntity]:

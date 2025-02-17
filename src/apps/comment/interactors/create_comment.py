@@ -1,5 +1,5 @@
 from src.apps.comment import AddCommentDto, CommentOutDto
-from src.apps.comment.converters import CommentMapper
+from src.apps.comment.mapper import CommentMapper
 from src.apps.comment.domain import CommentEntity, ICommentRepository, Interactor
 
 

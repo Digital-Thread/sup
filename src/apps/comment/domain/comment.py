@@ -6,7 +6,7 @@ from typing import Self
 from src.apps.comment import CommentAssociatedWithBothError, CommentNotAssociatedError
 
 from .event import CommentCreatedEvent, CommentDeletedEvent, CommentUpdatedEvent, Event
-from .value_objects import (
+from .types_ids import (
     AuthorId,
     CommentId,
     Content,

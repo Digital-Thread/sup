@@ -1,7 +1,7 @@
 from abc import ABC
 from dataclasses import dataclass
 
-from .value_objects import AuthorId, CommentId, Content, CreatedAt, FeatureId, TaskId
+from .types_ids import AuthorId, CommentId, Content, CreatedAt, FeatureId, TaskId
 
 
 @dataclass

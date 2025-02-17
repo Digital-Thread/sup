@@ -4,7 +4,7 @@ from src.apps.comment import (
     FetchCommentDto,
     FetchTaskCommentDto,
 )
-from src.apps.comment.converters import CommentMapper
+from src.apps.comment.mapper import CommentMapper
 from src.apps.comment.domain import (
     CommentId,
     FeatureId,
