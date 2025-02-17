@@ -1,11 +1,11 @@
 from dataclasses import dataclass, field
 
-from src.apps.workspace.domain.entities.validator_mixins import NameValidatorMixin
 from src.apps.workspace.domain.types_ids import CategoryId, WorkspaceId
+from src.apps.workspace.domain.validator_mixins import NameValidatorMixin
 
 
 @dataclass
-class Category(NameValidatorMixin):
+class CategoryEntity(NameValidatorMixin):
     _name: str
     _workspace_id: WorkspaceId
     _id: CategoryId | None = field(default=None)
@@ -17,9 +17,23 @@ class Category(NameValidatorMixin):
     def id(self) -> CategoryId | None:
         return self._id
 
+    @id.setter
+    def id(self, new_id: CategoryId) -> None:
+        if self._id is not None:
+            raise AttributeError('Идентификатор категории уже установлен')
+
+        self._id = new_id
+
     @property
     def workspace_id(self) -> WorkspaceId:
         return self._workspace_id
+
+    @workspace_id.setter
+    def workspace_id(self, new_workspace_id: WorkspaceId) -> None:
+        if self._workspace_id is not None:
+            raise AttributeError('Идентификатор рабочего пространства уже установлен')
+
+        self._workspace_id = new_workspace_id
 
     @property
     def name(self) -> str:

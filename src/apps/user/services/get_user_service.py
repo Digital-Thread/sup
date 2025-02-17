@@ -1,9 +1,9 @@
 from typing import List, Optional
 
-from src.apps.user.domain.entities import User
+from src.apps.user.domain.entity import User
 from src.apps.user.exceptions import TokenExpiredError, UserNotFoundError
 from src.apps.user.protocols import JWTServiceProtocol
-from src.apps.user.repositories import IUserRepository
+from src.apps.user.repository import IUserRepository
 
 
 class GetUserService:

@@ -1,20 +1,16 @@
 from dataclasses import dataclass
 from uuid import UUID
 
-
-@dataclass
-class CreateCategoryAppDTO:
-    name: str
-    workspace_id: UUID
+from src.apps.workspace.dtos.pagination_dto import PaginationDTO
 
 
 @dataclass
-class CategoryAppDTO:
+class CategoryOutDTO:
     id: int
-    name: str
     workspace_id: UUID
+    name: str
 
 
 @dataclass
-class UpdateCategoryAppDTO:
-    name: str | None = None
+class GetCategoryDTO(PaginationDTO):
+    workspace_id: UUID

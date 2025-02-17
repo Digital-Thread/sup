@@ -8,6 +8,7 @@ import uvicorn
 from dishka import AsyncContainer, make_async_container
 from dishka.integrations.fastapi import setup_dishka
 from fastapi import FastAPI
+from fastapi.openapi.utils import get_openapi
 
 from src.api import init_exception_handlers, init_routes
 from src.api.middlewares import init_middlewares
@@ -15,12 +16,13 @@ from src.providers.adapters import (
     ConfigProvider,
     RepositoriesProvider,
     SqlalchemyProvider,
+    WorkspaceProvider,
 )
 from src.providers.usecases import (
     CategoryUseCaseProvider,
     FeatureInteractorProvider,
     InteractorProvider,
-    ProjectUseCaseProvider,
+    ProjectInteractorProvider,
     RoleUseCaseProvider,
     TagUseCaseProvider,
     TaskInteractorProvider,
@@ -42,9 +44,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 def container_factory() -> AsyncContainer:
     return make_async_container(
         SqlalchemyProvider(),
+        WorkspaceProvider(),
         ConfigProvider(),
         RepositoriesProvider(),
-        ProjectUseCaseProvider(),
+        ProjectInteractorProvider(),
         InteractorProvider(),
         WorkspaceUseCaseProvider(),
         RoleUseCaseProvider(),
@@ -80,6 +83,32 @@ async def start_server(app: FastAPI) -> None:
     await server.serve()
 
 
+def customize_openapi(app: FastAPI):
+    """
+    Настраивает OpenAPI схему для добавления заголовка X-Workspace-Id.
+    """
+    if app.openapi_schema:
+        return app.openapi_schema
+
+    openapi_schema = get_openapi(
+        title=app.title,
+        version=app.version,
+        description=app.description,
+        routes=app.routes,
+    )
+    openapi_schema["components"]["securitySchemes"] = {
+        "WorkspaceHeader": {
+            "type": "apiKey",
+            "name": "X-Workspace-Id",
+            "in": "header",
+        }
+    }
+    openapi_schema["security"] = [{"WorkspaceHeader": []}]
+
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+
 def create_app() -> FastAPI:
     app = FastAPI(
         title='Sup API',
@@ -88,6 +117,8 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
         docs_url='/',
     )
+    app.openapi = lambda: customize_openapi(app)
+
     init_services(app)
     init_di(app)
     init_routes(app)

@@ -3,10 +3,11 @@ from datetime import datetime
 from uuid import UUID
 
 from src.apps.workspace.domain.entities.workspace_invite import StatusInvite
+from src.apps.workspace.dtos.pagination_dto import PaginationDTO
 
 
 @dataclass
-class WorkspaceInviteAppDTO:
+class WorkspaceInviteOutDTO:
     id: int
     workspace_id: UUID
     code: UUID
@@ -16,5 +17,12 @@ class WorkspaceInviteAppDTO:
 
 
 @dataclass
+class GetWorkspaceInvitesDTO(PaginationDTO):
+    workspace_id: UUID
+
+
+@dataclass
 class UpdateWorkspaceInviteAppDTO:
+    id_: int
+    workspace_id: UUID
     status: StatusInvite | None = None

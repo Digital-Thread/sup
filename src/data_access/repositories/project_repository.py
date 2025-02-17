@@ -1,33 +1,51 @@
 from logging import warning
+from uuid import UUID
 
 from asyncpg.exceptions import ForeignKeyViolationError, UniqueViolationError
-from sqlalchemy import delete, exists, func, select, update
+from sqlalchemy import delete, select, update
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from src.apps.project.domain.entity.project import Project
+from src.apps.project.domain.project import ProjectEntity
 from src.apps.project.domain.types_ids import ParticipantId, ProjectId, WorkspaceId
 from src.apps.project.exceptions import (
     ParticipantNotFound,
     ProjectAlreadyExists,
-    ProjectNotFound,
+    ProjectNotDeleted,
     WorkspaceForProjectNotFound,
 )
-from src.apps.project.i_project_repository import IProjectRepository
-from src.data_access.converters.project_converter import ProjectConverter
+from src.apps.project.project_repository import IProjectRepository
+from src.apps.workspace.exceptions.workspace_exceptions import WorkspaceMemberNotFound
+from src.data_access.mappers.project_mapper import ProjectMapper
+from src.data_access.models import WorkspaceMemberModel
 from src.data_access.models.project import ProjectModel
 from src.data_access.models.project_participants import ProjectParticipantsModel
+from src.data_access.models.user import UserModel
 
 
 class ProjectRepository(IProjectRepository):
     def __init__(self, session_factory: AsyncSession):
         self._session = session_factory
-        self._counter = 0
 
-    async def save(self, project: Project) -> None:
-        stmt_project = ProjectConverter.entity_to_model(project)
+    async def check_user_in_workspace(self, user_ids: set[UUID], workspace_id: WorkspaceId) -> None:
+        query = select(WorkspaceMemberModel.user_id).where(
+            WorkspaceMemberModel.workspace_id == workspace_id,
+            WorkspaceMemberModel.user_id.in_(user_ids),
+        )
+        result = await self._session.execute(query)
+        valid_user_ids = {row.user_id for row in result}
+
+        invalid_users = user_ids - valid_user_ids
+
+        if invalid_users:
+            raise WorkspaceMemberNotFound(
+                'Пользователь отсутствует в рабочем пространстве, в котором находится проект'
+            )
+
+    async def save(self, project: ProjectEntity) -> None:
+        stmt_project = ProjectMapper.entity_to_model(project)
         self._session.add(stmt_project)
 
         try:
@@ -37,70 +55,71 @@ class ProjectRepository(IProjectRepository):
             if isinstance(error.orig.__cause__, UniqueViolationError):
                 raise ProjectAlreadyExists(
                     'Проект с таким именем в этом рабочем пространстве уже существует.'
-                )
+                ) from error
 
             raise WorkspaceForProjectNotFound(
-                f'Рабочего пространства с id={project.workspace_id} не существует'
-            )
+                f'Рабочего пространства с id={project.workspace_id} не существует.'
+            ) from error
 
-    async def find_by_id(self, project_id: ProjectId, workspace_id: WorkspaceId) -> Project | None:
+    async def get_by_id(
+        self, project_id: ProjectId, workspace_id: WorkspaceId
+    ) -> ProjectEntity | None:
         query = (
             select(ProjectModel)
+            .filter(ProjectModel.id == project_id, ProjectModel.workspace_id == workspace_id)
             .options(selectinload(ProjectModel.participants))
-            .filter_by(id=project_id, workspace_id=workspace_id)
         )
         result = await self._session.execute(query)
-        try:
-            project_model = result.scalar_one()
-        except NoResultFound as error:
-            warning(error)
-            raise ProjectNotFound(
-                f'Проект с id={project_id} не найден в указанном рабочем пространстве.'
-            )
-        else:
-            return ProjectConverter.model_to_entity(project_model)
+        project_model = result.scalar_one_or_none()
 
-    async def find_by_workspace_id(self, workspace_id: WorkspaceId) -> list[tuple[Project, int]]:
-        query = (
-            select(
-                ProjectModel,
-                func.count(ProjectParticipantsModel.participant_id).label('participant_count'),
-            )
-            .outerjoin(
-                ProjectParticipantsModel, ProjectModel.id == ProjectParticipantsModel.project_id
-            )
-            .where(ProjectModel.workspace_id == workspace_id)
-            .group_by(ProjectModel.id)
+        return ProjectMapper.model_to_entity(project_model) if project_model else None
+
+    async def get_by_workspace_id(
+        self,
+        workspace_id: WorkspaceId,
+        page: int,
+        page_size: int,
+    ) -> list[tuple[ProjectEntity, list[dict[str, str]] | None]]:
+        projects_query = (
+            select(ProjectModel)
+            .filter_by(workspace_id=workspace_id)
+            .offset((page - 1) * page_size)
+            .limit(page_size)
         )
-
-        result = await self._session.execute(query)
-        list_projects_with_user_count = result.all()
-        projects = ProjectConverter.list_to_entity(list_projects_with_user_count)
+        projects_result = await self._session.execute(projects_query)
+        projects = projects_result.scalars().all()
 
         if not projects:
-            raise WorkspaceForProjectNotFound(
-                f'Рабочее пространство с id={workspace_id} не найдено'
-            )
+            return []
 
-        return projects
+        project_ids = [project.id for project in projects]
+        particpants_query = (
+            select(
+                ProjectParticipantsModel.project_id,
+                UserModel.id,
+                UserModel.first_name,
+                UserModel.last_name,
+                UserModel.avatar,
+            )
+            .join(UserModel, ProjectParticipantsModel.participant_id == UserModel.id)
+            .filter(ProjectParticipantsModel.project_id.in_(project_ids))
+        )
+        participants_result = await self._session.execute(particpants_query)
+        participants = participants_result.all()
+        projects_with_participants = ProjectMapper.list_to_entity(
+            participants=participants, projects=projects
+        )
+        return projects_with_participants
 
     async def delete(self, project_id: ProjectId, workspace_id: WorkspaceId) -> None:
-        exists_project = await self._session.execute(
-            select(
-                exists().where(
-                    ProjectModel.id == project_id, ProjectModel.workspace_id == workspace_id
-                )
-            )
-        )
-
-        if not exists_project.scalar():
-            raise ProjectNotFound(f'Проект с id={project_id} не найден в рабочем пространстве')
-
         stmt = delete(ProjectModel).filter_by(id=project_id, workspace_id=workspace_id)
-        await self._session.execute(stmt)
+        result = await self._session.execute(stmt)
 
-    async def update_project(self, project: Project) -> None:
-        updated_data = ProjectConverter.entity_to_dict(project)
+        if result.rowcount == 0:
+            raise ProjectNotDeleted(f'Проект с id={project_id} не удален.')
+
+    async def update(self, project: ProjectEntity) -> None:
+        updated_data = ProjectMapper.entity_to_dict(project)
         stmt = (
             update(ProjectModel)
             .where(ProjectModel.id == project.id, ProjectModel.workspace_id == project.workspace_id)
@@ -111,11 +130,11 @@ class ProjectRepository(IProjectRepository):
     async def update_participants(
         self,
         project_id: ProjectId,
-        workspace_id: WorkspaceId,
         update_participants: list[ParticipantId],
+        workspace_id: WorkspaceId,
     ) -> None:
         await self._delete_participants(project_id, workspace_id)
-        await self._insert_participants(project_id, workspace_id, update_participants)
+        await self._insert_participants(project_id, update_participants, workspace_id)
 
     async def _delete_participants(self, project_id: ProjectId, workspace_id: WorkspaceId) -> None:
         delete_stmt = delete(ProjectParticipantsModel).where(
@@ -125,7 +144,7 @@ class ProjectRepository(IProjectRepository):
         await self._session.execute(delete_stmt)
 
     async def _insert_participants(
-        self, project_id: ProjectId, workspace_id: WorkspaceId, participant_ids: list[ParticipantId]
+        self, project_id: ProjectId, participant_ids: list[ParticipantId], workspace_id: WorkspaceId
     ) -> None:
         participant_insert_stmt = insert(ProjectParticipantsModel).values(
             [
@@ -145,4 +164,4 @@ class ProjectRepository(IProjectRepository):
         except IntegrityError as error:
             warning(error)
             if isinstance(error.orig.__cause__, ForeignKeyViolationError):
-                raise ParticipantNotFound(f'Участник не найден')
+                raise ParticipantNotFound('Участник не найден.') from error

@@ -4,6 +4,8 @@ from .category import category_router
 from .comment import comment_router
 from .feature import feature_router
 from .health_check import router
+from .meet import router as meet_router
+from .meet_participant import router as meet_participant_router
 from .project import project_router
 from .role import role_router
 from .tag import tag_router
@@ -38,6 +40,16 @@ def init_routes(app: FastAPI) -> None:
     app.include_router(router=project_router, prefix=f'{prefix}/projects', tags=['Project'])
     app.include_router(router=feature_router, prefix=f'{prefix}/features', tags=['Feature'])
     app.include_router(router=task_router, prefix=f'{prefix}/tasks', tags=['Task'])
+
+    meet_router.include_router(
+        router=meet_participant_router,
+        prefix='/{meet_id}/participants',
+    )
+    app.include_router(
+        router=meet_router,
+        prefix=f'{prefix}/meets',
+        tags=['Meets'],
+    )
 
 
 __all__ = ('init_routes',)

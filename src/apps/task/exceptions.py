@@ -8,8 +8,9 @@ class TaskError(ApplicationException):
     DEFAULT_MESSAGE = 'Ошибка во время работы с задачей.'
 
     def __init__(
-            self, context: Exception = None,
-            message: str = None,
+        self,
+        context: Exception = None,
+        message: str = None,
     ) -> None:
         self.context = context
         self.message = message or self.DEFAULT_MESSAGE
@@ -38,9 +39,10 @@ class TaskDoesNotExistError(TaskError):
     DEFAULT_MESSAGE = 'Задача не найдена.'
 
     def __init__(
-            self, task_id: TaskId = None,
-            context: Exception = None,
-            message: str = None,
+        self,
+        task_id: TaskId = None,
+        context: Exception = None,
+        message: str = None,
     ) -> None:
         custom_message = f'Задача с ID {task_id} не найдена.' if task_id else message
         super().__init__(context=context, message=custom_message or self.DEFAULT_MESSAGE)
@@ -48,5 +50,5 @@ class TaskDoesNotExistError(TaskError):
         self.args = (self.task_id, self.context, self.message)
 
 
-class RepositoryError(TaskError):
+class TaskRepositoryError(TaskError):
     DEFAULT_MESSAGE = 'Ошибка репозитория.'

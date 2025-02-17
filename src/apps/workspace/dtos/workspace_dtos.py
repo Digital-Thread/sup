@@ -1,17 +1,18 @@
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import TypedDict
 from uuid import UUID
 
 
 @dataclass
-class CreateWorkspaceAppDTO:
+class CreateWorkspaceDTO:
     name: str
     owner_id: UUID
 
 
 @dataclass
-class WorkspaceAppDTO:
-    id: UUID
+class WorkspaceOutDTO:
+    workspace_id: UUID
     owner_id: UUID
     name: str
     created_at: datetime
@@ -26,7 +27,29 @@ class WorkspaceAppDTO:
 
 
 @dataclass
-class UpdateWorkspaceAppDTO:
-    name: str | None = None
-    description: str | None = None
-    logo: str | None = None
+class GetWorkspacesByMemberIdDTO:
+    member_id: UUID
+
+
+class OptionalWorkspaceUpdateFields(TypedDict, total=False):
+    name: str
+    description: str
+    logo: str
+
+
+@dataclass
+class UpdateWorkspaceDTO:
+    workspace_id: UUID
+    updated_fields: OptionalWorkspaceUpdateFields
+
+
+@dataclass
+class DeleteWorkspaceDTO:
+    workspace_id: UUID
+    owner_id: UUID
+
+
+@dataclass
+class MemberOutDTO:
+    id: UUID
+    name: str

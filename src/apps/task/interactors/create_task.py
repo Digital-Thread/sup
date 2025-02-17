@@ -1,28 +1,23 @@
 from src.apps.task import TaskInputDTO
-from src.apps.task.domain import Task
-from src.apps.task.exceptions import RepositoryError, TaskCreateError
+from src.apps.task.exceptions import TaskCreateError, TaskRepositoryError
 from src.apps.task.interactors.base_interactor import BaseInteractor
+from src.apps.task.mapper import TaskMapper
 
 
 class CreateTaskInteractor(BaseInteractor):
     async def execute(self, dto: TaskInputDTO) -> None:
         try:
-            task = Task(
-                workspace_id=dto.workspace_id,
-                name=dto.name,
-                feature_id=dto.feature_id,
-                owner_id=dto.owner_id,
-                assigned_to=dto.assigned_to,
-                due_date=dto.due_date,
-                description=dto.description,
-                priority=dto.priority,
-                status=dto.status,
-                tags=dto.tags,
-            )
+            task = TaskMapper.dto_to_entity(dto=dto)
         except ValueError as e:
             raise TaskCreateError(context=e) from None
 
         try:
+            attrs = TaskMapper.entity_to_attrs_dto(task)
+            await self._repository.validate_workspace_consistency(attrs=attrs)
+        except TaskRepositoryError as e:
+            raise TaskCreateError(context=e) from None
+
+        try:
             await self._repository.save(task=task)
-        except RepositoryError as e:
+        except TaskRepositoryError as e:
             raise TaskCreateError(context=e) from None

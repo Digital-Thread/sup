@@ -1,7 +1,8 @@
 from typing import AsyncIterable
 
-from dishka import Provider, Scope, provide
+from dishka import Provider, Scope, from_context, provide
 from environs import Env
+from fastapi import Request
 from passlib.context import CryptContext
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import (
@@ -14,11 +15,13 @@ from sqlalchemy.ext.asyncio import (
 from src.apps.auth import JWTService
 from src.apps.comment.domain import ICommentRepository
 from src.apps.feature.repositories import IFeatureRepository
-from src.apps.project.i_project_repository import IProjectRepository
+from src.apps.meet import IMeetRepository, IParticipantRepository, MeetService
+from src.apps.meet.protocols import WorkspaceService, WorkspaceServiceProtocol
+from src.apps.project.project_repository import IProjectRepository
 from src.apps.send_mail.service import SendMailService
-from src.apps.task.repositories import ITaskRepository
+from src.apps.task import ITaskRepository
 from src.apps.user.protocols import JWTServiceProtocol, SendMailServiceProtocol
-from src.apps.user.repositories import IUserRepository
+from src.apps.user.repository import IUserRepository
 from src.apps.user.services import (
     AuthenticateUserService,
     AuthorizeUserService,
@@ -35,6 +38,9 @@ from src.apps.workspace.repositories import (
     IWorkspaceInviteRepository,
     IWorkspaceRepository,
 )
+from src.apps.workspace.repositories.user_workspace_role_repository import (
+    IUserWorkspaceRoleRepository,
+)
 from src.config import Config, DbConfig, JWTConfig, RedisConfig, SMTPConfig
 from src.data_access.repositories import (
     CategoryRepository,
@@ -46,8 +52,14 @@ from src.data_access.repositories import (
     WorkspaceInviteRepository,
     WorkspaceRepository,
 )
+from src.data_access.repositories.meet import MeetRepository
+from src.data_access.repositories.meet_participant import ParticipantRepository
 from src.data_access.repositories.project_repository import ProjectRepository
 from src.data_access.repositories.user_repository import UserRepository
+from src.data_access.repositories.user_workspace_role_repository import (
+    UserWorkspaceRoleRepository,
+)
+from src.providers.context import WorkspaceContext
 
 
 class SqlalchemyProvider(Provider):
@@ -99,6 +111,16 @@ class ConfigProvider(Provider):
         return config.jwt
 
 
+class WorkspaceProvider(Provider):
+    scope = Scope.REQUEST
+    request = from_context(provides=Request, scope=Scope.REQUEST)
+
+    @provide
+    def provide_workspace_context(self, request: Request) -> WorkspaceContext:
+        workspace_id = getattr(request.state, 'workspace_id', None)
+        return WorkspaceContext(workspace_id=workspace_id)
+
+
 class RepositoriesProvider(Provider):
     scope = Scope.REQUEST
 
@@ -111,6 +133,9 @@ class RepositoriesProvider(Provider):
     )
     category_repository = provide(CategoryRepository, provides=ICategoryRepository)
     role_repository = provide(RoleRepository, provides=IRoleRepository)
+    user_workspace_role_repository = provide(
+        UserWorkspaceRoleRepository, provides=IUserWorkspaceRoleRepository
+    )
     tag_repository = provide(TagRepository, provides=ITagRepository)
     project_repository = provide(ProjectRepository, provides=IProjectRepository)
 
@@ -204,4 +229,29 @@ class RepositoriesProvider(Provider):
             repository=repository,
             authenticate_service=authenticate_service,
             create_service=create_service,
+        )
+
+    @provide(scope=scope)
+    def provide_meet_repository(self, session: AsyncSession) -> IMeetRepository:
+        return MeetRepository(session)
+
+    @provide(scope=scope)
+    def provide_participant_repository(self, session: AsyncSession) -> IParticipantRepository:
+        return ParticipantRepository(session)
+
+    @provide(scope=scope)
+    def provide_temp_workspace_service(self) -> WorkspaceServiceProtocol:
+        return WorkspaceService()
+
+    @provide(scope=scope)
+    def provide_meet_service(
+        self,
+        meet_repository: IMeetRepository,
+        participant_repository: IParticipantRepository,
+        workspace_service: WorkspaceServiceProtocol,
+    ) -> MeetService:
+        return MeetService(
+            meet_repository=meet_repository,
+            participant_repository=participant_repository,
+            workspace_service=workspace_service,
         )
