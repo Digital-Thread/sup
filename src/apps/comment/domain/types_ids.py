@@ -7,8 +7,6 @@ __all__ = (
     'FeatureId',
     'TaskId',
     'Content',
-    'CreatedAt',
-    'UpdatedAt',
     'ValueObject',
 )
 
@@ -80,17 +78,3 @@ class Content(ValueObject[str]):
     def _validate(self) -> None:
         if not isinstance(self.value, str) or not self.value.strip():
             raise InvalidContentError()
-
-
-@dataclass(frozen=True)
-class CreatedAt(ValueObject[datetime]):
-    def _validate(self) -> None:
-        if not isinstance(self.value, datetime):
-            raise ValueError('CreatedAt must be a datetime object')
-
-
-@dataclass(frozen=True)
-class UpdatedAt(ValueObject[datetime]):
-    def _validate(self) -> None:
-        if not isinstance(self.value, datetime):
-            raise ValueError('UpdatedAt must be a datetime object')

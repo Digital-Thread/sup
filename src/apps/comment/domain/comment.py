@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Self
 
 from src.apps.comment import CommentAssociatedWithBothError, CommentNotAssociatedError
@@ -8,10 +8,8 @@ from .types_ids import (
     AuthorId,
     CommentId,
     Content,
-    CreatedAt,
     FeatureId,
     TaskId,
-    UpdatedAt,
 )
 
 
@@ -22,8 +20,8 @@ class CommentEntity:
     task_id: TaskId | None
     feature_id: FeatureId | None
     content: Content
-    created_at: CreatedAt
-    updated_at: UpdatedAt
+    created_at: datetime
+    updated_at: datetime
 
     @classmethod
     def create_for_entity(
@@ -43,12 +41,12 @@ class CommentEntity:
             feature_id=feature_id,
             content=content,
             user_id=user_id,
-            created_at=CreatedAt(datetime.now()),
-            updated_at=UpdatedAt(datetime.now()),
+            created_at=datetime.now(timezone.utc),
+            updated_at=datetime.now(timezone.utc),
         )
 
         return instance
 
     def update_content(self: Self, new_content: Content) -> None:
         self.content = new_content
-        self.updated_at = UpdatedAt(datetime.now())
+        self.updated_at = datetime.now(timezone.utc)

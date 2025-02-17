@@ -3,10 +3,8 @@ from .types_ids import (
     AuthorId,
     CommentId,
     Content,
-    CreatedAt,
     FeatureId,
     TaskId,
-    UpdatedAt,
 )
 
 __all__ = (
@@ -16,6 +14,4 @@ __all__ = (
     'TaskId',
     'FeatureId',
     'Content',
-    'CreatedAt',
-    'UpdatedAt',
 )

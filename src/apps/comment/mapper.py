@@ -13,8 +13,8 @@ class CommentMapper:
             feature_id=entity.feature_id.value if entity.feature_id is not None else None,
             content=entity.content.value,
             user_id=entity.user_id.value,
-            created_at=entity.created_at.value,
-            updated_at=entity.updated_at.value,
+            created_at=entity.created_at,
+            updated_at=entity.updated_at,
         )
 
     @staticmethod
