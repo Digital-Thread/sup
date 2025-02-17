@@ -1,9 +1,9 @@
-import abc
-from typing import Protocol
+from abc import ABC, abstractmethod
+from typing import Any
 
 
-class Interactor[Request, Response](Protocol):
+class BaseInteractor(ABC):
 
-    @abc.abstractmethod
-    async def execute(self, request: Request) -> Response:
+    @abstractmethod
+    async def execute(self, *args: Any) -> Any:
         raise NotImplementedError

@@ -1,11 +1,11 @@
 from src.apps.comment import CommentOutDto, UpdateCommentDto
 from src.apps.comment.mapper import CommentMapper
 from src.apps.comment.domain import CommentId
-from src.apps.comment.interactors.base_interactor import Interactor
+from src.apps.comment.interactors.base_interactor import BaseInteractor
 from src.apps.comment.repository import ICommentRepository
 
 
-class UpdateCommentInteractor(Interactor[UpdateCommentDto, CommentOutDto]):
+class UpdateCommentInteractor(BaseInteractor):
 
     def __init__(
         self,

@@ -15,15 +15,12 @@ from .exceptions import (
     InvalidContentError,
     IDAlreadyExistsError,
 )
-from .interactors import (
-    AddCommentInteractor,
-    DeleteCommentInteractor,
-    FetchAllCommentsInteractor,
-    FetchAllFeatureCommentsInteractor,
-    FetchAllTaskCommentsInteractor,
-    FetchCommentInteractor,
-    UpdateCommentInteractor,
-)
+from .interactors.create_comment import CreateCommentInteractor
+from .interactors.delete_comment import DeleteCommentInteractor
+from .interactors.get_by_feature_id import GetCommentsByFeatureIdInteractor
+from .interactors.get_by_task_id import GetCommentsByTaskIdInteractor
+from .interactors.update_comment import UpdateCommentInteractor
+
 from .repository import ICommentRepository
 
 __all__ = (
@@ -32,21 +29,19 @@ __all__ = (
     'CommentNotAssociatedError',
     'CommentAssociatedWithBothError',
     'IDAlreadyExistsError',
-    'AddCommentInteractor',
+    'CreateCommentInteractor',
     'AddCommentDto',
     'CommentNotFoundError',
     'FetchCommentDto',
     'CommentPaginationDto',
     'UpdateCommentDto',
-    'AddCommentInteractor',
-    'FetchCommentInteractor',
-    'FetchAllCommentsInteractor',
+    'CreateCommentInteractor',
     'UpdateCommentInteractor',
     'DeleteCommentInteractor',
     'DeleteCommentDto',
     'FetchTaskCommentDto',
-    'FetchAllFeatureCommentsInteractor',
-    'FetchAllTaskCommentsInteractor',
     'FetchFeatureCommentDto',
     'ICommentRepository',
+    'GetCommentsByFeatureIdInteractor',
+    'GetCommentsByTaskIdInteractor',
 )

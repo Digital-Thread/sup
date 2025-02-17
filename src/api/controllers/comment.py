@@ -14,11 +14,14 @@ from src.apps.comment import (
     AddCommentDto,
     CommentOutDto,
     DeleteCommentDto,
-    FetchCommentDto,
     FetchTaskCommentDto,
     UpdateCommentDto,
+    CreateCommentInteractor,
+    GetCommentsByTaskIdInteractor,
+    GetCommentsByFeatureIdInteractor,
+    UpdateCommentInteractor,
+    DeleteCommentInteractor,
 )
-from src.apps.comment.interactors.base_interactor import Interactor
 from src.apps.comment.dtos import FetchFeatureCommentDto
 
 comment_router = APIRouter()
@@ -40,7 +43,7 @@ def list_dto_mapper(responses: list[CommentOutDto]) -> list[CommentResponseDto]:
 )
 @inject
 async def add_comment_to_task(
-    body: CreateCommentForTaskDto, interactor: FromDishka[Interactor[AddCommentDto, CommentOutDto]]
+        body: CreateCommentForTaskDto, interactor: FromDishka[CreateCommentInteractor]
 ) -> CommentResponseDto:
     request = AddCommentDto(
         user_id=body.user_id,
@@ -60,28 +63,12 @@ async def add_comment_to_task(
 )
 @inject
 async def add_comment_to_feature(
-    body: CreateCommentForFeatureDto,
-    interactor: FromDishka[Interactor[AddCommentDto, CommentOutDto]],
+        body: CreateCommentForFeatureDto,
+        interactor: FromDishka[CreateCommentInteractor],
 ) -> CommentResponseDto:
     request = AddCommentDto(
         user_id=body.user_id, task_id=None, feature_id=body.feature_id, content=body.content
     )
-    response = await interactor.execute(request=request)
-    return dto_mapper(response=response)
-
-
-@comment_router.get(
-    '/{comment_id}',
-    response_model=CommentResponseDto,
-    response_model_exclude_none=True,
-    status_code=status.HTTP_200_OK,
-)
-@inject
-async def get_comment_by_id(
-    comment_id: Annotated[int, Path()],
-    interactor: FromDishka[Interactor[FetchCommentDto, CommentOutDto]],
-) -> CommentResponseDto:
-    request = FetchCommentDto(comment_id=comment_id)
     response = await interactor.execute(request=request)
     return dto_mapper(response=response)
 
@@ -94,10 +81,10 @@ async def get_comment_by_id(
 )
 @inject
 async def get_task_comments(
-    interactor: FromDishka[Interactor[FetchTaskCommentDto, list[CommentOutDto]]],
-    task_id: Annotated[int, Path()],
-    page: int = Query(1, description='Page number', ge=1),
-    page_size: int = Query(10, description='Number of comments per page', ge=1, le=100),
+        interactor: FromDishka[GetCommentsByTaskIdInteractor],
+        task_id: Annotated[int, Path()],
+        page: int = Query(1, description='Page number', ge=1),
+        page_size: int = Query(10, description='Number of comments per page', ge=1, le=100),
 ) -> list[CommentResponseDto]:
     response = await interactor.execute(
         request=FetchTaskCommentDto(page=page, page_size=page_size, task_id=task_id)
@@ -113,10 +100,10 @@ async def get_task_comments(
 )
 @inject
 async def get_feature_comments(
-    interactor: FromDishka[Interactor[FetchFeatureCommentDto, list[CommentOutDto]]],
-    feature_id: Annotated[int, Path()],
-    page: int = Query(1, description='Page number', ge=1),
-    page_size: int = Query(10, description='Number of comments per page', ge=1, le=100),
+        interactor: FromDishka[GetCommentsByFeatureIdInteractor],
+        feature_id: Annotated[int, Path()],
+        page: int = Query(1, description='Page number', ge=1),
+        page_size: int = Query(10, description='Number of comments per page', ge=1, le=100),
 ) -> list[CommentResponseDto]:
     response = await interactor.execute(
         request=FetchFeatureCommentDto(feature_id=feature_id, page=page, page_size=page_size),
@@ -132,9 +119,9 @@ async def get_feature_comments(
 )
 @inject
 async def update_comment(
-    comment_id: Annotated[int, Path()],
-    body: UpdateCommentRequestDto,
-    interactor: FromDishka[Interactor[UpdateCommentDto, CommentOutDto]],
+        comment_id: Annotated[int, Path()],
+        body: UpdateCommentRequestDto,
+        interactor: FromDishka[UpdateCommentInteractor],
 ) -> CommentResponseDto:
     response = await interactor.execute(
         request=UpdateCommentDto(comment_id=comment_id, new_content=body.new_content)
@@ -149,7 +136,7 @@ async def update_comment(
 )
 @inject
 async def delete_comment(
-    comment_id: Annotated[int, Path()],
-    interactor: FromDishka[Interactor[DeleteCommentDto, None]],
+        comment_id: Annotated[int, Path()],
+        interactor: FromDishka[DeleteCommentInteractor],
 ) -> None:
     await interactor.execute(request=DeleteCommentDto(comment_id=comment_id))
