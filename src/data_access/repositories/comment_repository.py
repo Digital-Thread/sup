@@ -50,10 +50,6 @@ class CommentRepository(ICommentRepository):
             CommentMapper.convert_db_model_to_comment_entity(comment) for comment in comments
         ]
 
-    async def fetch_all(self, page: int, page_size: int) -> list[CommentEntity]:
-        query = select(CommentModel)
-        return await self._fetch_comments(query, page, page_size)
-
     async def get_by_task_id(
         self, task_id: TaskId, page: int, page_size: int
     ) -> list[CommentEntity]:

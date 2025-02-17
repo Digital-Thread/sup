@@ -28,13 +28,6 @@ class ICommentRepository(ABC):
         """
         pass
 
-    @abstractmethod
-    async def fetch_all(self, page: int, page_size: int) -> list[CommentEntity]:
-        """
-        Получить список всех комментариев
-        :return: Список сущностей комментариев
-        """
-        pass
 
     @abstractmethod
     async def update_comment(self, comment_id: CommentId, new_content: str) -> CommentEntity:
