@@ -37,40 +37,36 @@ def list_dto_mapper(responses: list[CommentOutDto]) -> list[CommentResponseDto]:
 
 @comment_router.post(
     '/task',
-    response_model=CommentResponseDto,
-    response_model_exclude_none=True,
+    response_model=None,
     status_code=status.HTTP_201_CREATED,
 )
 @inject
 async def add_comment_to_task(
         body: CreateCommentForTaskDto, interactor: FromDishka[CreateCommentInteractor]
-) -> CommentResponseDto:
+) -> None:
     request = AddCommentDto(
         user_id=body.user_id,
         task_id=body.task_id,
         feature_id=None,
         content=body.content,
     )
-    response = await interactor.execute(request=request)
-    return dto_mapper(response=response)
+    await interactor.execute(request=request)
 
 
 @comment_router.post(
     '/feature',
-    response_model=CommentResponseDto,
-    response_model_exclude_none=True,
+    response_model=None,
     status_code=status.HTTP_201_CREATED,
 )
 @inject
 async def add_comment_to_feature(
         body: CreateCommentForFeatureDto,
         interactor: FromDishka[CreateCommentInteractor],
-) -> CommentResponseDto:
+) -> None:
     request = AddCommentDto(
         user_id=body.user_id, task_id=None, feature_id=body.feature_id, content=body.content
     )
-    response = await interactor.execute(request=request)
-    return dto_mapper(response=response)
+    await interactor.execute(request=request)
 
 
 @comment_router.get(
@@ -113,20 +109,18 @@ async def get_feature_comments(
 
 @comment_router.patch(
     '/{comment_id}',
-    response_model=CommentResponseDto,
-    response_model_exclude_none=True,
-    status_code=status.HTTP_200_OK,
+    response_model=None,
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 @inject
 async def update_comment(
         comment_id: Annotated[int, Path()],
         body: UpdateCommentRequestDto,
         interactor: FromDishka[UpdateCommentInteractor],
-) -> CommentResponseDto:
-    response = await interactor.execute(
+) -> None:
+    await interactor.execute(
         request=UpdateCommentDto(comment_id=comment_id, new_content=body.new_content)
     )
-    return dto_mapper(response=response)
 
 
 @comment_router.delete(

@@ -11,11 +11,11 @@ from src.apps.comment.domain import (
 class ICommentRepository(ABC):
 
     @abstractmethod
-    async def save(self, entity: CommentEntity) -> CommentEntity | None:
+    async def save(self, entity: CommentEntity) -> None:
         """
         Сохранить комментарий в базе данных
         :param entity: Сущность комментария для сохранения
-        :return: Сохраненная сущность комментария
+        :return: None
         """
         pass
 
@@ -30,11 +30,11 @@ class ICommentRepository(ABC):
 
 
     @abstractmethod
-    async def update_comment(self, comment: CommentEntity) -> CommentEntity:
+    async def update_comment(self, comment: CommentEntity) -> None:
         """
         Обновить данные комментария по его ID
         :param comment: Сущность комментария с новым контентом
-        :return: Обновленная сущность комментария
+        :return: None
         """
         pass
 

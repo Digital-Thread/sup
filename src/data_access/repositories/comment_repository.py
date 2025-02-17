@@ -22,13 +22,11 @@ class CommentRepository(ICommentRepository):
     def __init__(self, session_factory: AsyncSession) -> None:
         self._session = session_factory
 
-    async def save(self, entity: CommentEntity) -> CommentEntity | None:
+    async def save(self, entity: CommentEntity) -> None:
         comment = CommentMapper.convert_comment_entity_to_db_model(entity)
         self._session.add(comment)
         try:
             await self._session.flush()
-            entity.id = CommentId(comment.id)
-            return entity
         except IntegrityError as err:
             logging.warning(err)
             raise CommentRepositoryError(message='User does not exist')
@@ -65,7 +63,7 @@ class CommentRepository(ICommentRepository):
 
     async def update_comment(
             self, comment: CommentEntity
-    ) -> CommentEntity | None:
+    ) -> None:
         stmt = (
             update(CommentModel)
             .where(CommentModel.id == comment.id)
@@ -75,8 +73,6 @@ class CommentRepository(ICommentRepository):
         )
         await self._session.execute(stmt)
 
-        return comment
-
     async def delete_comment(self, comment_id: CommentId) -> None:
         result = await self._session.execute(
             select(CommentModel).where(CommentModel.id == comment_id)
@@ -85,4 +81,3 @@ class CommentRepository(ICommentRepository):
         if comment is None:
             raise CommentRepositoryError()
         await self._session.delete(comment)
-        return None
