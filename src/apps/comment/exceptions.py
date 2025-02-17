@@ -9,6 +9,9 @@ class BaseCommentException(ApplicationException):
 
     message: str = 'A domain error occurred'
 
+    def __str__(self) -> str:
+        return self.message
+
 
 @dataclass
 class CommentNotAssociatedError(BaseCommentException):
@@ -34,3 +37,10 @@ class InvalidContentError(BaseCommentException):
     """Выбрасывается, когда контент комментария некорректный"""
 
     message: str = 'Content must be a non-empty string.'
+
+
+@dataclass
+class IDAlreadyExistsError(BaseCommentException):
+    """Выбрасывается, когда id комментария пытаются установить повторно"""
+
+    message: str = 'The comment ID has already been set.'

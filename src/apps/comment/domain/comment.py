@@ -1,7 +1,12 @@
 from datetime import datetime, timezone
 from typing import Self
 
-from src.apps.comment import CommentAssociatedWithBothError, CommentNotAssociatedError, InvalidContentError
+from src.apps.comment import (
+    CommentAssociatedWithBothError,
+    CommentNotAssociatedError,
+    InvalidContentError,
+    IDAlreadyExistsError,
+)
 
 from .types_ids import (
     AuthorId,
@@ -32,7 +37,7 @@ class CommentEntity:
         self.content = content
         self.created_at = datetime.now(timezone.utc)
         self.updated_at = datetime.now(timezone.utc)
-    
+
     @property
     def id(self) -> CommentId:
         return self._id
@@ -40,9 +45,9 @@ class CommentEntity:
     @id.setter
     def id(self, _id: CommentId) -> None:
         if self._id is not None:
-            raise AttributeError('Идентификатор комментария уже установлен')
+            raise IDAlreadyExistsError()
         self._id = _id
-    
+
     @property
     def content(self) -> str:
         return self._content

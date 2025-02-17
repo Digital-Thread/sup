@@ -13,6 +13,7 @@ from .exceptions import (
     CommentNotAssociatedError,
     CommentNotFoundError,
     InvalidContentError,
+    IDAlreadyExistsError,
 )
 from .interactors import (
     AddCommentInteractor,
@@ -30,6 +31,7 @@ __all__ = (
     'InvalidContentError',
     'CommentNotAssociatedError',
     'CommentAssociatedWithBothError',
+    'IDAlreadyExistsError',
     'AddCommentInteractor',
     'AddCommentDto',
     'CommentNotFoundError',
