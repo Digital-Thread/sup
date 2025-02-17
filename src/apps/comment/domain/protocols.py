@@ -2,7 +2,6 @@ import abc
 from typing import Protocol
 
 from .comment import CommentEntity
-from .event import Event
 from .types_ids import CommentId, Content, FeatureId, TaskId
 
 
@@ -85,9 +84,3 @@ class Interactor[Request, Response](Protocol):
     @abc.abstractmethod
     async def execute(self, request: Request) -> Response:
         raise NotImplementedError
-
-
-class IEventHandler(Protocol):
-    @abc.abstractmethod
-    async def handle(self, events: list[Event]) -> None:
-        pass

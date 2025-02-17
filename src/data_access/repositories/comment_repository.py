@@ -22,7 +22,6 @@ class CommentRepository(ICommentRepository):
 
     def __init__(self, session_factory: AsyncSession) -> None:
         self._session = session_factory
-        # self._event = event_handler
 
     async def save(self, entity: CommentEntity) -> CommentEntity | None:
         comment = CommentMapper.convert_comment_entity_to_db_model(entity)
@@ -30,8 +29,6 @@ class CommentRepository(ICommentRepository):
         try:
             await self._session.flush()
             entity.comment_id = CommentId(comment.id)
-            entity.register_creation_event()
-            # await self._event.handle(entity.pull_events())
             return entity
         except IntegrityError as err:
             logging.warning(err)

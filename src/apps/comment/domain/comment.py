@@ -1,11 +1,9 @@
-from abc import ABC
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Self
 
 from src.apps.comment import CommentAssociatedWithBothError, CommentNotAssociatedError
 
-from .event import CommentCreatedEvent, CommentDeletedEvent, CommentUpdatedEvent, Event
 from .types_ids import (
     AuthorId,
     CommentId,
@@ -17,33 +15,8 @@ from .types_ids import (
 )
 
 
-class Entity(ABC):
-    pass
-
-
 @dataclass
-class AggregateRoot(Entity, ABC):
-    _events: list[Event] = field(
-        default_factory=list, init=False, repr=False, hash=False, compare=False
-    )
-
-    def record_event(self: Self, event: Event) -> None:
-        self._events.append(event)
-
-    def get_events(self: Self) -> list[Event]:
-        return self._events
-
-    def clear_events(self: Self) -> None:
-        self._events = []
-
-    def pull_events(self: Self) -> list[Event]:
-        events = self.get_events().copy()
-        self.clear_events()
-        return events
-
-
-@dataclass
-class CommentEntity(AggregateRoot):
+class CommentEntity:
     comment_id: CommentId | None
     user_id: AuthorId
     task_id: TaskId | None
@@ -54,11 +27,11 @@ class CommentEntity(AggregateRoot):
 
     @classmethod
     def create_for_entity(
-        cls,
-        task_id: TaskId | None,
-        feature_id: FeatureId | None,
-        user_id: AuthorId,
-        content: Content,
+            cls,
+            task_id: TaskId | None,
+            feature_id: FeatureId | None,
+            user_id: AuthorId,
+            content: Content,
     ) -> 'Self':
         if not task_id and not feature_id:
             raise CommentNotAssociatedError()
@@ -76,27 +49,6 @@ class CommentEntity(AggregateRoot):
 
         return instance
 
-    def register_creation_event(self: Self) -> None:
-        if self.comment_id is not None:
-            self.record_event(
-                CommentCreatedEvent(
-                    comment_id=self.comment_id,
-                    task_id=self.task_id,
-                    feature_id=self.feature_id,
-                    user_id=self.user_id,
-                    content=self.content,
-                    created_at=self.created_at,
-                )
-            )
-
     def update_content(self: Self, new_content: Content) -> None:
         self.content = new_content
         self.updated_at = UpdatedAt(datetime.now())
-        self.record_event(CommentUpdatedEvent(self.comment_id, new_content))
-
-    def delete(self: Self) -> None:
-        self.record_event(
-            CommentDeletedEvent(
-                comment_id=self.comment_id, task_id=self.task_id, feature_id=self.feature_id
-            )
-        )
