@@ -14,6 +14,8 @@ from .exceptions import (
     CommentNotFoundError,
     InvalidContentError,
     IDAlreadyExistsError,
+    BaseCommentException,
+    CommentRepositoryError,
 )
 from .interactors.create_comment import CreateCommentInteractor
 from .interactors.delete_comment import DeleteCommentInteractor
@@ -44,4 +46,6 @@ __all__ = (
     'ICommentRepository',
     'GetCommentsByFeatureIdInteractor',
     'GetCommentsByTaskIdInteractor',
+    'BaseCommentException',
+    'CommentRepositoryError',
 )

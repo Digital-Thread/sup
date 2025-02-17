@@ -44,3 +44,10 @@ class IDAlreadyExistsError(BaseCommentException):
     """Выбрасывается, когда id комментария пытаются установить повторно"""
 
     message: str = 'The comment ID has already been set.'
+
+
+@dataclass
+class CommentRepositoryError(BaseCommentException):
+    """Выбрасывается, когда возникла ошибка при работе с БД"""
+
+    message: str = 'An error occurred while working with the database'

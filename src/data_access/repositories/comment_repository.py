@@ -5,7 +5,7 @@ from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.apps.comment import CommentNotFoundError
+from src.apps.comment import CommentRepositoryError
 from src.apps.comment.domain import (
     CommentEntity,
     CommentId,
@@ -31,15 +31,16 @@ class CommentRepository(ICommentRepository):
             return entity
         except IntegrityError as err:
             logging.warning(err)
-            raise ValueError('User does not exist')
+            raise CommentRepositoryError(message='User does not exist')
 
     async def get_by_id(self, comment_id: CommentId) -> CommentEntity | None:
         stmt = select(CommentModel).where(CommentModel.id == comment_id)
         result = await self._session.execute(stmt)
         comment: CommentModel = result.scalar_one_or_none()
-        if comment is None:
-            raise CommentNotFoundError()
-        return CommentMapper.convert_db_model_to_comment_entity(comment)
+        if comment:
+            return CommentMapper.convert_db_model_to_comment_entity(comment)
+
+        return None
 
     async def _fetch_comments(self, query: Any, page: int, page_size: int) -> list[CommentEntity]:
         offset = (page - 1) * page_size
@@ -51,13 +52,13 @@ class CommentRepository(ICommentRepository):
         ]
 
     async def get_by_task_id(
-        self, task_id: TaskId, page: int, page_size: int
+            self, task_id: TaskId, page: int, page_size: int
     ) -> list[CommentEntity]:
         query = select(CommentModel).where(CommentModel.task_id == task_id)
         return await self._fetch_comments(query, page, page_size)
 
     async def get_by_feature_id(
-        self, feature_id: FeatureId, page: int, page_size: int
+            self, feature_id: FeatureId, page: int, page_size: int
     ) -> list[CommentEntity]:
         query = select(CommentModel).where(CommentModel.feature_id == feature_id)
         return await self._fetch_comments(query, page, page_size)
@@ -84,6 +85,6 @@ class CommentRepository(ICommentRepository):
         )
         comment = result.scalar_one_or_none()
         if comment is None:
-            raise CommentNotFoundError()
+            raise CommentRepositoryError()
         await self._session.delete(comment)
         return None
