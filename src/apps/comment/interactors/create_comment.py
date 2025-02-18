@@ -1,7 +1,11 @@
-from src.apps.comment.exceptions import BaseCommentException, CommentRepositoryError, FeatureOrTaskDoesNotExistsError
 from src.apps.comment import AddCommentDto
-from src.apps.comment.mapper import CommentMapper
+from src.apps.comment.exceptions import (
+    BaseCommentException,
+    CommentRepositoryError,
+    FeatureOrTaskDoesNotExistsError,
+)
 from src.apps.comment.interactors.base_interactor import BaseInteractor
+from src.apps.comment.mapper import CommentMapper
 from src.apps.comment.repository import ICommentRepository
 
 
