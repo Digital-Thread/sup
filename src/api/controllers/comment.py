@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from dishka import FromDishka
-from dishka.integrations.fastapi import inject
+from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter, Path, Query, status
 
 from src.api.dtos import (
@@ -24,7 +24,7 @@ from src.apps.comment import (
 )
 from src.apps.comment.dtos import FetchFeatureCommentDto
 
-comment_router = APIRouter()
+comment_router = APIRouter(route_class=DishkaRoute)
 
 
 def dto_mapper(response: CommentOutDto) -> CommentResponseDto:
@@ -40,7 +40,6 @@ def list_dto_mapper(responses: list[CommentOutDto]) -> list[CommentResponseDto]:
     response_model=None,
     status_code=status.HTTP_201_CREATED,
 )
-@inject
 async def add_comment_to_task(
         body: CreateCommentForTaskDto, interactor: FromDishka[CreateCommentInteractor]
 ) -> None:
@@ -58,7 +57,6 @@ async def add_comment_to_task(
     response_model=None,
     status_code=status.HTTP_201_CREATED,
 )
-@inject
 async def add_comment_to_feature(
         body: CreateCommentForFeatureDto,
         interactor: FromDishka[CreateCommentInteractor],
@@ -75,7 +73,6 @@ async def add_comment_to_feature(
     response_model_exclude_none=True,
     status_code=status.HTTP_200_OK,
 )
-@inject
 async def get_task_comments(
         interactor: FromDishka[GetCommentsByTaskIdInteractor],
         task_id: Annotated[int, Path()],
@@ -94,7 +91,6 @@ async def get_task_comments(
     response_model_exclude_none=True,
     status_code=status.HTTP_200_OK,
 )
-@inject
 async def get_feature_comments(
         interactor: FromDishka[GetCommentsByFeatureIdInteractor],
         feature_id: Annotated[int, Path()],
@@ -112,7 +108,6 @@ async def get_feature_comments(
     response_model=None,
     status_code=status.HTTP_204_NO_CONTENT,
 )
-@inject
 async def update_comment(
         comment_id: Annotated[int, Path()],
         body: UpdateCommentRequestDto,
@@ -128,7 +123,6 @@ async def update_comment(
     response_model=None,
     status_code=status.HTTP_204_NO_CONTENT,
 )
-@inject
 async def delete_comment(
         comment_id: Annotated[int, Path()],
         interactor: FromDishka[DeleteCommentInteractor],
