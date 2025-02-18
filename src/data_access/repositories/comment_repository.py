@@ -1,7 +1,7 @@
 import logging
 from typing import Any
 
-from sqlalchemy import select, update
+from sqlalchemy import select, update, exists
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -15,7 +15,7 @@ from src.apps.comment.domain import (
 )
 from src.apps.comment.repository import ICommentRepository
 from src.data_access.mappers import CommentMapper
-from src.data_access.models import CommentModel
+from src.data_access.models import CommentModel, FeatureModel, TaskModel
 
 
 class CommentRepository(ICommentRepository):
@@ -83,3 +83,12 @@ class CommentRepository(ICommentRepository):
         if comment is None:
             raise CommentRepositoryError()
         await self._session.delete(comment)
+
+    async def is_task_or_feature_exists(self, comment_entity: CommentEntity) -> bool:
+        parent_id, model = (comment_entity.task_id, TaskModel) if comment_entity.task_id else (
+        comment_entity.feature_id, FeatureModel)
+        stmt = select(exists().where(model.id == parent_id))
+        result = await self._session.execute(stmt)
+
+        exists_ = result.scalar()
+        return exists_

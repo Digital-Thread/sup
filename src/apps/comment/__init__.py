@@ -17,6 +17,7 @@ from .exceptions import (
     IDAlreadyExistsError,
     BaseCommentException,
     CommentRepositoryError,
+    FeatureOrTaskDoesNotExistsError,
 )
 from .interactors.create_comment import CreateCommentInteractor
 from .interactors.delete_comment import DeleteCommentInteractor
@@ -49,5 +50,6 @@ __all__ = (
     'GetCommentsByTaskIdInteractor',
     'BaseCommentException',
     'CommentRepositoryError',
+    'FeatureOrTaskDoesNotExistsError',
     'UserInfo',
 )

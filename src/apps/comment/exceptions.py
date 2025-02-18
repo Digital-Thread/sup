@@ -28,6 +28,13 @@ class CommentAssociatedWithBothError(BaseCommentException):
 
 
 @dataclass
+class FeatureOrTaskDoesNotExistsError(BaseCommentException):
+    """Выбрасывается, когда комментарий создаётся для несуществующей фичи или задачи"""
+
+    message: str = 'Comment must be associated with an existing Task or a Feature.'
+
+
+@dataclass
 class CommentNotFoundError(BaseCommentException):
     message: str = 'Comment cannot be found.'
 

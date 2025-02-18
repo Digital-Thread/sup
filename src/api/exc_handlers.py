@@ -7,6 +7,7 @@ from src.apps.comment import (
     CommentRepositoryError,
     CommentNotAssociatedError,
     CommentAssociatedWithBothError,
+    FeatureOrTaskDoesNotExistsError,
 )
 from src.apps import ApplicationException
 from src.apps.auth.exceptions import (
@@ -133,6 +134,7 @@ exception_status_codes = {
     CommentNotAssociatedError: status.HTTP_400_BAD_REQUEST,
     CommentRepositoryError: status.HTTP_400_BAD_REQUEST,
     CommentAssociatedWithBothError: status.HTTP_400_BAD_REQUEST,
+    FeatureOrTaskDoesNotExistsError: status.HTTP_400_BAD_REQUEST,
     CommentNotFoundError: status.HTTP_404_NOT_FOUND,
 }
 

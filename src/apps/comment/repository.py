@@ -29,7 +29,6 @@ class ICommentRepository(ABC):
         """
         pass
 
-
     @abstractmethod
     async def update_comment(self, comment: CommentEntity) -> None:
         """
@@ -72,4 +71,8 @@ class ICommentRepository(ABC):
         :param page_size: Размер страницы
         :return: Список сущностей комментариев
         """
+        pass
+
+    @abstractmethod
+    async def is_task_or_feature_exists(self, comment_entity: CommentEntity) -> bool:
         pass
