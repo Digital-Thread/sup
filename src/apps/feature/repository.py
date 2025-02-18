@@ -32,6 +32,10 @@ class IFeatureRepository(ABC):
         pass
 
     @abstractmethod
+    async def delete_comments(self, feature_id: FeatureId) -> None:
+        pass
+
+    @abstractmethod
     async def get_by_workspace_id(
         self, workspace_id: WorkspaceId, query: FeatureListQuery
     ) -> list[FeatureInWorkspaceOutputDTO]:

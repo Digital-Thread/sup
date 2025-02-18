@@ -9,3 +9,5 @@ class DeleteFeatureInteractor(BaseInteractor):
             await self._repository.delete(feature_id=feature_id)
         except FeatureRepositoryError as e:
             raise FeatureDeleteError(context=e) from None
+        else:
+            await self._repository.delete_comments(feature_id=feature_id)
