@@ -32,6 +32,10 @@ class ITaskRepository(ABC):
         pass
 
     @abstractmethod
+    async def delete_comments(self, task_id: TaskId) -> None:
+        pass
+
+    @abstractmethod
     async def get_by_feature_id(
         self, feature_id: FeatureId, query: TaskListQuery
     ) -> list[TaskInFeatureOutputDTO]:

@@ -19,6 +19,7 @@ from src.data_access.models import (
     TagModel,
     TaskModel,
     WorkspaceMemberModel,
+    CommentModel,
 )
 from src.data_access.models.task import Priority, Status
 
@@ -31,8 +32,8 @@ class TaskRepository(ITaskRepository):
         self.mapper = TaskMapper()
 
     async def _get_tags(
-        self,
-        list_ids: list[TagId] | None,
+            self,
+            list_ids: list[TagId] | None,
     ) -> list[TagModel]:
         if list_ids:
             query = select(TagModel).where(TagModel.id.in_(list_ids))
@@ -116,8 +117,11 @@ class TaskRepository(ITaskRepository):
         if result.rowcount == 0:
             raise TaskRepositoryError(message=f'Не найдена задача с id: {task_id}')
 
+    async def delete_comments(self, task_id: TaskId) -> None:
+        await self._session.execute(delete(CommentModel).where(CommentModel.task_id == task_id))
+
     async def get_by_feature_id(
-        self, feature_id: FeatureId, query: TaskListQuery
+            self, feature_id: FeatureId, query: TaskListQuery
     ) -> list[TaskInFeatureOutputDTO] | None:
 
         stmt = (
@@ -141,8 +145,8 @@ class TaskRepository(ITaskRepository):
         return [self.mapper.map_model_to_for_feature_dto(t) for t in tasks] if tasks else None
 
     def _make_stmt_for_validation(
-        self,
-        attrs: TaskAttrsWithWorkspace,
+            self,
+            attrs: TaskAttrsWithWorkspace,
     ) -> 'Select':
         feature_subq = (
             select(func.count())
@@ -196,8 +200,8 @@ class TaskRepository(ITaskRepository):
         return stmt
 
     async def validate_workspace_consistency(
-        self,
-        attrs: TaskAttrsWithWorkspace,
+            self,
+            attrs: TaskAttrsWithWorkspace,
     ) -> None:
         """
         Проверяет, что:

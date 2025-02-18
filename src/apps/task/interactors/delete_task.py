@@ -9,3 +9,5 @@ class DeleteTaskInteractor(BaseInteractor):
             await self._repository.delete(task_id=task_id)
         except TaskRepositoryError as e:
             raise TaskDeleteError(context=e) from None
+        else:
+            await self._repository.delete_comments(task_id=task_id)
