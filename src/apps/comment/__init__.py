@@ -7,6 +7,7 @@ from .dtos import (
     FetchFeatureCommentDto,
     FetchTaskCommentDto,
     UpdateCommentDto,
+    UserInfo,
 )
 from .exceptions import (
     CommentAssociatedWithBothError,
@@ -48,4 +49,5 @@ __all__ = (
     'GetCommentsByTaskIdInteractor',
     'BaseCommentException',
     'CommentRepositoryError',
+    'UserInfo',
 )

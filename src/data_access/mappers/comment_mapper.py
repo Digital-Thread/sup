@@ -1,3 +1,4 @@
+from src.apps.comment import CommentOutDto, UserInfo
 from src.apps.comment.domain import (
     AuthorId,
     CommentEntity,
@@ -43,3 +44,18 @@ class CommentMapper:
         comment.created_at = model.created_at
         comment.updated_at = model.updated_at
         return comment
+
+    @staticmethod
+    def convert_db_model_to_output_dto(model: CommentModel) -> CommentOutDto:
+        dto = CommentOutDto(
+            comment_id=model.id,
+            user=UserInfo(
+                user_id=model.user.id,
+                avatar=model.user.avatar,
+                fullname=f'{model.user.first_name} {model.user.last_name}'
+            ),
+            content=model.content,
+            created_at=model.created_at,
+            updated_at=model.updated_at,
+        )
+        return dto

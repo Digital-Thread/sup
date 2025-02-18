@@ -4,8 +4,9 @@ from typing import Any
 from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
-from src.apps.comment import CommentRepositoryError
+from src.apps.comment import CommentRepositoryError, CommentOutDto
 from src.apps.comment.domain import (
     CommentEntity,
     CommentId,
@@ -40,25 +41,26 @@ class CommentRepository(ICommentRepository):
 
         return None
 
-    async def _fetch_comments(self, query: Any, page: int, page_size: int) -> list[CommentEntity]:
+    async def _fetch_comments(self, query: Any, page: int, page_size: int) -> list[CommentOutDto]:
         offset = (page - 1) * page_size
         stmt = query.offset(offset).limit(page_size)
         result = await self._session.execute(stmt)
         comments = result.scalars().all()
         return [
-            CommentMapper.convert_db_model_to_comment_entity(comment) for comment in comments
+            CommentMapper.convert_db_model_to_output_dto(comment) for comment in comments
         ]
 
     async def get_by_task_id(
             self, task_id: TaskId, page: int, page_size: int
-    ) -> list[CommentEntity]:
-        query = select(CommentModel).where(CommentModel.task_id == task_id)
+    ) -> list[CommentOutDto]:
+        query = select(CommentModel).where(CommentModel.task_id == task_id).options(selectinload(CommentModel.user))
         return await self._fetch_comments(query, page, page_size)
 
     async def get_by_feature_id(
             self, feature_id: FeatureId, page: int, page_size: int
-    ) -> list[CommentEntity]:
-        query = select(CommentModel).where(CommentModel.feature_id == feature_id)
+    ) -> list[CommentOutDto]:
+        query = select(CommentModel).where(CommentModel.feature_id == feature_id).options(
+            selectinload(CommentModel.user))
         return await self._fetch_comments(query, page, page_size)
 
     async def update_comment(

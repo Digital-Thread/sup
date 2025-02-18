@@ -2,7 +2,6 @@ from src.apps.comment.repository import ICommentRepository
 from src.apps.comment.dtos import FetchTaskCommentDto, CommentOutDto
 from src.apps.comment.domain import TaskId
 from src.apps.comment.interactors.base_interactor import BaseInteractor
-from src.apps.comment.mapper import CommentMapper
 
 
 class GetCommentsByTaskIdInteractor(BaseInteractor):
@@ -16,4 +15,4 @@ class GetCommentsByTaskIdInteractor(BaseInteractor):
             page=request.page,
             page_size=request.page_size,
         )
-        return [CommentMapper.entity_to_dto(comment) for comment in comments]
+        return comments

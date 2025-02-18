@@ -6,6 +6,7 @@ from src.apps.comment.domain import (
     TaskId,
     FeatureId,
 )
+from src.apps.comment.dtos import CommentOutDto
 
 
 class ICommentRepository(ABC):
@@ -50,7 +51,7 @@ class ICommentRepository(ABC):
     @abstractmethod
     async def get_by_task_id(
             self, task_id: TaskId, page: int, page_size: int
-    ) -> list[CommentEntity]:
+    ) -> list[CommentOutDto]:
         """
         Получить список комментариев для задачи
         :param task_id: Идентификатор задачи
@@ -63,7 +64,7 @@ class ICommentRepository(ABC):
     @abstractmethod
     async def get_by_feature_id(
             self, feature_id: FeatureId, page: int, page_size: int
-    ) -> list[CommentEntity]:
+    ) -> list[CommentOutDto]:
         """
         Получить список комментариев для фичи
         :param feature_id: Идентификатор фичи

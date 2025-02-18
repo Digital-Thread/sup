@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from .task import TaskModel
     from .workspace_models.user_workspace_role import UserWorkspaceRoleModel
     from .workspace_models.workspace import WorkspaceModel
+    from .comment import CommentModel
 
 
 class UserModel(Base, DatetimeFieldsMixin, UUIDPkMixin):
@@ -67,4 +68,7 @@ class UserModel(Base, DatetimeFieldsMixin, UUIDPkMixin):
     )
     participations: Mapped[list['ParticipantModel']] = relationship(
         'ParticipantModel', back_populates='user', lazy='raise_on_sql'
+    )
+    comments: Mapped[list['CommentModel']] = relationship(
+        'CommentModel', back_populates='user', foreign_keys='CommentModel.user_id'
     )
