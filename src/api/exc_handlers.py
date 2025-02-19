@@ -1,6 +1,14 @@
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
+from src.apps.comment import (
+    InvalidContentError,
+    CommentNotFoundError,
+    CommentRepositoryError,
+    CommentNotAssociatedError,
+    CommentAssociatedWithBothError,
+    FeatureOrTaskDoesNotExistsError,
+)
 from src.apps import ApplicationException
 from src.apps.auth.exceptions import (
     InvalidTokenError,
@@ -122,6 +130,12 @@ exception_status_codes = {
     WorkspaceForProjectNotFound: status.HTTP_404_NOT_FOUND,
     ProjectException: status.HTTP_400_BAD_REQUEST,
     ProjectNotFound: status.HTTP_404_NOT_FOUND,
+    InvalidContentError: status.HTTP_400_BAD_REQUEST,
+    CommentNotAssociatedError: status.HTTP_400_BAD_REQUEST,
+    CommentRepositoryError: status.HTTP_400_BAD_REQUEST,
+    CommentAssociatedWithBothError: status.HTTP_400_BAD_REQUEST,
+    FeatureOrTaskDoesNotExistsError: status.HTTP_400_BAD_REQUEST,
+    CommentNotFoundError: status.HTTP_404_NOT_FOUND,
 }
 
 
