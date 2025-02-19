@@ -25,15 +25,15 @@ from src.apps.user.services import (
 from src.apps.user.services.password_reset_user_service import PasswordResetUserService
 from src.apps.user.services.remove_user_service import RemoveUserService
 from src.apps.workspace.domain.entities.workspace_invite import StatusInvite
-from src.apps.workspace.dtos.workspace_dtos import CreateWorkspaceAppDTO
+from src.apps.workspace.dtos.workspace_dtos import CreateWorkspaceDTO
 from src.apps.workspace.dtos.workspace_invite_dtos import UpdateWorkspaceInviteAppDTO
-from src.apps.workspace.interactors.workspace_invite_interactors import (
-    GetWorkspaceIdByInviteCodeInteractor,
-    UpdateWorkspaceInviteInteractor,
-)
 from src.apps.workspace.interactors.workspace_interactors import CreateWorkspaceInteractor
 from src.apps.workspace.interactors.workspace_interactors.add_member_in_workspace import (
     AddMemberInWorkspaceInteractor,
+)
+from src.apps.workspace.interactors.workspace_invite_interactors import (
+    GetWorkspaceIdByInviteCodeInteractor,
+    UpdateWorkspaceInviteInteractor,
 )
 
 router = APIRouter(route_class=DishkaRoute)
@@ -182,7 +182,7 @@ async def create_user_by_admin(
     user = await authenticate_and_create_tokens(request, get_user_service)
     await authorize_service.get_access_admin(user)
     user_id, username, user_email, user_password = await create_user_service.create_user_by_admin(create_user_dto)
-    await create_workspace_interactor.execute(CreateWorkspaceAppDTO(
+    await create_workspace_interactor.execute(CreateWorkspaceDTO(
         owner_id=user_id,
         name=username
     ))
@@ -199,22 +199,18 @@ async def create_user_by_invite(
     update_status_invite_interactor: FromDishka[UpdateWorkspaceInviteInteractor],
     invite_token: UUID = Path(...),
 ) -> UserResponseDTO:
-    workspace_id_for_invite = await workspace_invite_interactor.execute(invite_token)
+    workspace_id, invite_id = await workspace_invite_interactor.execute(invite_token)
     new_user = await create_user_service.create_user(dto=create_user_dto)
-
     await workspace_interactor.execute(
-        CreateWorkspaceAppDTO(
+        CreateWorkspaceDTO(
             name=f'{new_user.first_name} {new_user.last_name}',
             owner_id=new_user.id,
         )
     )
-    await add_member_interactor.execute(workspace_id_for_invite[0], new_user.id)
+    await add_member_interactor.execute(workspace_id, new_user.id)
     await update_status_invite_interactor.execute(
-        workspace_id_for_invite[1],
-        workspace_id_for_invite[0],
-        UpdateWorkspaceInviteAppDTO(status=StatusInvite.USED),
+        UpdateWorkspaceInviteAppDTO(id_=invite_id, workspace_id=workspace_id, status=StatusInvite.USED),
     )
-
     return UserResponseDTO.model_validate(new_user)
 
 
@@ -226,7 +222,7 @@ async def create_user_with_workspace(
 ) -> UserResponseDTO:
     new_user = await create_user_service.create_user(dto=create_user_dto)
     await workspace_interactor.execute(
-        CreateWorkspaceAppDTO(
+        CreateWorkspaceDTO(
             name=f'{new_user.first_name} {new_user.last_name}',
             owner_id=new_user.id,
         )

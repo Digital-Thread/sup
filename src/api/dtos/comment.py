@@ -3,6 +3,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
+from src.apps.comment import UserInfo
+
 
 class BaseCommentDto(BaseModel):
     user_id: UUID
@@ -21,10 +23,10 @@ class UpdateCommentRequestDto(BaseModel):
     new_content: str
 
 
-class CommentResponseDto(BaseCommentDto):
-    id: int
-    task_id: int | None
-    feature_id: int | None
+class CommentResponseDto(BaseModel):
+    comment_id: int
+    user: UserInfo
+    content: str
     created_at: datetime.datetime
     updated_at: datetime.datetime
     model_config = ConfigDict(

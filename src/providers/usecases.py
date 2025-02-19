@@ -1,24 +1,13 @@
 from dishka import Provider, Scope, provide
 
 from src.apps.comment import (
-    AddCommentDto,
-    AddCommentInteractor,
-    CommentOutDto,
-    CommentPaginationDto,
-    DeleteCommentDto,
+    CreateCommentInteractor,
     DeleteCommentInteractor,
-    FetchAllCommentsInteractor,
-    FetchAllFeatureCommentsInteractor,
-    FetchAllTaskCommentsInteractor,
-    FetchCommentDto,
-    FetchCommentInteractor,
-    FetchFeatureCommentDto,
-    FetchTaskCommentDto,
-    UpdateCommentDto,
     UpdateCommentInteractor,
+    GetCommentsByTaskIdInteractor,
+    GetCommentsByFeatureIdInteractor,
 )
-from src.apps.comment.domain import Interactor
-from src.apps.feature.interactors import (
+from src.apps.feature import (
     CreateFeatureInteractor,
     DeleteFeatureInteractor,
     GetFeaturesByWorkspaceInteractor,
@@ -51,7 +40,7 @@ from src.apps.workspace.interactors.role_interactors import (
     CreateRoleInteractor,
     DeleteRoleInteractor,
     GetRoleByIdInteractor,
-    GetRoleByWorkspaceInteractor,
+    GetRolesByWorkspaceInteractor,
     UpdateRoleInteractor,
     AssignRoleToWorkspaceMemberInteractor,
     RemoveRoleFromWorkspaceMemberInteractor
@@ -63,14 +52,6 @@ from src.apps.workspace.interactors.tag_interactors import (
     GetTagByWorkspaceInteractor,
     UpdateTagInteractor,
 )
-from src.apps.workspace.interactors.workspace_interactors.get_workspace_members import GetWorkspaceMembersInteractor
-from src.apps.workspace.interactors.workspace_invite_interactors import (
-    CreateWorkspaceInviteInteractor,
-    DeleteWorkspaceInviteInteractor,
-    GetWorkspaceIdByInviteCodeInteractor,
-    GetWorkspaceInviteByWorkspaceInteractor,
-    UpdateWorkspaceInviteInteractor,
-)
 from src.apps.workspace.interactors.workspace_interactors import (
     AddMemberInWorkspaceInteractor,
     CreateWorkspaceInteractor,
@@ -79,30 +60,24 @@ from src.apps.workspace.interactors.workspace_interactors import (
     GetWorkspaceByMemberInteractor,
     UpdateWorkspaceInteractor,
 )
+from src.apps.workspace.interactors.workspace_interactors.get_workspace_members import GetWorkspaceMembersInteractor
+from src.apps.workspace.interactors.workspace_invite_interactors import (
+    CreateWorkspaceInviteInteractor,
+    DeleteWorkspaceInviteInteractor,
+    GetWorkspaceIdByInviteCodeInteractor,
+    GetWorkspaceInvitesByWorkspaceInteractor,
+    UpdateWorkspaceInviteInteractor,
+)
 
 
-class InteractorProvider(Provider):
+class CommentInteractorProvider(Provider):
     scope = Scope.REQUEST
-    comment = provide(AddCommentInteractor, provides=Interactor[AddCommentDto, CommentOutDto])
-    fetch_comment = provide(
-        FetchCommentInteractor, provides=Interactor[FetchCommentDto, CommentOutDto]
-    )
-    fetch_comments = provide(
-        FetchAllCommentsInteractor, provides=Interactor[CommentPaginationDto, list[CommentOutDto]]
-    )
-    update_comment = provide(
-        UpdateCommentInteractor, provides=Interactor[UpdateCommentDto, CommentOutDto]
-    )
-    delete_comment = provide(DeleteCommentInteractor, provides=Interactor[DeleteCommentDto, None])
-    fetch_task_comments = provide(
-        FetchAllTaskCommentsInteractor,
-        provides=Interactor[FetchTaskCommentDto, list[CommentOutDto]],
-    )
 
-    fetch_feature_comments = provide(
-        FetchAllFeatureCommentsInteractor,
-        provides=Interactor[FetchFeatureCommentDto, list[CommentOutDto]],
-    )
+    create_comment = provide(CreateCommentInteractor)
+    get_comments_by_task_id = provide(GetCommentsByTaskIdInteractor)
+    get_comments_by_feature_id = provide(GetCommentsByFeatureIdInteractor)
+    update_comment = provide(UpdateCommentInteractor)
+    delete_comment = provide(DeleteCommentInteractor)
 
 
 class WorkspaceUseCaseProvider(Provider):
@@ -122,7 +97,7 @@ class RoleUseCaseProvider(Provider):
 
     create_role = provide(CreateRoleInteractor)
     get_role_by_id = provide(GetRoleByIdInteractor)
-    get_role_by_workspace = provide(GetRoleByWorkspaceInteractor)
+    get_role_by_workspace = provide(GetRolesByWorkspaceInteractor)
     update_role = provide(UpdateRoleInteractor)
     delete_role = provide(DeleteRoleInteractor)
     assign_role_to_user = provide(AssignRoleToWorkspaceMemberInteractor)
@@ -154,7 +129,7 @@ class WorkspaceInviteUseCaseProvider(Provider):
 
     create_workspace_invite = provide(CreateWorkspaceInviteInteractor)
     get_workspace_invite_by_id = provide(GetWorkspaceIdByInviteCodeInteractor)
-    get_workspace_invite_by_workspace = provide(GetWorkspaceInviteByWorkspaceInteractor)
+    get_workspace_invite_by_workspace = provide(GetWorkspaceInvitesByWorkspaceInteractor)
     update_workspace_invite = provide(UpdateWorkspaceInviteInteractor)
     delete_workspace_invite = provide(DeleteWorkspaceInviteInteractor)
 

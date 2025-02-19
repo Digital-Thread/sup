@@ -15,7 +15,7 @@ class GetWorkspaceIdByInviteCodeInteractor:
 
     async def execute(self, code: UUID) -> tuple[WorkspaceId, InviteId]:
         try:
-            workspace_and_invite_ids = await self._workspaceInvite_repository.find_by_code(code)
+            workspace_and_invite_ids = await self._workspaceInvite_repository.get_by_code(code)
         except WorkspaceInviteNotFound:
             raise ValueError(f'Ссылка приглашения не найдена')
         else:

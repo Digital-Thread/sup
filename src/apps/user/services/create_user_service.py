@@ -8,9 +8,9 @@ from typing import Optional
 import redis.asyncio as redis
 from passlib.context import CryptContext
 
-from src.apps.user.domain.entities import User
+from src.apps.user.domain.entity import User
 from src.apps.user.dtos import UserCreateDTO
-from src.apps.user.dtos.dtos import AdminCreateUserDTO
+from src.apps.user.dtos import AdminCreateUserDTO
 from src.apps.user.exceptions import (
     LengthUserPasswordException,
     TokenActivationExpire,
@@ -19,7 +19,7 @@ from src.apps.user.exceptions import (
     UserPermissionError,
 )
 from src.apps.user.protocols import SendMailServiceProtocol
-from src.apps.user.repositories import IUserRepository
+from src.apps.user.repository import IUserRepository
 from src.config import RedisConfig, SMTPConfig
 
 

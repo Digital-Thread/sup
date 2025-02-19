@@ -16,7 +16,7 @@ class StatusInvite(Enum):
 class WorkspaceInviteEntity:
     EXPIRATION_DAYS = 7
 
-    _workspace_id: WorkspaceId | None = field(default=None)
+    _workspace_id: WorkspaceId
     _id: InviteId | None = field(default=None)
     code: UUID = field(default_factory=uuid4)
     _status: StatusInvite = field(default=StatusInvite.ACTIVE)

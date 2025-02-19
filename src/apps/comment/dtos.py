@@ -1,5 +1,6 @@
 import dataclasses
 from datetime import datetime
+from typing import TypedDict
 from uuid import UUID
 
 
@@ -23,8 +24,8 @@ class FetchCommentDto:
 
 @dataclasses.dataclass
 class UpdateCommentDto:
-    comment_id: int | None = None
-    new_content: str | None = None
+    comment_id: int
+    new_content: str
 
 
 @dataclasses.dataclass
@@ -32,9 +33,17 @@ class DeleteCommentDto:
     comment_id: int
 
 
+class UserInfo(TypedDict):
+    user_id: UUID
+    avatar: str
+    fullname: str
+
+
 @dataclasses.dataclass
-class CommentOutDto(BaseCommentDto):
+class CommentOutDto:
     comment_id: int
+    user: UserInfo
+    content: str
     created_at: datetime
     updated_at: datetime
 

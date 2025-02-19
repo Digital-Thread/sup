@@ -1,3 +1,3 @@
-from .comment_converter import CommentConverter
+from .comment_mapper import CommentMapper
 
-__all__ = ('CommentConverter',)
+__all__ = ('CommentMapper',)

@@ -8,7 +8,7 @@ from src.apps.project.domain.types_ids import ParticipantId, ProjectId, Workspac
 class IProjectRepository(ABC):
 
     @abstractmethod
-    async def check_user_in_workspace(self, user_ids: set[UUID]) -> None:
+    async def check_user_in_workspace(self, user_ids: set[UUID], workspace_id: WorkspaceId) -> None:
         raise NotImplementedError
 
     @abstractmethod
@@ -16,11 +16,15 @@ class IProjectRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_by_id(self, project_id: ProjectId) -> ProjectEntity | None:
+    async def get_by_id(
+        self, project_id: ProjectId, workspace_id: WorkspaceId
+    ) -> ProjectEntity | None:
         raise NotImplementedError
 
     @abstractmethod
-    async def get_by_workspace_id(self) -> list[tuple[ProjectEntity, int]]:
+    async def get_by_workspace_id(
+        self, workspace_id: WorkspaceId, page: int, page_size: int
+    ) -> list[tuple[ProjectEntity, list[dict[str, str]] | None]]:
         raise NotImplementedError
 
     @abstractmethod
@@ -32,9 +36,10 @@ class IProjectRepository(ABC):
         self,
         project_id: ProjectId,
         update_participants: list[ParticipantId],
+        workspace_id: WorkspaceId,
     ) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    async def delete(self, project_id: ProjectId) -> None:
+    async def delete(self, project_id: ProjectId, workspace_id: WorkspaceId) -> None:
         raise NotImplementedError

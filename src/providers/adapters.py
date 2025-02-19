@@ -13,15 +13,15 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from src.apps.auth import JWTService
-from src.apps.comment.domain import ICommentRepository
 from src.apps.feature import IFeatureRepository
+from src.apps.comment import ICommentRepository
 from src.apps.meet import IMeetRepository, IParticipantRepository, MeetService
 from src.apps.meet.protocols import WorkspaceService, WorkspaceServiceProtocol
 from src.apps.project.project_repository import IProjectRepository
 from src.apps.send_mail.service import SendMailService
 from src.apps.task.repositories import ITaskRepository
 from src.apps.user.protocols import JWTServiceProtocol, SendMailServiceProtocol
-from src.apps.user.repositories import IUserRepository
+from src.apps.user.repository import IUserRepository
 from src.apps.user.services import (
     AuthenticateUserService,
     AuthorizeUserService,

@@ -1,6 +1,6 @@
 from fastapi import Request
 
-from src.apps.user.domain.entities import User
+from src.apps.user.domain.entity import User
 from src.apps.user.services import GetUserService
 
 

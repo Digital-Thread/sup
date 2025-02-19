@@ -1,25 +1,39 @@
 from dataclasses import dataclass
 from uuid import UUID
 
+from src.apps.workspace.dtos.pagination_dto import PaginationDTO
+
 
 @dataclass
 class CreateRoleAppDTO:
     name: str
     color: str
+    workspace_id: UUID
 
 
 @dataclass
-class RoleWithUserCountAppDTO:
+class MemberOutDTO:
+    first_name: str
+    last_name: str
+    avatar: str
+
+
+@dataclass
+class RoleWithMemberOutDTO:
     id: int
     name: str
     color: str
-    user_count: int
+    members: list[MemberOutDTO] | None
+
+
+@dataclass
+class GetRolesDTO(PaginationDTO):
+    workspace_id: UUID
 
 
 @dataclass
 class RoleOutDTO:
     id: int
-    workspace_id: UUID
     name: str
     color: str
 
@@ -27,6 +41,7 @@ class RoleOutDTO:
 @dataclass
 class UpdateRoleAppDTO:
     id: int
+    workspace_id: UUID
     name: str | None = None
     color: str | None = None
 
@@ -34,4 +49,5 @@ class UpdateRoleAppDTO:
 @dataclass
 class AssignRoleToWorkspaceMemberDTO:
     id: int
+    workspace_id: UUID
     member_id: UUID

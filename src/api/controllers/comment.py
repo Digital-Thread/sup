@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from dishka import FromDishka
-from dishka.integrations.fastapi import inject
+from dishka.integrations.fastapi import DishkaRoute
 from fastapi import APIRouter, Path, Query, status
 
 from src.api.dtos import (
@@ -13,19 +13,22 @@ from src.api.dtos import (
 from src.apps.comment import (
     AddCommentDto,
     CommentOutDto,
+    CreateCommentInteractor,
     DeleteCommentDto,
-    FetchCommentDto,
+    DeleteCommentInteractor,
     FetchTaskCommentDto,
+    GetCommentsByFeatureIdInteractor,
+    GetCommentsByTaskIdInteractor,
     UpdateCommentDto,
+    UpdateCommentInteractor,
 )
-from src.apps.comment.domain import Interactor
 from src.apps.comment.dtos import FetchFeatureCommentDto
 
-comment_router = APIRouter()
+comment_router = APIRouter(route_class=DishkaRoute)
 
 
 def dto_mapper(response: CommentOutDto) -> CommentResponseDto:
-    return CommentResponseDto(id=response.comment_id, **response.__dict__)
+    return CommentResponseDto(**response.__dict__)
 
 
 def list_dto_mapper(responses: list[CommentOutDto]) -> list[CommentResponseDto]:
@@ -34,56 +37,34 @@ def list_dto_mapper(responses: list[CommentOutDto]) -> list[CommentResponseDto]:
 
 @comment_router.post(
     '/task',
-    response_model=CommentResponseDto,
-    response_model_exclude_none=True,
+    response_model=None,
     status_code=status.HTTP_201_CREATED,
 )
-@inject
 async def add_comment_to_task(
-    body: CreateCommentForTaskDto, interactor: FromDishka[Interactor[AddCommentDto, CommentOutDto]]
-) -> CommentResponseDto:
+    body: CreateCommentForTaskDto, interactor: FromDishka[CreateCommentInteractor]
+) -> None:
     request = AddCommentDto(
         user_id=body.user_id,
         task_id=body.task_id,
         feature_id=None,
         content=body.content,
     )
-    response = await interactor.execute(request=request)
-    return dto_mapper(response=response)
+    await interactor.execute(request=request)
 
 
 @comment_router.post(
     '/feature',
-    response_model=CommentResponseDto,
-    response_model_exclude_none=True,
+    response_model=None,
     status_code=status.HTTP_201_CREATED,
 )
-@inject
 async def add_comment_to_feature(
     body: CreateCommentForFeatureDto,
-    interactor: FromDishka[Interactor[AddCommentDto, CommentOutDto]],
-) -> CommentResponseDto:
+    interactor: FromDishka[CreateCommentInteractor],
+) -> None:
     request = AddCommentDto(
         user_id=body.user_id, task_id=None, feature_id=body.feature_id, content=body.content
     )
-    response = await interactor.execute(request=request)
-    return dto_mapper(response=response)
-
-
-@comment_router.get(
-    '/{comment_id}',
-    response_model=CommentResponseDto,
-    response_model_exclude_none=True,
-    status_code=status.HTTP_200_OK,
-)
-@inject
-async def get_comment_by_id(
-    comment_id: Annotated[int, Path()],
-    interactor: FromDishka[Interactor[FetchCommentDto, CommentOutDto]],
-) -> CommentResponseDto:
-    request = FetchCommentDto(comment_id=comment_id)
-    response = await interactor.execute(request=request)
-    return dto_mapper(response=response)
+    await interactor.execute(request=request)
 
 
 @comment_router.get(
@@ -92,9 +73,8 @@ async def get_comment_by_id(
     response_model_exclude_none=True,
     status_code=status.HTTP_200_OK,
 )
-@inject
 async def get_task_comments(
-    interactor: FromDishka[Interactor[FetchTaskCommentDto, list[CommentOutDto]]],
+    interactor: FromDishka[GetCommentsByTaskIdInteractor],
     task_id: Annotated[int, Path()],
     page: int = Query(1, description='Page number', ge=1),
     page_size: int = Query(10, description='Number of comments per page', ge=1, le=100),
@@ -111,9 +91,8 @@ async def get_task_comments(
     response_model_exclude_none=True,
     status_code=status.HTTP_200_OK,
 )
-@inject
 async def get_feature_comments(
-    interactor: FromDishka[Interactor[FetchFeatureCommentDto, list[CommentOutDto]]],
+    interactor: FromDishka[GetCommentsByFeatureIdInteractor],
     feature_id: Annotated[int, Path()],
     page: int = Query(1, description='Page number', ge=1),
     page_size: int = Query(10, description='Number of comments per page', ge=1, le=100),
@@ -126,20 +105,17 @@ async def get_feature_comments(
 
 @comment_router.patch(
     '/{comment_id}',
-    response_model=CommentResponseDto,
-    response_model_exclude_none=True,
-    status_code=status.HTTP_200_OK,
+    response_model=None,
+    status_code=status.HTTP_204_NO_CONTENT,
 )
-@inject
 async def update_comment(
     comment_id: Annotated[int, Path()],
     body: UpdateCommentRequestDto,
-    interactor: FromDishka[Interactor[UpdateCommentDto, CommentOutDto]],
-) -> CommentResponseDto:
-    response = await interactor.execute(
+    interactor: FromDishka[UpdateCommentInteractor],
+) -> None:
+    await interactor.execute(
         request=UpdateCommentDto(comment_id=comment_id, new_content=body.new_content)
     )
-    return dto_mapper(response=response)
 
 
 @comment_router.delete(
@@ -147,9 +123,8 @@ async def update_comment(
     response_model=None,
     status_code=status.HTTP_204_NO_CONTENT,
 )
-@inject
 async def delete_comment(
     comment_id: Annotated[int, Path()],
-    interactor: FromDishka[Interactor[DeleteCommentDto, None]],
+    interactor: FromDishka[DeleteCommentInteractor],
 ) -> None:
     await interactor.execute(request=DeleteCommentDto(comment_id=comment_id))
