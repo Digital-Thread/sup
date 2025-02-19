@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from src.apps.task.repositories import ITaskRepository
+from src.apps.task.repository import ITaskRepository
 
 
 class BaseInteractor(ABC):

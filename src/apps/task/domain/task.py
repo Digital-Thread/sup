@@ -1,45 +1,32 @@
 from datetime import date, datetime, timezone
-from enum import IntEnum
+from enum import StrEnum
 from re import match
 from typing import TypedDict
 
-from src.apps.task.domain.aliases import AssignedId, FeatureId, OwnerId, TagId, WorkspaceId
+from src.apps.task.domain.types_ids import (
+    AssignedId,
+    FeatureId,
+    OwnerId,
+    TagId,
+    TaskId,
+    WorkspaceId,
+)
 
 
-class Priority(IntEnum):
-    CRITICAL = 5
-    HIGH = 4
-    MEDIUM = 3
-    LOW = 2
-    NO_PRIORITY = 1
-
-    @property
-    def display(self) -> str:
-        return {
-            5: 'Критическая',
-            4: 'Высокая',
-            3: 'Средняя',
-            2: 'Низкая',
-            1: 'Не задана',
-        }[self.value]
+class Priority(StrEnum):
+    CRITICAL = 'Критическая'
+    HIGH = 'Высокая'
+    MEDIUM = 'Средняя'
+    LOW = 'Низкая'
+    NO_PRIORITY = 'Не задана'
 
 
-class Status(IntEnum):
-    FINISH = 5
-    BACKLOG = 4
-    TEST = 3
-    DEVELOPMENT = 2
-    NEW = 1
-
-    @property
-    def display(self) -> str:
-        return {
-            5: 'Готово',
-            4: 'Бэклог',
-            3: 'Тестирование',
-            2: 'Разработка',
-            1: 'Новая',
-        }[self.value]
+class Status(StrEnum):
+    FINISH = 'Готово'
+    BACKLOG = 'Бэклог'
+    TEST = 'Тестирование'
+    DEVELOPMENT = 'Разработка'
+    NEW = 'Новая'
 
 
 class OptionalTaskUpdateFields(TypedDict, total=False):
@@ -53,21 +40,22 @@ class OptionalTaskUpdateFields(TypedDict, total=False):
     tags: list[TagId] | None
 
 
-class Task:
+class TaskEntity:
 
     def __init__(
-            self,
-            name: str,
-            workspace_id: WorkspaceId,
-            feature_id: FeatureId,
-            owner_id: OwnerId,
-            assigned_to: AssignedId,
-            due_date: date,
-            description: str | None = None,
-            priority: Priority = Priority.NO_PRIORITY,
-            status: Status = Status.NEW,
-            tags: list[TagId] | None = None,
+        self,
+        name: str,
+        workspace_id: WorkspaceId,
+        feature_id: FeatureId,
+        owner_id: OwnerId,
+        assigned_to: AssignedId,
+        due_date: date,
+        description: str | None = None,
+        priority: Priority = Priority.NO_PRIORITY,
+        status: Status = Status.NEW,
+        tags: list[TagId] | None = None,
     ):
+        self._id: TaskId | None = None
         self.name = name
         self._workspace_id = workspace_id
         self.feature_id = feature_id
@@ -80,6 +68,17 @@ class Task:
         self.tags = tags
         self.created_at = datetime.now(timezone.utc)
         self.updated_at = datetime.now(timezone.utc)
+
+    @property
+    def id(self) -> TaskId:
+        return self._id
+
+    @id.setter
+    def id(self, _id: TaskId) -> None:
+        if self._id is not None:
+            raise AttributeError('Идентификатор задачи уже установлен')
+
+        self._id = _id
 
     @property
     def name(self) -> str:
@@ -123,6 +122,20 @@ class Task:
         return self._owner_id
 
     def update_fields(self, updates: OptionalTaskUpdateFields) -> None:
+        required_fields = {
+            'name': 'Название',
+            'feature_id': 'Фича',
+            'assigned_to': 'Исполнитель',
+            'priority': 'Приоритет',
+            'status': 'Статус',
+            'due_date': 'Дата завершения',
+        }
+
         for field, value in updates.items():
+            if field in required_fields.keys() and value is None:
+                raise ValueError(
+                    f'{required_fields[field]} обязательное поле и не может быть пустым!'
+                )
             setattr(self, field, value)
+
         self.updated_at = datetime.now(timezone.utc)

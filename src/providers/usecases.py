@@ -25,8 +25,8 @@ from src.apps.project.use_cases.get_project_by_id import GetProjectByIdUseCase
 from src.apps.task import (
     CreateTaskInteractor,
     DeleteTaskInteractor,
-    GetAllTasksInteractor,
-    GetTaskInteractor,
+    GetTasksByFeatureIdInteractor,
+    GetTaskByIdInteractor,
     UpdateTaskInteractor,
 )
 from src.apps.workspace.interactors.category_interactors import (
@@ -159,7 +159,7 @@ class TaskInteractorProvider(Provider):
     scope = Scope.REQUEST
 
     create_task = provide(CreateTaskInteractor)
-    get_task_by_id = provide(GetTaskInteractor)
-    get_tasks = provide(GetAllTasksInteractor)
+    get_task_by_id = provide(GetTaskByIdInteractor)
+    get_tasks = provide(GetTasksByFeatureIdInteractor)
     update_task = provide(UpdateTaskInteractor)
     delete_task = provide(DeleteTaskInteractor)
