@@ -1,28 +1,23 @@
-from src.apps.feature import FeatureInputDTO
-from src.apps.feature.domain import Feature
-from src.apps.feature.exceptions import FeatureCreateError, RepositoryError
+from src.apps.feature.dtos import FeatureInputDTO
+from src.apps.feature.exceptions import FeatureCreateError, FeatureRepositoryError
 from src.apps.feature.interactors.base_interactor import BaseInteractor
+from src.apps.feature.mapper import FeatureMapper
 
 
 class CreateFeatureInteractor(BaseInteractor):
     async def execute(self, dto: FeatureInputDTO) -> None:
         try:
-            feature = Feature(
-                workspace_id=dto.workspace_id,
-                name=dto.name,
-                project_id=dto.project_id,
-                owner_id=dto.owner_id,
-                assigned_to=dto.assigned_to,
-                description=dto.description,
-                priority=dto.priority,
-                status=dto.status,
-                tags=dto.tags,
-                members=dto.members,
-            )
-        except ValueError as e:
+            feature = FeatureMapper.dto_to_entity(dto=dto)
+        except (ValueError, AttributeError) as e:
+            raise FeatureCreateError(context=e) from None
+
+        try:
+            attrs = FeatureMapper.entity_to_attrs_dto(feature)
+            await self._repository.validate_workspace_consistency(attrs=attrs)
+        except FeatureRepositoryError as e:
             raise FeatureCreateError(context=e) from None
 
         try:
             await self._repository.save(feature=feature)
-        except RepositoryError as e:
+        except FeatureRepositoryError as e:
             raise FeatureCreateError(context=e) from None

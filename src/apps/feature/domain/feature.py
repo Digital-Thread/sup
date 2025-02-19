@@ -1,9 +1,10 @@
 from datetime import datetime, timezone
-from enum import IntEnum
+from enum import StrEnum
 from re import match
 from typing import TypedDict
 
-from src.apps.feature.domain.aliases import (
+from src.apps.feature.domain.types_ids import (
+    FeatureId,
     OwnerId,
     ProjectId,
     TagId,
@@ -12,38 +13,19 @@ from src.apps.feature.domain.aliases import (
 )
 
 
-class Priority(IntEnum):
-    CRITICAL = 5
-    HIGH = 4
-    MEDIUM = 3
-    LOW = 2
-    NO_PRIORITY = 1
-
-    @property
-    def display(self) -> str:
-        return {
-            5: 'Критическая',
-            4: 'Высокая',
-            3: 'Средняя',
-            2: 'Низкая',
-            1: 'Не задана',
-        }[self.value]
+class Priority(StrEnum):
+    CRITICAL = 'Критическая'
+    HIGH = 'Высокая'
+    MEDIUM = 'Средняя'
+    LOW = 'Низкая'
+    NO_PRIORITY = 'Не задана'
 
 
-class Status(IntEnum):
-    FINISH = 4
-    TEST = 3
-    DEVELOPMENT = 2
-    NEW = 1
-
-    @property
-    def display(self) -> str:
-        return {
-            4: 'Готово',
-            3: 'Тестирование',
-            2: 'Разработка',
-            1: 'Новая',
-        }[self.value]
+class Status(StrEnum):
+    FINISH = 'Готово'
+    TEST = 'Тестирование'
+    DEVELOPMENT = 'Разработка'
+    NEW = 'Новая'
 
 
 class OptionalFeatureUpdateFields(TypedDict, total=False):
@@ -57,7 +39,7 @@ class OptionalFeatureUpdateFields(TypedDict, total=False):
     members: list[UserId] | None
 
 
-class Feature:
+class FeatureEntity:
 
     def __init__(
         self,
@@ -72,6 +54,7 @@ class Feature:
         tags: list[TagId] | None = None,
         members: list[UserId] | None = None,
     ):
+        self._id: FeatureId | None = None
         self.name = name
         self._workspace_id = workspace_id
         self.project_id = project_id
@@ -84,6 +67,17 @@ class Feature:
         self.members = members
         self.created_at = datetime.now(timezone.utc)
         self.updated_at = datetime.now(timezone.utc)
+
+    @property
+    def id(self) -> FeatureId:
+        return self._id
+
+    @id.setter
+    def id(self, _id: FeatureId) -> None:
+        if self._id is not None:
+            raise AttributeError('Идентификатор фичи уже установлен')
+
+        self._id = _id
 
     @property
     def name(self) -> str:
@@ -127,6 +121,16 @@ class Feature:
         return self._owner_id
 
     def update_fields(self, updates: OptionalFeatureUpdateFields) -> None:
+        required_fields = {
+            'name': 'Название',
+            'project_id': 'Проект',
+            'priority': 'Приоритет',
+            'status': 'Статус',
+        }
         for field, value in updates.items():
+            if field in required_fields.keys() and value is None:
+                raise ValueError(
+                    f'{required_fields[field]} обязательное поле и не может быть пустым!'
+                )
             setattr(self, field, value)
         self.updated_at = datetime.now(timezone.utc)

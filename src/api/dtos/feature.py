@@ -1,10 +1,16 @@
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, Literal
+from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
-from pydantic_core.core_schema import FieldValidationInfo
+from pydantic import BaseModel, ConfigDict, Field
 
+from src.apps.feature import (
+    FeatureMember,
+    FeatureTag,
+    FilterField,
+    OrderByField,
+    SortOrder,
+)
 from src.apps.feature.domain import (
     FeatureId,
     OwnerId,
@@ -13,18 +19,10 @@ from src.apps.feature.domain import (
     Status,
     TagId,
     UserId,
-    WorkspaceId,
 )
-from src.apps.feature.exceptions import FeatureUpdateError
-from src.apps.feature.repositories import FilterField, OrderByField, SortOrder
-
-
-class SuccessResponse(BaseModel):
-    message: str
 
 
 class CreateFeatureRequestDTO(BaseModel):
-    workspace_id: WorkspaceId
     name: str
     project_id: ProjectId
     owner_id: OwnerId
@@ -46,29 +44,33 @@ class UpdateFeatureRequestDTO(BaseModel):
     tags: list[TagId] | None = None
     members: list[UserId] | None = None
 
-    @field_validator('name', 'project_id', 'priority', 'status')
-    def fields_cannot_be_none(cls, value: Any, info: FieldValidationInfo) -> Any:
-        if value is None:
-            raise FeatureUpdateError(
-                message=f"Для поля '{info.field_name}' не может быть установлено значение None."
-            )
-        return value
-
 
 class FeatureResponseDTO(BaseModel):
     id: FeatureId
-    workspace_id: WorkspaceId
     name: str
-    project_id: ProjectId
-    owner_id: OwnerId
+    project_name: str
+    owner: FeatureMember
     created_at: datetime
     updated_at: datetime
-    assigned_to: UserId | None
+    assigned_to: FeatureMember | None
     description: str | None
     priority: Priority
     status: Status
-    tags: list[TagId] | None
-    members: list[UserId] | None
+    tags: list[FeatureTag] | None
+    members: list[FeatureMember] | None
+    model_config = ConfigDict(
+        from_attributes=True,
+    )
+
+
+class FeaturesResponseDTO(BaseModel):
+    id: FeatureId
+    name: str
+    project_name: str
+    created_at: datetime
+    priority: Priority
+    status: Status
+    members: list[FeatureMember] | None
     model_config = ConfigDict(
         from_attributes=True,
     )
@@ -92,8 +94,6 @@ class PageLimits(StrEnum):
 
 
 class QueryParams(BaseModel):
-    workspace_id: WorkspaceId
-
     filter_by_members: list[UserId] | None = None
     filter_by_tags: list[TagId] | None = None
     filter_by_statuses: list[Status] | None = None
