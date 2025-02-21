@@ -66,7 +66,7 @@ async def update_status_invite(
 
 
 @workspace_invite_router.delete('/{workspace_invite_id}', status_code=status.HTTP_204_NO_CONTENT)
-async def delete_category_by_id(
+async def delete_workspace_invite_by_id(
     workspace_invite_id: int,
     interactor: FromDishka[DeleteWorkspaceInviteInteractor],
     context: FromDishka[WorkspaceContext],
