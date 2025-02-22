@@ -3,16 +3,25 @@ from dishka import Provider, Scope, provide
 from src.apps.comment import (
     CreateCommentInteractor,
     DeleteCommentInteractor,
-    UpdateCommentInteractor,
-    GetCommentsByTaskIdInteractor,
     GetCommentsByFeatureIdInteractor,
+    GetCommentsByTaskIdInteractor,
+    UpdateCommentInteractor,
 )
 from src.apps.feature import (
     CreateFeatureInteractor,
     DeleteFeatureInteractor,
-    GetFeaturesByWorkspaceInteractor,
     GetFeatureByIdInteractor,
+    GetFeaturesByWorkspaceInteractor,
     UpdateFeatureInteractor,
+)
+from src.apps.permission import (
+    AssignWorkspacePermissionsGroupInteractor,
+    CreatePermissionGroupInteractor,
+    DeletePermissionGroupInteractor,
+    GetPermissionGroupByIdInteractor,
+    GetPermissionGroupsByWorkspaceIdInteractor,
+    GetPermissionsInteractor,
+    UpdatePermissionGroupInteractor,
 )
 from src.apps.project.interactors import (
     CreateProjectInteractor,
@@ -20,13 +29,15 @@ from src.apps.project.interactors import (
     GetProjectByWorkspaceInteractor,
     UpdateProjectInteractor,
 )
-from src.apps.project.interactors.update_participants import UpdateParticipantsInteractor
+from src.apps.project.interactors.update_participants import (
+    UpdateParticipantsInteractor,
+)
 from src.apps.project.use_cases.get_project_by_id import GetProjectByIdUseCase
 from src.apps.task import (
     CreateTaskInteractor,
     DeleteTaskInteractor,
-    GetTasksByFeatureIdInteractor,
     GetTaskByIdInteractor,
+    GetTasksByFeatureIdInteractor,
     UpdateTaskInteractor,
 )
 from src.apps.workspace.interactors.category_interactors import (
@@ -35,15 +46,17 @@ from src.apps.workspace.interactors.category_interactors import (
     GetCategoryByWorkspaceInteractor,
     UpdateCategoryInteractor,
 )
-from src.apps.workspace.interactors.category_interactors.get_category_by_id import GetCategoryByIdInteractor
+from src.apps.workspace.interactors.category_interactors.get_category_by_id import (
+    GetCategoryByIdInteractor,
+)
 from src.apps.workspace.interactors.role_interactors import (
+    AssignRoleToWorkspaceMemberInteractor,
     CreateRoleInteractor,
     DeleteRoleInteractor,
     GetRoleByIdInteractor,
     GetRolesByWorkspaceInteractor,
+    RemoveRoleFromWorkspaceMemberInteractor,
     UpdateRoleInteractor,
-    AssignRoleToWorkspaceMemberInteractor,
-    RemoveRoleFromWorkspaceMemberInteractor
 )
 from src.apps.workspace.interactors.tag_interactors import (
     CreateTagInteractor,
@@ -60,7 +73,9 @@ from src.apps.workspace.interactors.workspace_interactors import (
     GetWorkspaceByMemberInteractor,
     UpdateWorkspaceInteractor,
 )
-from src.apps.workspace.interactors.workspace_interactors.get_workspace_members import GetWorkspaceMembersInteractor
+from src.apps.workspace.interactors.workspace_interactors.get_workspace_members import (
+    GetWorkspaceMembersInteractor,
+)
 from src.apps.workspace.interactors.workspace_invite_interactors import (
     CreateWorkspaceInviteInteractor,
     DeleteWorkspaceInviteInteractor,
@@ -163,3 +178,20 @@ class TaskInteractorProvider(Provider):
     get_tasks = provide(GetTasksByFeatureIdInteractor)
     update_task = provide(UpdateTaskInteractor)
     delete_task = provide(DeleteTaskInteractor)
+
+
+class PermissionInteractorProvider(Provider):
+    scope = Scope.REQUEST
+
+    get_permissions = provide(GetPermissionsInteractor)
+
+
+class PermissionGroupInteractorProvider(Provider):
+    scope = Scope.REQUEST
+
+    create_perm_group = provide(CreatePermissionGroupInteractor)
+    get_perm_group_by_id = provide(GetPermissionGroupByIdInteractor)
+    get_perm_groups = provide(GetPermissionGroupsByWorkspaceIdInteractor)
+    update_perm_group = provide(UpdatePermissionGroupInteractor)
+    delete_perm_group = provide(DeletePermissionGroupInteractor)
+    assign_workspace_permissions_group = provide(AssignWorkspacePermissionsGroupInteractor)

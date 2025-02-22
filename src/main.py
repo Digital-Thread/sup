@@ -20,8 +20,10 @@ from src.providers.adapters import (
 )
 from src.providers.usecases import (
     CategoryUseCaseProvider,
-    FeatureInteractorProvider,
     CommentInteractorProvider,
+    FeatureInteractorProvider,
+    PermissionGroupInteractorProvider,
+    PermissionInteractorProvider,
     ProjectInteractorProvider,
     RoleUseCaseProvider,
     TagUseCaseProvider,
@@ -56,6 +58,8 @@ def container_factory() -> AsyncContainer:
         WorkspaceInviteUseCaseProvider(),
         FeatureInteractorProvider(),
         TaskInteractorProvider(),
+        PermissionInteractorProvider(),
+        PermissionGroupInteractorProvider(),
     )
 
 
@@ -96,14 +100,14 @@ def customize_openapi(app: FastAPI):
         description=app.description,
         routes=app.routes,
     )
-    openapi_schema["components"]["securitySchemes"] = {
-        "WorkspaceHeader": {
-            "type": "apiKey",
-            "name": "X-Workspace-Id",
-            "in": "header",
+    openapi_schema['components']['securitySchemes'] = {
+        'WorkspaceHeader': {
+            'type': 'apiKey',
+            'name': 'X-Workspace-Id',
+            'in': 'header',
         }
     }
-    openapi_schema["security"] = [{"WorkspaceHeader": []}]
+    openapi_schema['security'] = [{'WorkspaceHeader': []}]
 
     app.openapi_schema = openapi_schema
     return app.openapi_schema

@@ -13,10 +13,11 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from src.apps.auth import JWTService
-from src.apps.feature import IFeatureRepository
 from src.apps.comment import ICommentRepository
+from src.apps.feature import IFeatureRepository
 from src.apps.meet import IMeetRepository, IParticipantRepository, MeetService
 from src.apps.meet.protocols import WorkspaceService, WorkspaceServiceProtocol
+from src.apps.permission import IPermissionGroupRepository, IPermissionRepository
 from src.apps.project.project_repository import IProjectRepository
 from src.apps.send_mail.service import SendMailService
 from src.apps.task import ITaskRepository
@@ -46,6 +47,8 @@ from src.data_access.repositories import (
     CategoryRepository,
     CommentRepository,
     FeatureRepository,
+    PermissionGroupRepository,
+    PermissionRepository,
     RoleRepository,
     TagRepository,
     TaskRepository,
@@ -138,6 +141,10 @@ class RepositoriesProvider(Provider):
     )
     tag_repository = provide(TagRepository, provides=ITagRepository)
     project_repository = provide(ProjectRepository, provides=IProjectRepository)
+    permission_repository = provide(PermissionRepository, provides=IPermissionRepository)
+    permission_group_repository = provide(
+        PermissionGroupRepository, provides=IPermissionGroupRepository
+    )
 
     @provide(scope=scope, provides=SendMailServiceProtocol)
     def provide_send_mail_service(self) -> SendMailService:

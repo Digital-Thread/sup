@@ -7,12 +7,13 @@ from .base import Base
 from .mixins import DatetimeFieldsMixin, UUIDPkMixin
 
 if TYPE_CHECKING:
+    from .comment import CommentModel
     from .feature import FeatureModel
     from .meet import MeetModel, ParticipantModel
+    from .permission_group import PermissionGroupModel
     from .task import TaskModel
     from .workspace_models.user_workspace_role import UserWorkspaceRoleModel
     from .workspace_models.workspace import WorkspaceModel
-    from .comment import CommentModel
 
 
 class UserModel(Base, DatetimeFieldsMixin, UUIDPkMixin):
@@ -71,4 +72,9 @@ class UserModel(Base, DatetimeFieldsMixin, UUIDPkMixin):
     )
     comments: Mapped[list['CommentModel']] = relationship(
         'CommentModel', back_populates='user', foreign_keys='CommentModel.user_id'
+    )
+    permission_groups: Mapped[set['PermissionGroupModel']] = relationship(
+        'PermissionGroupModel',
+        secondary='permission_group_users',
+        back_populates='authorized_users',
     )

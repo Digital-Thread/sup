@@ -6,6 +6,8 @@ from .feature import feature_router
 from .health_check import router
 from .meet import router as meet_router
 from .meet_participant import router as meet_participant_router
+from .permission import permission_router
+from .permission_group import perm_group_router
 from .project import project_router
 from .role import role_router
 from .tag import tag_router
@@ -21,6 +23,12 @@ def init_routes(app: FastAPI) -> None:
         router=router,
         prefix=f'{prefix}/health-check',
         tags=['Test'],
+    )
+    app.include_router(
+        router=perm_group_router, prefix=f'{prefix}/permission_groups', tags=['Permission Groups']
+    )
+    app.include_router(
+        router=permission_router, prefix=f'{prefix}/permissions', tags=['Permission']
     )
     app.include_router(
         router=user_router,

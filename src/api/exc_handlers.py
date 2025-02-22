@@ -1,19 +1,19 @@
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
-from src.apps.comment import (
-    InvalidContentError,
-    CommentNotFoundError,
-    CommentRepositoryError,
-    CommentNotAssociatedError,
-    CommentAssociatedWithBothError,
-    FeatureOrTaskDoesNotExistsError,
-)
 from src.apps import ApplicationException
 from src.apps.auth.exceptions import (
     InvalidTokenError,
     TokenExpireError,
     TokenRefreshExpireError,
+)
+from src.apps.comment import (
+    CommentAssociatedWithBothError,
+    CommentNotAssociatedError,
+    CommentNotFoundError,
+    CommentRepositoryError,
+    FeatureOrTaskDoesNotExistsError,
+    InvalidContentError,
 )
 from src.apps.feature.exceptions import (
     FeatureCreateError,
@@ -21,7 +21,18 @@ from src.apps.feature.exceptions import (
     FeatureDoesNotExistError,
     FeatureUpdateError,
 )
-from src.apps.project.exceptions import ProjectException, ProjectNotFound, WorkspaceForProjectNotFound
+from src.apps.permission import (
+    PermissionGroupCreateError,
+    PermissionGroupDeleteError,
+    PermissionGroupDoesNotExistError,
+    PermissionGroupRepositoryError,
+    PermissionGroupUpdateError,
+)
+from src.apps.project.exceptions import (
+    ProjectException,
+    ProjectNotFound,
+    WorkspaceForProjectNotFound,
+)
 from src.apps.task.exceptions import (
     TaskCreateError,
     TaskDeleteError,
@@ -136,6 +147,11 @@ exception_status_codes = {
     CommentAssociatedWithBothError: status.HTTP_400_BAD_REQUEST,
     FeatureOrTaskDoesNotExistsError: status.HTTP_400_BAD_REQUEST,
     CommentNotFoundError: status.HTTP_404_NOT_FOUND,
+    PermissionGroupCreateError: status.HTTP_400_BAD_REQUEST,
+    PermissionGroupUpdateError: status.HTTP_400_BAD_REQUEST,
+    PermissionGroupDeleteError: status.HTTP_400_BAD_REQUEST,
+    PermissionGroupRepositoryError: status.HTTP_400_BAD_REQUEST,
+    PermissionGroupDoesNotExistError: status.HTTP_404_NOT_FOUND,
 }
 
 

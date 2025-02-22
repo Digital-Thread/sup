@@ -1,6 +1,8 @@
 from .category_respository import CategoryRepository
 from .comment_repository import CommentRepository
 from .feature_repository import FeatureRepository
+from .permission_group_repository import PermissionGroupRepository
+from .permission_repository import PermissionRepository
 from .role_repository import RoleRepository
 from .tag_repository import TagRepository
 from .task_repository import TaskRepository
@@ -16,4 +18,6 @@ __all__ = (
     'CommentRepository',
     'FeatureRepository',
     'TaskRepository',
+    'PermissionRepository',
+    'PermissionGroupRepository',
 )
