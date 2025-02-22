@@ -13,20 +13,18 @@ from src.api.dtos.feature import (
     UpdateFeatureRequestDTO,
 )
 from src.apps.feature import (
+    CreateFeatureInteractor,
+    DeleteFeatureInteractor,
     FeatureInputDTO,
     FeatureListQuery,
     FeatureUpdateDTO,
-    OrderBy,
-    PaginateParams,
-)
-from src.apps.feature.domain import FeatureId, OptionalFeatureUpdateFields, WorkspaceId
-from src.apps.feature import (
-    CreateFeatureInteractor,
-    DeleteFeatureInteractor,
     GetFeatureByIdInteractor,
     GetFeaturesByWorkspaceInteractor,
+    OrderBy,
+    PaginateParams,
     UpdateFeatureInteractor,
 )
+from src.apps.feature.domain import FeatureId, OptionalFeatureUpdateFields, WorkspaceId
 from src.providers.context import WorkspaceContext
 
 feature_router = APIRouter(route_class=DishkaRoute)
@@ -34,9 +32,9 @@ feature_router = APIRouter(route_class=DishkaRoute)
 
 @feature_router.post('/', status_code=status.HTTP_201_CREATED)
 async def create_feature(
-        dto: CreateFeatureRequestDTO,
-        interactor: FromDishka[CreateFeatureInteractor],
-        context: FromDishka[WorkspaceContext],
+    dto: CreateFeatureRequestDTO,
+    interactor: FromDishka[CreateFeatureInteractor],
+    context: FromDishka[WorkspaceContext],
 ) -> None:
     workspace_id = context.workspace_id
     feature = FeatureInputDTO(WorkspaceId(workspace_id), **dto.model_dump())
@@ -45,9 +43,9 @@ async def create_feature(
 
 @feature_router.get('/', status_code=status.HTTP_200_OK, response_model=list[FeaturesResponseDTO])
 async def get_features_by_workspace_id(
-        query: Annotated[QueryParams, Query()],
-        interactor: FromDishka[GetFeaturesByWorkspaceInteractor],
-        context: FromDishka[WorkspaceContext],
+    query: Annotated[QueryParams, Query()],
+    interactor: FromDishka[GetFeaturesByWorkspaceInteractor],
+    context: FromDishka[WorkspaceContext],
 ) -> list[FeaturesResponseDTO]:
     workspace_id = WorkspaceId(context.workspace_id)
     query_params = FeatureListQuery(
@@ -63,8 +61,8 @@ async def get_features_by_workspace_id(
     '/{feature_id}', status_code=status.HTTP_200_OK, response_model=FeatureResponseDTO
 )
 async def get_feature_by_id(
-        feature_id: FeatureId,
-        interactor: FromDishka[GetFeatureByIdInteractor],
+    feature_id: FeatureId,
+    interactor: FromDishka[GetFeatureByIdInteractor],
 ) -> FeatureResponseDTO:
     feature = await interactor.execute(feature_id=feature_id)
     return FeatureResponseDTO(**asdict(feature))
@@ -72,9 +70,9 @@ async def get_feature_by_id(
 
 @feature_router.patch('/{feature_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def update_feature(
-        feature_id: FeatureId,
-        dto: UpdateFeatureRequestDTO,
-        interactor: FromDishka[UpdateFeatureInteractor],
+    feature_id: FeatureId,
+    dto: UpdateFeatureRequestDTO,
+    interactor: FromDishka[UpdateFeatureInteractor],
 ) -> None:
     update_data = FeatureUpdateDTO(
         id=feature_id,
@@ -85,7 +83,7 @@ async def update_feature(
 
 @feature_router.delete('/{feature_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_feature(
-        feature_id: FeatureId,
-        interactor: FromDishka[DeleteFeatureInteractor],
+    feature_id: FeatureId,
+    interactor: FromDishka[DeleteFeatureInteractor],
 ) -> None:
     await interactor.execute(feature_id=feature_id)

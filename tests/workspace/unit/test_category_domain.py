@@ -27,7 +27,9 @@ class TestCategoryCreation:
         assert category_minimal._id is None
         assert category_minimal._workspace_id == workspace_id
 
-    def test_category_creation_with_full_data(self, category_full: CategoryEntity, workspace_id) -> None:
+    def test_category_creation_with_full_data(
+        self, category_full: CategoryEntity, workspace_id
+    ) -> None:
         assert category_full.name == 'Full Category'
         assert category_full._id == 1
         assert category_full._workspace_id == workspace_id

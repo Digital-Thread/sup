@@ -1,7 +1,7 @@
-from src.apps.comment.dtos import FetchFeatureCommentDto, CommentOutDto
-from src.apps.comment.repository import ICommentRepository
 from src.apps.comment.domain import FeatureId
+from src.apps.comment.dtos import CommentOutDto, FetchFeatureCommentDto
 from src.apps.comment.interactors.base_interactor import BaseInteractor
+from src.apps.comment.repository import ICommentRepository
 
 
 class GetCommentsByFeatureIdInteractor(BaseInteractor):

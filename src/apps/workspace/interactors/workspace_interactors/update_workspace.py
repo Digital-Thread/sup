@@ -19,8 +19,7 @@ class UpdateWorkspaceInteractor:
             workspace_id=WorkspaceId(workspace_update_data.workspace_id)
         )
         updated_workspace = await self._map_to_update_data(
-            workspace=existing_workspace,
-            updated_data=workspace_update_data.updated_fields
+            workspace=existing_workspace, updated_data=workspace_update_data.updated_fields
         )
 
         try:
@@ -39,12 +38,11 @@ class UpdateWorkspaceInteractor:
 
     @staticmethod
     async def _map_to_update_data(
-            workspace: WorkspaceEntity, updated_data: dict[str, str]
+        workspace: WorkspaceEntity, updated_data: dict[str, str]
     ) -> WorkspaceEntity:
         try:
             updated_workspace = WorkspaceMapper.update_data(
-                updated_fields=updated_data,
-                existing_workspace=workspace
+                updated_fields=updated_data, existing_workspace=workspace
             )
         except ValueError as error:
             raise WorkspaceException(str(error))

@@ -11,10 +11,7 @@ from src.apps.workspace.domain.types_ids import (
     TagId,
     WorkspaceId,
 )
-from src.apps.workspace.dtos.workspace_dtos import (
-    MemberOutDTO,
-    WorkspaceOutDTO,
-)
+from src.apps.workspace.dtos.workspace_dtos import MemberOutDTO, WorkspaceOutDTO
 
 
 class WorkspaceMapper:

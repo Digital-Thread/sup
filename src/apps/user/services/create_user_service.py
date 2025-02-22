@@ -9,8 +9,7 @@ import redis.asyncio as redis
 from passlib.context import CryptContext
 
 from src.apps.user.domain.entity import User
-from src.apps.user.dtos import UserCreateDTO
-from src.apps.user.dtos import AdminCreateUserDTO
+from src.apps.user.dtos import AdminCreateUserDTO, UserCreateDTO
 from src.apps.user.exceptions import (
     LengthUserPasswordException,
     TokenActivationExpire,
@@ -93,7 +92,9 @@ class CreateUserService:
 
         return new_user, inviter_user_id
 
-    async def create_user_by_admin(self, dto: AdminCreateUserDTO) -> tuple[uuid.UUID, str, str, str]:
+    async def create_user_by_admin(
+        self, dto: AdminCreateUserDTO
+    ) -> tuple[uuid.UUID, str, str, str]:
         existing_user = await self.repository.find_by_email(dto.email)
         if existing_user:
             raise UserAlreadyExistsError(dto.email)

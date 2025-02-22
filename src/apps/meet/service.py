@@ -212,7 +212,9 @@ class MeetService:
         participant_id = await self.participant_repository.update_participant(participant)
         return int(participant_id)
 
-    def _create_entity[T](
+    def _create_entity[
+        T
+    ](
         self, entity_class: Type[T], data: dict[str, Any], exception_class: Type[BaseMeetException]
     ) -> T:
         try:

@@ -52,7 +52,7 @@ class CommentMapper:
             user=UserInfo(
                 user_id=model.user.id,
                 avatar=model.user.avatar,
-                fullname=f'{model.user.first_name} {model.user.last_name}'
+                fullname=f'{model.user.first_name} {model.user.last_name}',
             ),
             content=model.content,
             created_at=model.created_at,
