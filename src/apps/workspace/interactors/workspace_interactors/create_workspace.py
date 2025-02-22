@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from src.apps.workspace.domain.entities.workspace import WorkspaceEntity
 from src.apps.workspace.domain.types_ids import MemberId, OwnerId, WorkspaceId
 from src.apps.workspace.dtos.workspace_dtos import CreateWorkspaceDTO
@@ -13,7 +15,7 @@ class CreateWorkspaceInteractor:
     def __init__(self, workspace_repository: IWorkspaceRepository):
         self._workspace_repository = workspace_repository
 
-    async def execute(self, create_workspace_data: CreateWorkspaceDTO) -> None:
+    async def execute(self, create_workspace_data: CreateWorkspaceDTO) -> (UUID, UUID):
         try:
             workspace = WorkspaceEntity(
                 owner_id=OwnerId(create_workspace_data.owner_id), _name=create_workspace_data.name
@@ -27,6 +29,8 @@ class CreateWorkspaceInteractor:
             raise
 
         await self._add_owner_as_member(workspace.id, workspace.owner_id)
+
+        return workspace.id, workspace.owner_id
 
     async def _add_owner_as_member(self, workspace_id: WorkspaceId, owner_id: OwnerId) -> None:
         """Метод для автоматического добавления владельца, как члена рабочего пространства"""
