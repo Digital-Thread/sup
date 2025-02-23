@@ -1,8 +1,8 @@
-from .comment_converter import CommentConverter
-from .meet_converter import MeetConverter, MeetParticipantConverter
+from .comment_mapper import CommentMapper
+from .meet_mapper import MeetMapper, MeetParticipantMapper
 
 __all__ = (
-    'CommentConverter',
-    'MeetConverter',
-    'MeetParticipantConverter',
+    'CommentMapper',
+    'MeetMapper',
+    'MeetParticipantMapper',
 )

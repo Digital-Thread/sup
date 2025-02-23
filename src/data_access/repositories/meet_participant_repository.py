@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.apps.meet import IParticipantRepository
 from src.apps.meet.domain import MeetId, ParticipantEntity, ParticipantId
 from src.apps.meet.exceptions import MeetRepositoryError
-from src.data_access.mappers import MeetParticipantConverter
+from src.data_access.mappers import MeetParticipantMapper
 from src.data_access.models import MeetModel, ParticipantModel
 from src.providers.context import WorkspaceContext
 
@@ -15,7 +15,7 @@ class MeetParticipantRepository(IParticipantRepository):
         self._session = session
         self._context = context
         self.model = ParticipantModel
-        self.converter = MeetParticipantConverter()
+        self.converter = MeetParticipantMapper()
 
     def _base_select(self) -> Select:
         return select(self.model).where(

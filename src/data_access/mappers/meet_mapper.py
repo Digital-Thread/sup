@@ -13,7 +13,7 @@ from src.apps.meet.domain import (
 from src.data_access.models import MeetModel, ParticipantModel
 
 
-class MeetConverter:
+class MeetMapper:
     @staticmethod
     def map_entity_to_model(meet_entity: MeetEntity) -> MeetModel:
         meet_model = MeetModel(
@@ -64,7 +64,7 @@ class MeetConverter:
         return meet
 
 
-class MeetParticipantConverter:
+class MeetParticipantMapper:
     @staticmethod
     def map_entity_to_model(participant_entity: ParticipantEntity) -> ParticipantModel:
         return ParticipantModel(

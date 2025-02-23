@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectinload
 from src.apps.meet import IMeetRepository, MeetListQuery
 from src.apps.meet.domain import MeetEntity, MeetId
 from src.apps.meet.exceptions import MeetRepositoryError
-from src.data_access.mappers import MeetConverter
+from src.data_access.mappers import MeetMapper
 from src.data_access.models import MeetModel
 from src.providers.context import WorkspaceContext
 
@@ -15,7 +15,7 @@ class MeetRepository(IMeetRepository):
     def __init__(self, session: AsyncSession, context: WorkspaceContext):
         self._session = session
         self.model = MeetModel
-        self.converter = MeetConverter()
+        self.converter = MeetMapper()
         self._context = context
 
     def _base_select(self) -> Select:
