@@ -2,61 +2,51 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import ForeignKey, UniqueConstraint
+from sqlalchemy import TIMESTAMP, ForeignKey, Index, String
+from sqlalchemy import UUID as SQL_UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .base import Base
+from src.data_access.models import Base
+
 from .mixins import DatetimeFieldsMixin, IntIdPkMixin
 
 if TYPE_CHECKING:
+    from .meet_participants import ParticipantModel
     from .user import UserModel
     from .workspace_models.category import CategoryModel
     from .workspace_models.workspace import WorkspaceModel
 
 
-class MeetModel(Base, IntIdPkMixin, DatetimeFieldsMixin):
+class MeetModel(Base, DatetimeFieldsMixin, IntIdPkMixin):
     __tablename__ = 'meets'
 
-    name: Mapped[str]
-    meet_at: Mapped[datetime]
-    workspace_id: Mapped[UUID] = mapped_column(ForeignKey('workspaces.id'))
+    __table_args__ = (
+        Index('ix_meets_workspace_id', 'workspace_id'),
+        Index('ix_meets_assigned_to_id', 'assigned_to_id'),
+        Index('ix_meets_category_id', 'category_id'),
+        Index('ix_meets_owned_id', 'owner_id'),
+    )
+
+    name: Mapped[str] = mapped_column(String(50))
+    meet_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True))
+    workspace_id: Mapped[UUID] = mapped_column(SQL_UUID(as_uuid=True), ForeignKey('workspaces.id'))
     category_id: Mapped[int] = mapped_column(ForeignKey('categories.id'))
-    owner_id: Mapped[UUID] = mapped_column(ForeignKey('users.id'))
-    assigned_to: Mapped[UUID] = mapped_column(ForeignKey('users.id'))
+    owner_id: Mapped[UUID] = mapped_column(SQL_UUID(as_uuid=True), ForeignKey('users.id'))
+    assigned_to_id: Mapped[UUID] = mapped_column(SQL_UUID(as_uuid=True), ForeignKey('users.id'))
 
     participants: Mapped[list['ParticipantModel']] = relationship(
         cascade='all, delete-orphan', back_populates='meet', lazy='raise_on_sql'
     )
 
-    owner: Mapped['UserModel'] = relationship(
-        'UserModel', foreign_keys=[owner_id], back_populates='owned_meetings'
-    )
-
-    assigned: Mapped['UserModel'] = relationship(
-        'UserModel', foreign_keys=[assigned_to], back_populates='assigned_meetings'
-    )
-
     workspace: Mapped['WorkspaceModel'] = relationship(
-        'WorkspaceModel', foreign_keys=[workspace_id], back_populates='meets', lazy='raise_on_sql'
+        'WorkspaceModel', back_populates='meets', lazy='raise_on_sql', foreign_keys=[workspace_id]
     )
-
     category: Mapped['CategoryModel'] = relationship(
         'CategoryModel', back_populates='meets', lazy='joined'
     )
-
-
-class ParticipantModel(Base, IntIdPkMixin, DatetimeFieldsMixin):
-    __tablename__ = 'participants'
-
-    meet_id: Mapped[int] = mapped_column(ForeignKey('meets.id'))
-    user_id: Mapped[UUID] = mapped_column(ForeignKey('users.id'))
-    status: Mapped[str]
-
-    user: Mapped['UserModel'] = relationship(
-        'UserModel', back_populates='participations', lazy='joined'
+    owner: Mapped['UserModel'] = relationship(
+        'UserModel', back_populates='owned_meets', foreign_keys=[owner_id], lazy='selectin'
     )
-    meet: Mapped['MeetModel'] = relationship(
-        'MeetModel', back_populates='participants', lazy='raise_on_sql'
+    assigned_to: Mapped['UserModel'] = relationship(
+        'UserModel', back_populates='assigned_meets', foreign_keys=[assigned_to_id], lazy='selectin'
     )
-
-    __table_args__ = (UniqueConstraint('meet_id', 'user_id'),)

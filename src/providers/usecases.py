@@ -3,16 +3,28 @@ from dishka import Provider, Scope, provide
 from src.apps.comment import (
     CreateCommentInteractor,
     DeleteCommentInteractor,
-    UpdateCommentInteractor,
-    GetCommentsByTaskIdInteractor,
     GetCommentsByFeatureIdInteractor,
+    GetCommentsByTaskIdInteractor,
+    UpdateCommentInteractor,
 )
 from src.apps.feature import (
     CreateFeatureInteractor,
     DeleteFeatureInteractor,
-    GetFeaturesByWorkspaceInteractor,
     GetFeatureByIdInteractor,
+    GetFeaturesByWorkspaceInteractor,
     UpdateFeatureInteractor,
+)
+from src.apps.meet import (
+    CreateMeetInteractor,
+    CreateParticipantInteractor,
+    DeleteMeetInteractor,
+    DeleteParticipantInteractor,
+    GetListMeetsInteractor,
+    GetListParticipantsInteractor,
+    GetMeetInteractor,
+    GetParticipantInteractor,
+    UpdateMeetInteractor,
+    UpdateParticipantInteractor,
 )
 from src.apps.project.interactors import (
     CreateProjectInteractor,
@@ -25,8 +37,8 @@ from src.apps.project.use_cases.get_project_by_id import GetProjectByIdUseCase
 from src.apps.task import (
     CreateTaskInteractor,
     DeleteTaskInteractor,
-    GetTasksByFeatureIdInteractor,
     GetTaskByIdInteractor,
+    GetTasksByFeatureIdInteractor,
     UpdateTaskInteractor,
 )
 from src.apps.workspace.interactors.category_interactors import (
@@ -35,15 +47,17 @@ from src.apps.workspace.interactors.category_interactors import (
     GetCategoryByWorkspaceInteractor,
     UpdateCategoryInteractor,
 )
-from src.apps.workspace.interactors.category_interactors.get_category_by_id import GetCategoryByIdInteractor
+from src.apps.workspace.interactors.category_interactors.get_category_by_id import (
+    GetCategoryByIdInteractor,
+)
 from src.apps.workspace.interactors.role_interactors import (
+    AssignRoleToWorkspaceMemberInteractor,
     CreateRoleInteractor,
     DeleteRoleInteractor,
     GetRoleByIdInteractor,
     GetRolesByWorkspaceInteractor,
+    RemoveRoleFromWorkspaceMemberInteractor,
     UpdateRoleInteractor,
-    AssignRoleToWorkspaceMemberInteractor,
-    RemoveRoleFromWorkspaceMemberInteractor
 )
 from src.apps.workspace.interactors.tag_interactors import (
     CreateTagInteractor,
@@ -60,7 +74,9 @@ from src.apps.workspace.interactors.workspace_interactors import (
     GetWorkspaceByMemberInteractor,
     UpdateWorkspaceInteractor,
 )
-from src.apps.workspace.interactors.workspace_interactors.get_workspace_members import GetWorkspaceMembersInteractor
+from src.apps.workspace.interactors.workspace_interactors.get_workspace_members import (
+    GetWorkspaceMembersInteractor,
+)
 from src.apps.workspace.interactors.workspace_invite_interactors import (
     CreateWorkspaceInviteInteractor,
     DeleteWorkspaceInviteInteractor,
@@ -163,3 +179,23 @@ class TaskInteractorProvider(Provider):
     get_tasks = provide(GetTasksByFeatureIdInteractor)
     update_task = provide(UpdateTaskInteractor)
     delete_task = provide(DeleteTaskInteractor)
+
+
+class MeetInteractorProvider(Provider):
+    scope = Scope.REQUEST
+
+    create_meet = provide(CreateMeetInteractor)
+    get_meet_by_id = provide(GetMeetInteractor)
+    get_meets = provide(GetListMeetsInteractor)
+    update_meet = provide(UpdateMeetInteractor)
+    delete_meet = provide(DeleteMeetInteractor)
+
+
+class MeetParticipantInteractorProvider(Provider):
+    scope = Scope.REQUEST
+
+    create_participant = provide(CreateParticipantInteractor)
+    get_participant_by_id = provide(GetParticipantInteractor)
+    get_participants = provide(GetListParticipantsInteractor)
+    update_participant = provide(UpdateParticipantInteractor)
+    delete_participant = provide(DeleteParticipantInteractor)

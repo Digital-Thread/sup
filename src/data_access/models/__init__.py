@@ -2,6 +2,7 @@ from .base import Base
 from .comment import CommentModel
 from .feature import FeatureModel
 from .meet import MeetModel
+from .meet_participants import ParticipantModel
 from .project import ProjectModel
 from .project_participants import ProjectParticipantsModel
 from .task import TaskModel
@@ -30,4 +31,5 @@ __all__ = (
     'ProjectParticipantsModel',
     'TaskModel',
     'MeetModel',
+    'ParticipantModel',
 )

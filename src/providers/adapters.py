@@ -13,9 +13,9 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from src.apps.auth import JWTService
-from src.apps.feature import IFeatureRepository
 from src.apps.comment import ICommentRepository
-from src.apps.meet import IMeetRepository, IParticipantRepository, MeetService
+from src.apps.feature import IFeatureRepository
+from src.apps.meet import IMeetRepository, IParticipantRepository
 from src.apps.meet.protocols import WorkspaceService, WorkspaceServiceProtocol
 from src.apps.project.project_repository import IProjectRepository
 from src.apps.send_mail.service import SendMailService
@@ -46,14 +46,14 @@ from src.data_access.repositories import (
     CategoryRepository,
     CommentRepository,
     FeatureRepository,
+    MeetParticipantRepository,
+    MeetRepository,
     RoleRepository,
     TagRepository,
     TaskRepository,
     WorkspaceInviteRepository,
     WorkspaceRepository,
 )
-from src.data_access.repositories.meet import MeetRepository
-from src.data_access.repositories.meet_participant import ParticipantRepository
 from src.data_access.repositories.project_repository import ProjectRepository
 from src.data_access.repositories.user_repository import UserRepository
 from src.data_access.repositories.user_workspace_role_repository import (
@@ -81,6 +81,10 @@ class SqlalchemyProvider(Provider):
                 await session.commit()
             except SQLAlchemyError:
                 await session.rollback()
+                raise
+            except Exception:
+                await session.rollback()
+                raise
             finally:
                 await session.close()
 
@@ -138,6 +142,8 @@ class RepositoriesProvider(Provider):
     )
     tag_repository = provide(TagRepository, provides=ITagRepository)
     project_repository = provide(ProjectRepository, provides=IProjectRepository)
+    meet_repository = provide(MeetRepository, provides=IMeetRepository)
+    participant_repository = provide(MeetParticipantRepository, provides=IParticipantRepository)
 
     @provide(scope=scope, provides=SendMailServiceProtocol)
     def provide_send_mail_service(self) -> SendMailService:
@@ -232,26 +238,17 @@ class RepositoriesProvider(Provider):
         )
 
     @provide(scope=scope)
-    def provide_meet_repository(self, session: AsyncSession) -> IMeetRepository:
-        return MeetRepository(session)
+    def provide_meet_repository(
+        self, session: AsyncSession, context: WorkspaceContext
+    ) -> IMeetRepository:
+        return MeetRepository(session, context)
 
     @provide(scope=scope)
-    def provide_participant_repository(self, session: AsyncSession) -> IParticipantRepository:
-        return ParticipantRepository(session)
+    def provide_participant_repository(
+        self, session: AsyncSession, context: WorkspaceContext
+    ) -> IParticipantRepository:
+        return MeetParticipantRepository(session, context)
 
     @provide(scope=scope)
     def provide_temp_workspace_service(self) -> WorkspaceServiceProtocol:
         return WorkspaceService()
-
-    @provide(scope=scope)
-    def provide_meet_service(
-        self,
-        meet_repository: IMeetRepository,
-        participant_repository: IParticipantRepository,
-        workspace_service: WorkspaceServiceProtocol,
-    ) -> MeetService:
-        return MeetService(
-            meet_repository=meet_repository,
-            participant_repository=participant_repository,
-            workspace_service=workspace_service,
-        )

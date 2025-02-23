@@ -1,122 +1,102 @@
 from datetime import datetime
-from typing import Annotated, Literal
-from uuid import UUID
+from enum import StrEnum
+from typing import Literal
 
-from pydantic import BaseModel, BeforeValidator, Field
+from pydantic import BaseModel, ConfigDict, Field
 
-from src.apps.meet.dtos import MeetFilterFields, MeetResponseDTO, ParticipantResponseDTO
-
-
-class SuccessResponse(BaseModel):
-    message: str
-
-
-class ParticipantRequest(BaseModel):
-    user_id: UUID
-    status: Literal['present', 'absent', 'warned']
-
-
-class ParticipantRequestUpdate(BaseModel):
-    status: Literal['present', 'absent', 'warned']
+from src.apps.meet import FilterField, OrderByField, SortOrder
+from src.apps.meet.domain import (
+    AssignedId,
+    CategoryId,
+    MeetId,
+    OwnerId,
+    ParticipantId,
+    WorkspaceId,
+)
 
 
-class ParticipantRequestDelete(BaseModel):
-    id: int
-
-
-class MeetRequestCreate(BaseModel):
+class CreateMeetRequestDTO(BaseModel):
     name: str
     meet_at: datetime
-    category_id: int
-    assigned_to: UUID
-    participants: list[ParticipantRequest]
+    owner_id: OwnerId
+    category_id: CategoryId | None = None
+    assigned_to: AssignedId | None = None
+    participants: list[ParticipantId] | None = None
 
 
-class MeetRequestUpdate(BaseModel):
+class UpdateMeetRequestDTO(BaseModel):
     name: str | None = None
     meet_at: datetime | None = None
-    category_id: int | None = None
-    assigned_to: UUID | None = None
-    participants_to_add: list[ParticipantRequest] = Field(default_factory=list)
-    participants_to_update: list[ParticipantRequestUpdate] = Field(default_factory=list)
-    participants_to_delete: list[ParticipantRequestDelete] = Field(default_factory=list)
+    category_id: CategoryId | None = None
+    assigned_to: AssignedId | None = None
+    participants: list[ParticipantId] | None = None
 
 
-class ParticipantResponse(BaseModel):
-    id: int
-    user_id: UUID
-    status: Literal['present', 'absent', 'warned']
-
-    @staticmethod
-    def from_dto(dto: ParticipantResponseDTO) -> 'ParticipantResponse':
-        return ParticipantResponse(id=dto.id, user_id=dto.user_id, status=dto.status)
-
-
-class MeetResponse(BaseModel):
-    id: int
+class MeetResponseDTO(BaseModel):
+    id: MeetId
+    workspace_id: WorkspaceId
     name: str
     meet_at: datetime
-    category_id: int
-    owner_id: UUID
-    assigned_to: UUID
-    participants: list[ParticipantResponse]
-
-    @staticmethod
-    def from_dto(dto: MeetResponseDTO) -> 'MeetResponse':
-        return MeetResponse(
-            id=dto.id,
-            name=dto.name,
-            meet_at=dto.meet_at,
-            category_id=dto.category_id,
-            owner_id=dto.owner_id,
-            assigned_to=dto.assigned_to,
-            participants=[ParticipantResponse.from_dto(p) for p in dto.participants],
-        )
+    category_id: CategoryId | None
+    owner_id: OwnerId
+    assigned_to: AssignedId | None
+    participants: list[ParticipantId] | None
+    created_at: datetime
+    updated_at: datetime
+    model_config = ConfigDict(
+        from_attributes=True,
+    )
 
 
-class CreateMeetResponse(BaseModel):
-    id: int
-
-
-class PaginatedParams(BaseModel):
-    page: int = Field(1, ge=1)
-    per_page: Annotated[Literal[4, 8, 16, 24] | None, BeforeValidator(int)] = 16
+class PageLimits(StrEnum):
+    ALL = 'all'
+    FOUR = '4'
+    EIGHT = '8'
+    SIXTEEN = '16'
+    TWENTYFOUR = '24'
 
     @property
-    def limit(self) -> Literal[4, 8, 16, 24] | None:
-        return self.per_page
+    def limit_by(self) -> Literal[4, 8, 16, 24, None]:
+        match self:
+            case self.ALL:
+                return None
+            case self.FOUR:
+                return 4
+            case self.EIGHT:
+                return 8
+            case self.SIXTEEN:
+                return 16
+            case self.TWENTYFOUR:
+                return 24
+
+
+class QueryParams(BaseModel):
+    filter_by_name: str | None = None
+    filter_by_category: CategoryId | None = None
+    filter_by_assigned_to: AssignedId | None = None
+    filter_by_meet_at: datetime | None = None
+    order_by_field: OrderByField = OrderByField.MEET_AT
+    sort_order: SortOrder = SortOrder.DESC
+
+    page: int = Field(1, ge=1)
+    per_page: PageLimits = PageLimits.SIXTEEN
 
     @property
     def offset(self) -> int:
-        if self.per_page is None:
+        if self.per_page.limit_by is None:
             return 0
-        return (self.page - 1) * self.per_page
+        return (self.page - 1) * self.per_page.limit_by
 
+    @property
+    def filters(self) -> FilterField | None:
+        filter = FilterField()
+        if self.filter_by_name is not None:
+            filter['name'] = self.filter_by_name
+        if self.filter_by_category is not None:
+            filter['category'] = self.filter_by_category
+        if self.filter_by_assigned_to is not None:
+            filter['assigned_to'] = self.filter_by_assigned_to
+        if self.filter_by_meet_at is not None:
+            filter['meet_at'] = self.filter_by_meet_at
 
-class MeetFilterFieldsRequest(BaseModel):
-    category_id: int | None = None
-    assigned_to: UUID | None = None
-    meet_at: datetime | None = None
-
-    def to_dto(self) -> MeetFilterFields:
-        result: MeetFilterFields = {}
-
-        if self.category_id is not None:
-            result['category_id'] = self.category_id
-        if self.assigned_to is not None:
-            result['assigned_to'] = self.assigned_to
-        if self.meet_at is not None:
-            result['meet_at'] = self.meet_at
-        return result
-
-
-class MeetSortFieldsRequest(BaseModel):
-    field: Literal['meet_at', 'name', 'assigned_to'] = 'meet_at'
-    order: Literal['ASC', 'DESC'] = 'DESC'
-
-
-class PaginatedResponse[M](BaseModel):
-    count: int = Field(description='Number of items returned in the response')
-    items: list[M] = Field(
-        description='List of items returned in the response following given criteria'
-    )
+        return filter if filter else None
