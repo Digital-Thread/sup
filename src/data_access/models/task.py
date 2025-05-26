@@ -1,12 +1,13 @@
 from datetime import date, datetime
+from enum import IntEnum
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import TIMESTAMP, Column, Date, ForeignKey, Index, Integer, String, Table
+from sqlalchemy import TIMESTAMP
 from sqlalchemy import UUID as SQL_UUID
+from sqlalchemy import Column, Date, ForeignKey, Index, Integer, String, Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.apps.task.domain import Priority, Status
 from src.data_access.models import Base
 
 if TYPE_CHECKING:
@@ -23,12 +24,26 @@ task_tag = Table(
 )
 
 
+class Priority(IntEnum):
+    CRITICAL = 5
+    HIGH = 4
+    MEDIUM = 3
+    LOW = 2
+    NO_PRIORITY = 1
+
+
+class Status(IntEnum):
+    FINISH = 5
+    BACKLOG = 4
+    TEST = 3
+    DEVELOPMENT = 2
+    NEW = 1
+
+
 class TaskModel(Base):
     __tablename__ = 'tasks'
 
-    __table_args__ = (
-        Index('ix_tasks_feature_id', 'feature_id'),
-    )
+    __table_args__ = (Index('ix_tasks_feature_id', 'feature_id'),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(50))
@@ -48,9 +63,7 @@ class TaskModel(Base):
 
     owner_id: Mapped[UUID] = mapped_column(SQL_UUID(as_uuid=True), ForeignKey('users.id'))
 
-    assigned_to_id: Mapped[UUID] = mapped_column(
-        SQL_UUID(as_uuid=True), ForeignKey('users.id')
-    )
+    assigned_to_id: Mapped[UUID] = mapped_column(SQL_UUID(as_uuid=True), ForeignKey('users.id'))
 
     workspace: Mapped['WorkspaceModel'] = relationship(
         back_populates='tasks',
@@ -60,9 +73,7 @@ class TaskModel(Base):
         back_populates='tasks',
     )
 
-    owner: Mapped['UserModel'] = relationship(
-        back_populates='owned_tasks', foreign_keys=[owner_id]
-    )
+    owner: Mapped['UserModel'] = relationship(back_populates='owned_tasks', foreign_keys=[owner_id])
 
     assigned_to: Mapped['UserModel'] = relationship(
         back_populates='assigned_tasks', foreign_keys=[assigned_to_id]

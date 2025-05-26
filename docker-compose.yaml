@@ -1,6 +1,5 @@
-version: "3.9"
-
 services:
+
   postgres:
     container_name: postgres
     image: postgres:15.3-alpine
@@ -30,16 +29,24 @@ services:
           memory: 1GB
     networks:
       - custom
-  alembic:
-    build: .
-    env_file:
-      - '.env'
-    depends_on:
-      postgres:
-        condition: service_healthy
+
+  redis:
+    container_name: redis
+    image: redis:7.0-alpine
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    volumes:
+      - redis_data:/data
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - custom
-    command: alembic upgrade head
+
   sup_backend:
     build:
       context: .
@@ -48,13 +55,18 @@ services:
     env_file:
       - '.env'
     depends_on:
-      - alembic
+      - redis
     networks:
       - custom
-    command: python -m src.main
+    command: sh -c "alembic upgrade head && python -m src.main"
     ports:
       - "8080:8080"
+    volumes:
+      - .:/app
 
 networks:
   custom:
     driver: bridge
+
+volumes:
+  redis_data:

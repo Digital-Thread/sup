@@ -1,12 +1,12 @@
 from typing import List
 
-from src.apps.user.domain.entities import User
+from src.apps.user.domain.entity import User
 from src.apps.user.exceptions import (
     UserNotAdminError,
     UserNotFoundError,
     UserPermissionError,
 )
-from src.apps.user.repositories import IUserRepository
+from src.apps.user.repository import IUserRepository
 from src.apps.user.services import GetUserService
 
 

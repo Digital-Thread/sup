@@ -4,13 +4,13 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class CreateWorkspaceDTO(BaseModel):
+class CreateWorkspaceRequestDTO(BaseModel):
     name: str
     owner_id: UUID
 
 
 class ResponseWorkspaceDTO(BaseModel):
-    id: UUID
+    workspace_id: UUID
     owner_id: UUID
     name: str
     created_at: datetime
@@ -26,7 +26,14 @@ class ResponseWorkspaceDTO(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class UpdateWorkspaceDTO(BaseModel):
+class UpdateWorkspaceRequestDTO(BaseModel):
     name: str | None = Field(default=None)
     description: str | None = Field(default=None)
     logo: str | None = Field(default=None)
+
+
+class MemberResponseDTO(BaseModel):
+    id: UUID
+    name: str
+
+    model_config = ConfigDict(from_attributes=True)

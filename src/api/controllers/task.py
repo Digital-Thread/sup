@@ -8,81 +8,80 @@ from fastapi import APIRouter, Query, status
 from src.api.dtos.task import (
     CreateTaskRequestDTO,
     QueryParams,
-    SuccessResponse,
+    TaskForFeatureResponseDTO,
     TaskResponseDTO,
     UpdateTaskRequestDTO,
 )
 from src.apps.task import (
     CreateTaskInteractor,
     DeleteTaskInteractor,
-    GetAllTasksInteractor,
-    GetTaskInteractor,
+    GetTaskByIdInteractor,
+    GetTasksByFeatureIdInteractor,
+    OrderBy,
+    PaginateParams,
     TaskInputDTO,
+    TaskListQuery,
     TaskUpdateDTO,
     UpdateTaskInteractor,
 )
-from src.apps.task.domain import OptionalTaskUpdateFields, TaskId
-from src.apps.task.repositories import TaskListQuery
-from src.apps.task.repositories.task_repository import OrderBy, PaginateParams
+from src.apps.task.domain import OptionalTaskUpdateFields, TaskId, WorkspaceId
+from src.providers.context import WorkspaceContext
 
 task_router = APIRouter(route_class=DishkaRoute)
 
 
-@task_router.post('/', status_code=status.HTTP_201_CREATED, response_model=SuccessResponse)
+@task_router.post('/', status_code=status.HTTP_201_CREATED)
 async def create_task(
-        dto: CreateTaskRequestDTO,
-        interactor: FromDishka[CreateTaskInteractor],
-) -> SuccessResponse:
-    task = TaskInputDTO(**dto.model_dump())
+    dto: CreateTaskRequestDTO,
+    interactor: FromDishka[CreateTaskInteractor],
+    context: FromDishka[WorkspaceContext],
+) -> None:
+    workspace_id = context.workspace_id
+    task = TaskInputDTO(WorkspaceId(workspace_id), **dto.model_dump())
     await interactor.execute(dto=task)
 
-    return SuccessResponse(message='Task created')
 
-
-@task_router.get('/', status_code=status.HTTP_200_OK, response_model=list[TaskResponseDTO])
-async def get_tasks(
-        query: Annotated[QueryParams, Query()],
-        interactor: FromDishka[GetAllTasksInteractor],
-) -> list[TaskResponseDTO]:
+@task_router.get(
+    '/', status_code=status.HTTP_200_OK, response_model=list[TaskForFeatureResponseDTO]
+)
+async def get_tasks_by_feature_id(
+    query: Annotated[QueryParams, Query()],
+    interactor: FromDishka[GetTasksByFeatureIdInteractor],
+) -> list[TaskForFeatureResponseDTO]:
     feature_id = query.feature_id
     query_params = TaskListQuery(
         order_by=OrderBy(field=query.order_by_field, order=query.sort_order),
         paginate_by=PaginateParams(offset=query.offset, limit_by=query.per_page.limit_by),
     )
     tasks = await interactor.execute(feature_id=feature_id, query=query_params)
-    return [TaskResponseDTO(**asdict(task)) for task in tasks] if tasks else []
+    return [TaskForFeatureResponseDTO(**asdict(task)) for task in tasks] if tasks else []
 
 
-@task_router.get(
-    '/{task_id}', status_code=status.HTTP_200_OK, response_model=TaskResponseDTO
-)
+@task_router.get('/{task_id}', status_code=status.HTTP_200_OK, response_model=TaskResponseDTO)
 async def get_task_by_id(
-        task_id: TaskId,
-        interactor: FromDishka[GetTaskInteractor],
+    task_id: TaskId,
+    interactor: FromDishka[GetTaskByIdInteractor],
 ) -> TaskResponseDTO:
     task = await interactor.execute(task_id=task_id)
     return TaskResponseDTO(**asdict(task))
 
 
-@task_router.patch(
-    '/{task_id}', status_code=status.HTTP_200_OK, response_model=SuccessResponse
-)
+@task_router.patch('/{task_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def update_task(
-        task_id: TaskId,
-        dto: UpdateTaskRequestDTO,
-        interactor: FromDishka[UpdateTaskInteractor],
-) -> SuccessResponse:
+    task_id: TaskId,
+    dto: UpdateTaskRequestDTO,
+    interactor: FromDishka[UpdateTaskInteractor],
+) -> None:
     update_data = TaskUpdateDTO(
         id=task_id,
-        updated_fields=OptionalTaskUpdateFields(**dto.model_dump(exclude_unset=True)),
+        updated_fields=OptionalTaskUpdateFields(**dto.model_dump(exclude_unset=True)),  # type: ignore[typeddict-item]
     )
     await interactor.execute(update_data)
-    return SuccessResponse(message='Task updated')
 
 
 @task_router.delete('/{task_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_task(
-        task_id: TaskId,
-        interactor: FromDishka[DeleteTaskInteractor],
+    task_id: TaskId,
+    interactor: FromDishka[DeleteTaskInteractor],
 ) -> None:
     await interactor.execute(task_id=task_id)

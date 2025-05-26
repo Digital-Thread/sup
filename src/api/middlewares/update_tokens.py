@@ -1,10 +1,10 @@
-from typing import Callable
+from typing import Awaitable, Callable
 
 from fastapi import Request, Response
 
 
 async def update_tokens_middleware(
-    request: Request, call_next: Callable[[Request], Response]
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
 ) -> Response:
     response: Response = await call_next(request)
     access_token = getattr(request.state, 'new_access_token', None)

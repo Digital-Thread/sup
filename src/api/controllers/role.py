@@ -1,72 +1,115 @@
+from typing import Annotated
 from uuid import UUID
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Body, Path, Query, status
 
-from src.api.dtos.role_dtos import (
+from src.api.dtos.role import (
     CreateRoleDTO,
-    ResponseRoleWithUserCountDTO,
+    RoleResponseDTO,
+    RoleWithMembersResponseDTO,
     UpdateRoleDTO,
 )
-from src.apps.workspace.dtos.role_dtos import CreateRoleAppDTO, UpdateRoleAppDTO
-from src.apps.workspace.exceptions.role_exceptions import RoleException
-from src.apps.workspace.use_cases.role_use_cases import (
-    CreateRoleUseCase,
-    DeleteRoleUseCase,
-    GetRoleByWorkspaceUseCase,
-    UpdateRoleUseCase,
+from src.apps.workspace.dtos.role_dtos import (
+    AssignRoleToWorkspaceMemberDTO,
+    CreateRoleAppDTO,
+    GetRolesDTO,
+    UpdateRoleAppDTO,
 )
+from src.apps.workspace.interactors.role_interactors import (
+    AssignRoleToWorkspaceMemberInteractor,
+    CreateRoleInteractor,
+    DeleteRoleInteractor,
+    GetRoleByIdInteractor,
+    GetRolesByWorkspaceInteractor,
+    UpdateRoleInteractor,
+)
+from src.apps.workspace.interactors.role_interactors.remove_role_from_workspace_member import (
+    RemoveRoleFromWorkspaceMemberInteractor,
+)
+from src.providers.context import WorkspaceContext
 
 role_router = APIRouter(route_class=DishkaRoute)
 
 
 @role_router.post('', status_code=status.HTTP_201_CREATED)
 async def create_role(
-    body: CreateRoleDTO, use_case: FromDishka[CreateRoleUseCase]
-) -> dict[str, str]:
-    request = CreateRoleAppDTO(**body.model_dump())
-    try:
-        await use_case.execute(request)
-    except RoleException as error:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
-    return {'redirect_url': '/'}
+    body: CreateRoleDTO,
+    interactor: FromDishka[CreateRoleInteractor],
+    context: FromDishka[WorkspaceContext],
+) -> None:
+    create_role_data = CreateRoleAppDTO(**body.model_dump(), workspace_id=context.workspace_id)
+    await interactor.execute(create_role_data)
 
 
 @role_router.get(
-    '/', status_code=status.HTTP_200_OK, response_model=list[ResponseRoleWithUserCountDTO]
+    '/',
+    status_code=status.HTTP_200_OK,
+    response_model=list[RoleWithMembersResponseDTO],
+    response_model_exclude_none=True,
 )
-async def get_roles_by_workspace_id(
-    workspace_id: UUID, use_case: FromDishka[GetRoleByWorkspaceUseCase]
-) -> list[ResponseRoleWithUserCountDTO]:
-    try:
-        response = await use_case.execute(workspace_id)
-    except RoleException as error:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
-    return [ResponseRoleWithUserCountDTO(**role.__dict__) for role in response]
+async def get_roles_in_workspace(
+    interactor: FromDishka[GetRolesByWorkspaceInteractor],
+    context: FromDishka[WorkspaceContext],
+    page: int = Query(1, description='Page number', ge=1),
+    page_size: int = Query(10, description='Number of roles per page', ge=5, le=100),
+) -> list[RoleWithMembersResponseDTO]:
+    roles = await interactor.execute(
+        request_data=GetRolesDTO(workspace_id=context.workspace_id, page=page, page_size=page_size)
+    )
+    return [RoleWithMembersResponseDTO.model_validate(role) for role in roles]
 
 
-@role_router.patch('/{role_id}', status_code=status.HTTP_200_OK)
+@role_router.get('/{role_id}', status_code=status.HTTP_200_OK, response_model=RoleResponseDTO)
+async def get_role_by_id(
+    role_id: Annotated[int, Path()],
+    interactor: FromDishka[GetRoleByIdInteractor],
+    context: FromDishka[WorkspaceContext],
+) -> RoleResponseDTO:
+    role = await interactor.execute(role_id=role_id, workspace_id=context.workspace_id)
+    return RoleResponseDTO.model_validate(role)
+
+
+@role_router.patch('/{role_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def update_role(
     body: UpdateRoleDTO,
-    workspace_id: UUID,
     role_id: int,
-    use_case: FromDishka[UpdateRoleUseCase],
-) -> dict[str, str]:
-    request = UpdateRoleAppDTO(**body.model_dump(exclude_none=True))
-    try:
-        await use_case.execute(role_id, workspace_id, request)
-    except RoleException as error:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
-    return {'redirect_url': '/'}
+    interactor: FromDishka[UpdateRoleInteractor],
+    context: FromDishka[WorkspaceContext],
+) -> None:
+    updated_role_data = UpdateRoleAppDTO(
+        **body.model_dump(exclude_none=True), id=role_id, workspace_id=context.workspace_id
+    )
+    await interactor.execute(updated_role_data=updated_role_data)
 
 
-@role_router.delete('/{role_id}')
+@role_router.delete('/{role_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_role_by_id(
-    role_id: int, workspace_id: UUID, use_case: FromDishka[DeleteRoleUseCase]
-) -> dict[str, str]:
-    try:
-        await use_case.execute(role_id, workspace_id)
-    except RoleException as error:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(error))
-    return {'redirect_url': '/'}
+    role_id: int,
+    interactor: FromDishka[DeleteRoleInteractor],
+    context: FromDishka[WorkspaceContext],
+) -> None:
+    await interactor.execute(role_id=role_id, workspace_id=context.workspace_id)
+
+
+@role_router.post('/{role_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def assign_role_to_workspace_member(
+    role_id: int,
+    member_id: Annotated[UUID, Body(embed=True)],
+    interactor: FromDishka[AssignRoleToWorkspaceMemberInteractor],
+    context: FromDishka[WorkspaceContext],
+) -> None:
+    request = AssignRoleToWorkspaceMemberDTO(
+        member_id=member_id, id=role_id, workspace_id=context.workspace_id
+    )
+    await interactor.execute(request)
+
+
+@role_router.delete('/', status_code=status.HTTP_204_NO_CONTENT)
+async def remove_role_from_workspace_member(
+    member_id: Annotated[UUID, Body(embed=True)],
+    interactor: FromDishka[RemoveRoleFromWorkspaceMemberInteractor],
+    context: FromDishka[WorkspaceContext],
+) -> None:
+    await interactor.execute(member_id=member_id, workspace_id=context.workspace_id)

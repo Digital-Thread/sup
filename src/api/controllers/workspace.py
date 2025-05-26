@@ -2,25 +2,30 @@ from uuid import UUID
 
 from dishka import FromDishka
 from dishka.integrations.fastapi import DishkaRoute
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, status
 
 from src.api.dtos.workspace_dtos import (
-    CreateWorkspaceDTO,
+    CreateWorkspaceRequestDTO,
+    MemberResponseDTO,
     ResponseWorkspaceDTO,
-    UpdateWorkspaceDTO,
+    UpdateWorkspaceRequestDTO,
 )
 from src.apps.workspace.dtos.workspace_dtos import (
-    CreateWorkspaceAppDTO,
-    UpdateWorkspaceAppDTO,
+    CreateWorkspaceDTO,
+    DeleteWorkspaceDTO,
+    GetWorkspacesByMemberIdDTO,
+    OptionalWorkspaceUpdateFields,
+    UpdateWorkspaceDTO,
 )
-from src.apps.workspace.exceptions.workspace_exceptions import WorkspaceException
-from src.apps.workspace.use_cases.workspace_use_cases import (
-    CreateWorkspaceUseCase,
-    DeleteWorkspaceUseCase,
-    GetWorkspaceByIdUseCase,
-    GetWorkspaceByMemberUseCase,
-    UpdateWorkspaceUseCase,
+from src.apps.workspace.interactors.workspace_interactors import (
+    CreateWorkspaceInteractor,
+    DeleteWorkspaceInteractor,
+    GetWorkspaceByIdInteractor,
+    GetWorkspaceByMemberInteractor,
+    GetWorkspaceMembersInteractor,
+    UpdateWorkspaceInteractor,
 )
+from src.providers.context import WorkspaceContext
 
 workspace_router = APIRouter(route_class=DishkaRoute)
 
@@ -30,66 +35,55 @@ workspace_router = APIRouter(route_class=DishkaRoute)
     status_code=status.HTTP_201_CREATED,
 )
 async def create_workspace(
-    body: CreateWorkspaceDTO, use_case: FromDishka[CreateWorkspaceUseCase]
-) -> dict[str, str]:
-    request = CreateWorkspaceAppDTO(**body.model_dump())
-    try:
-        await use_case.execute(request)
-    except WorkspaceException as error:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(error))
+    body: CreateWorkspaceRequestDTO, interactor: FromDishka[CreateWorkspaceInteractor]
+) -> None:
+    create_workspace_data = CreateWorkspaceDTO(**body.model_dump())
+    await interactor.execute(create_workspace_data=create_workspace_data)
 
-    return {'redirect_url': '/'}
+
+@workspace_router.get('/members')
+async def get_workspace_members(
+    interactor: FromDishka[GetWorkspaceMembersInteractor], context: FromDishka[WorkspaceContext]
+) -> list[MemberResponseDTO]:
+    members = await interactor.execute(workspace_id=context.workspace_id)
+    return [MemberResponseDTO.model_validate(member) for member in members]
 
 
 @workspace_router.get(
     '/{workspace_id}', status_code=status.HTTP_200_OK, response_model=ResponseWorkspaceDTO
 )
 async def get_workspace_by_id(
-    workspace_id: UUID, use_case: FromDishka[GetWorkspaceByIdUseCase]
+    workspace_id: UUID, interactor: FromDishka[GetWorkspaceByIdInteractor]
 ) -> ResponseWorkspaceDTO:
-    try:
-        response = await use_case.execute(workspace_id)
-    except WorkspaceException as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'{str(e)}')
-
-    return ResponseWorkspaceDTO(**response.__dict__)
+    workspace = await interactor.execute(workspace_id)
+    return ResponseWorkspaceDTO.model_validate(workspace)
 
 
 @workspace_router.get(
     '/', status_code=status.HTTP_200_OK, response_model=list[ResponseWorkspaceDTO]
 )
 async def get_workspaces_by_member_id(
-    member_id: UUID, use_case: FromDishka[GetWorkspaceByMemberUseCase]
+    member_id: UUID, interactor: FromDishka[GetWorkspaceByMemberInteractor]
 ) -> list[ResponseWorkspaceDTO]:
-    try:
-        response = await use_case.execute(member_id)
-    except WorkspaceException as e:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'{str(e)}')
-
-    return [ResponseWorkspaceDTO(**workspace.__dict__) for workspace in response]
+    workspaces = await interactor.execute(GetWorkspacesByMemberIdDTO(member_id=member_id))
+    return [ResponseWorkspaceDTO.model_validate(workspace) for workspace in workspaces]
 
 
-@workspace_router.patch('/{workspace_id}')
+@workspace_router.patch('/{workspace_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def update_workspace(
-    body: UpdateWorkspaceDTO,
+    body: UpdateWorkspaceRequestDTO,
     workspace_id: UUID,
-    use_case: FromDishka[UpdateWorkspaceUseCase],
-) -> dict[str, str]:
-    request = UpdateWorkspaceAppDTO(**body.model_dump(exclude_none=True))
-    try:
-        await use_case.execute(workspace_id, request)
-    except WorkspaceException as error:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'{str(error)}')
-
-    return {'redirect_url': '/'}
+    interactor: FromDishka[UpdateWorkspaceInteractor],
+) -> None:
+    workspace_update_data = UpdateWorkspaceDTO(
+        updated_fields=OptionalWorkspaceUpdateFields(**body.model_dump(exclude_unset=True)),  # type: ignore[typeddict-item]
+        workspace_id=workspace_id,
+    )
+    await interactor.execute(workspace_update_data=workspace_update_data)
 
 
-@workspace_router.delete('/{workspace_id}')
+@workspace_router.delete('/{workspace_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_workspace(
-    workspace_id: UUID, owner_id: UUID, use_case: FromDishka[DeleteWorkspaceUseCase]
-) -> dict[str, str]:
-    try:
-        await use_case.execute(workspace_id, owner_id)
-    except WorkspaceException as error:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'{str(error)}')
-    return {'redirect_url': '/'}
+    workspace_id: UUID, owner_id: UUID, interactor: FromDishka[DeleteWorkspaceInteractor]
+) -> None:
+    await interactor.execute(DeleteWorkspaceDTO(workspace_id=workspace_id, owner_id=owner_id))

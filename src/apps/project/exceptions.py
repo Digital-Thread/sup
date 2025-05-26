@@ -2,23 +2,27 @@ from src.apps.base_exception import ApplicationException
 
 
 class ProjectException(ApplicationException):
-    """Ошибка работы с категорией"""
+    """Ошибка работы с проектом"""
 
 
 class ProjectNotFound(ProjectException):
-    """Категория не найдена"""
+    """Проект не найден"""
 
 
 class ProjectNotUpdated(ProjectException):
-    """Категория не обновлена"""
+    """Проект не обновлен"""
+
+
+class ProjectNotDeleted(ProjectException):
+    """Проект не удален"""
 
 
 class WorkspaceForProjectNotFound(ProjectException):
-    """Рабочее пространство для категории не найдено"""
+    """Рабочее пространство для проекта не найдено"""
 
 
 class ProjectAlreadyExists(ProjectException):
-    """Категория уже существует"""
+    """Проект уже существует"""
 
 
 class ParticipantNotFound(ProjectException):

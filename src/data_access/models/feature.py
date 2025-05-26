@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import IntEnum
 from typing import TYPE_CHECKING
 from uuid import UUID
 
@@ -7,7 +8,6 @@ from sqlalchemy import UUID as SQL_UUID
 from sqlalchemy import Column, ForeignKey, Index, Integer, String, Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from src.apps.feature.domain import Priority, Status
 from src.data_access.models import Base
 
 if TYPE_CHECKING:
@@ -30,6 +30,21 @@ feature_member = Table(
     Column('feature_id', ForeignKey('features.id', ondelete='CASCADE'), primary_key=True),
     Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), primary_key=True),
 )
+
+
+class Priority(IntEnum):
+    CRITICAL = 5
+    HIGH = 4
+    MEDIUM = 3
+    LOW = 2
+    NO_PRIORITY = 1
+
+
+class Status(IntEnum):
+    FINISH = 4
+    TEST = 3
+    DEVELOPMENT = 2
+    NEW = 1
 
 
 class FeatureModel(Base):

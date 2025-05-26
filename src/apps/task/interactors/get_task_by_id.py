@@ -1,14 +1,13 @@
-from src.apps.task import TaskOutputDTO
 from src.apps.task.domain import TaskId
+from src.apps.task.dtos import TaskOutputDTO
 from src.apps.task.exceptions import TaskDoesNotExistError
 from src.apps.task.interactors.base_interactor import BaseInteractor
 
 
-class GetTaskInteractor(BaseInteractor):
+class GetTaskByIdInteractor(BaseInteractor):
     async def execute(self, task_id: TaskId) -> TaskOutputDTO:
-        task = await self._repository.get_by_id(task_id=task_id)
-        if not task:
+        task_dto = await self._repository.get_by_id(task_id=task_id)
+        if not task_dto:
             raise TaskDoesNotExistError(task_id)
 
-        task_dto = TaskOutputDTO.from_entity(task_id=task_id, entity=task)
         return task_dto

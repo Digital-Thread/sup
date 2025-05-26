@@ -1,31 +1,57 @@
 from dataclasses import asdict
 
-from src.apps.workspace.domain.entities.role import Role
-from src.apps.workspace.domain.types_ids import RoleId
-from src.apps.workspace.dtos.role_dtos import RoleWithUserCountAppDTO, UpdateRoleAppDTO
-from src.apps.workspace.mappers.base_mapper import BaseMapper
+from src.apps.workspace.domain.entities.role import RoleEntity
+from src.apps.workspace.dtos.role_dtos import (
+    MemberOutDTO,
+    RoleOutDTO,
+    RoleWithMemberOutDTO,
+    UpdateRoleAppDTO,
+)
 
 
-class RoleMapper(BaseMapper[Role, RoleWithUserCountAppDTO]):
+class RoleMapper:
 
     @staticmethod
-    def update_data(existing_role: Role, dto: UpdateRoleAppDTO) -> Role:
+    def entity_to_dto(role: RoleEntity) -> RoleOutDTO:
+        return RoleOutDTO(
+            id=role.id,
+            name=role.name,
+            color=role.color,
+        )
+
+    @staticmethod
+    def update_data(existing_role: RoleEntity, dto: UpdateRoleAppDTO) -> RoleEntity:
         for field, value in asdict(dto).items():
-            if value is not None:
+            if value is not None and field in ['name', 'color']:
                 setattr(existing_role, field, value)
 
         return existing_role
 
     @staticmethod
-    def list_tuple_to_dto(roles: list[tuple[Role, int]]) -> list[RoleWithUserCountAppDTO]:
-        roles_with_user_count = []
-        for role in roles:
-            roles_with_user_count.append(
-                RoleWithUserCountAppDTO(
-                    id=RoleId(role[0].id),
-                    name=role[0].name,
-                    color=role[0].color,
-                    user_count=role[1],
+    def list_tuple_to_dto(
+        roles_with_members: list[tuple[RoleEntity, list[dict[str, str]] | None]]
+    ) -> list[RoleWithMemberOutDTO]:
+        role_with_members_dtos = []
+
+        for role, members in roles_with_members:
+            role_with_members_dtos.append(
+                RoleWithMemberOutDTO(
+                    id=role.id,
+                    name=role.name,
+                    color=role.color,
+                    members=(
+                        [
+                            MemberOutDTO(
+                                first_name=member.get('first_name'),
+                                last_name=member.get('last_name'),
+                                avatar=member.get('avatar'),
+                            )
+                            for member in members
+                        ]
+                        if members
+                        else None
+                    ),
                 )
             )
-        return roles_with_user_count
+
+        return role_with_members_dtos

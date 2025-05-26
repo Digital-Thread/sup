@@ -1,8 +1,8 @@
-from src.apps.user.domain.entities import User
+from src.apps.user.domain.entity import User
 from src.apps.user.dtos import UserUpdateDTO
 from src.apps.user.exceptions import UserAlreadyExistsError
 from src.apps.user.protocols import JWTServiceProtocol
-from src.apps.user.repositories import IUserRepository
+from src.apps.user.repository import IUserRepository
 
 
 class UpdateUserService:
@@ -28,7 +28,14 @@ class UpdateUserService:
                     user_data.email = value.lower()
 
                 setattr(user, key, getattr(user_data, key))
-                if key in ['first_name', 'last_name', 'email', 'username_tg', 'nick_tg', 'nick_gmeet']:
+                if key in [
+                    'first_name',
+                    'last_name',
+                    'email',
+                    'username_tg',
+                    'nick_tg',
+                    'nick_gmeet',
+                ]:
                     user.validate_length(value, key)
                     if key in ['first_name', 'last_name']:
                         user.validate_name(value)

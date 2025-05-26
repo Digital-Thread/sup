@@ -5,7 +5,7 @@ from typing import Optional, Union
 import jwt
 import redis.asyncio as redis
 
-from src.apps.auth.dto import AccessTokenDTO, RefreshTokenDTO
+from src.apps.auth.dto import RefreshTokenDTO
 from src.apps.auth.exceptions import (
     InvalidTokenError,
     TokenExpireError,
@@ -41,7 +41,7 @@ class JWTService:
         )
         return refresh_token, max_age_refresh
 
-    async def decode_access_token(self, token: str) -> str | bytes:
+    async def decode_access_token(self, token: str) -> str | None:
         try:
             algorithms = [self.algorithm] if isinstance(self.algorithm, str) else self.algorithm
             payload = jwt.decode(token, self.secret_key, algorithms=algorithms)

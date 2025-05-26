@@ -1,10 +1,10 @@
 from datetime import date, datetime
 from enum import StrEnum
-from typing import Any, Literal
+from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
-from pydantic_core.core_schema import FieldValidationInfo
+from pydantic import BaseModel, ConfigDict, Field
 
+from src.apps.task import FeatureInfo, OrderByField, SortOrder, TaskMember, TaskTag
 from src.apps.task.domain import (
     AssignedId,
     FeatureId,
@@ -13,18 +13,10 @@ from src.apps.task.domain import (
     Status,
     TagId,
     TaskId,
-    WorkspaceId,
 )
-from src.apps.task.exceptions import TaskUpdateError
-from src.apps.task.repositories import OrderByField, SortOrder
-
-
-class SuccessResponse(BaseModel):
-    message: str
 
 
 class CreateTaskRequestDTO(BaseModel):
-    workspace_id: WorkspaceId
     name: str
     feature_id: FeatureId
     owner_id: OwnerId
@@ -46,29 +38,34 @@ class UpdateTaskRequestDTO(BaseModel):
     due_date: date | None = None
     tags: list[TagId] | None = None
 
-    @field_validator('name', 'feature_id', 'assigned_to', 'priority', 'status', 'due_date')
-    def fields_cannot_be_none(cls, value: Any, info: FieldValidationInfo) -> Any:
-        if value is None:
-            raise TaskUpdateError(
-                message=f"Для поля '{info.field_name}' не может быть установлено значение None."
-            )
-        return value
-
 
 class TaskResponseDTO(BaseModel):
     id: TaskId
-    workspace_id: WorkspaceId
     name: str
-    feature_id: FeatureId
-    owner_id: OwnerId
-    assigned_to: AssignedId
-    due_date: date
+    owner: TaskMember
+    feature: FeatureInfo
+    feature_lead: TaskMember
+    assigned_to: TaskMember
     created_at: datetime
     updated_at: datetime
+    due_date: date
     description: str | None
     priority: Priority
     status: Status
-    tags: list[TagId] | None
+    tags: list[TaskTag] | None
+    model_config = ConfigDict(
+        from_attributes=True,
+    )
+
+
+class TaskForFeatureResponseDTO(BaseModel):
+    id: TaskId
+    name: str
+    assigned_to: TaskMember
+    created_at: datetime
+    due_date: date
+    priority: Priority = Priority.NO_PRIORITY
+    status: Status = Status.NEW
     model_config = ConfigDict(
         from_attributes=True,
     )

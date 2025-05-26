@@ -1,4 +1,3 @@
-from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, EmailStr
@@ -11,9 +10,9 @@ class UserUpdateDTO(BaseModel):
     username_tg: str
     nick_tg: str
     nick_gmeet: str
-    nick_gitlab: Optional[str] = None
-    nick_github: Optional[str] = None
-    avatar: Optional[str] = None
+    nick_gitlab: str | None = None
+    nick_github: str | None = None
+    avatar: str | None = None
 
 
 class UserCreateDTO(UserUpdateDTO):
@@ -21,8 +20,8 @@ class UserCreateDTO(UserUpdateDTO):
 
 
 class UserResponseDTO(UserUpdateDTO):
-    is_superuser: Optional[bool] = False
-    is_active: Optional[bool] = False
+    is_superuser: bool | None = False
+    is_active: bool | None = False
 
     model_config = ConfigDict(from_attributes=True)
 

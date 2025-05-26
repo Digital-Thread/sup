@@ -9,6 +9,9 @@ class BaseCommentException(ApplicationException):
 
     message: str = 'A domain error occurred'
 
+    def __str__(self) -> str:
+        return self.message
+
 
 @dataclass
 class CommentNotAssociatedError(BaseCommentException):
@@ -25,36 +28,15 @@ class CommentAssociatedWithBothError(BaseCommentException):
 
 
 @dataclass
+class FeatureOrTaskDoesNotExistsError(BaseCommentException):
+    """Выбрасывается, когда комментарий создаётся для несуществующей фичи или задачи"""
+
+    message: str = 'Comment must be associated with an existing Task or a Feature.'
+
+
+@dataclass
 class CommentNotFoundError(BaseCommentException):
     message: str = 'Comment cannot be found.'
-
-
-@dataclass
-class InvalidCommentIdError(BaseCommentException):
-    """Выбрасывается, когда идентификатор комментария некорректный"""
-
-    message: str = 'CommentId must be a positive integer.'
-
-
-@dataclass
-class InvalidAuthorIdError(BaseCommentException):
-    """Выбрасывается, когда идентификатор автора некорректный"""
-
-    message: str = 'AuthorId must be a uuid object.'
-
-
-@dataclass
-class InvalidTaskIdError(BaseCommentException):
-    """Выбрасывается, когда идентификатор задачи некорректный"""
-
-    message: str = 'TaskId must be a positive integer.'
-
-
-@dataclass
-class InvalidFeatureIdError(BaseCommentException):
-    """Выбрасывается, когда идентификатор фичи некорректный"""
-
-    message: str = 'FeatureId must be a positive integer.'
 
 
 @dataclass
@@ -62,3 +44,17 @@ class InvalidContentError(BaseCommentException):
     """Выбрасывается, когда контент комментария некорректный"""
 
     message: str = 'Content must be a non-empty string.'
+
+
+@dataclass
+class IDAlreadyExistsError(BaseCommentException):
+    """Выбрасывается, когда id комментария пытаются установить повторно"""
+
+    message: str = 'The comment ID has already been set.'
+
+
+@dataclass
+class CommentRepositoryError(BaseCommentException):
+    """Выбрасывается, когда возникла ошибка при работе с БД"""
+
+    message: str = 'An error occurred while working with the database'

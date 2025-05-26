@@ -1,15 +1,16 @@
 from src.apps.feature.dtos import FeatureUpdateDTO
 from src.apps.feature.exceptions import (
     FeatureDoesNotExistError,
+    FeatureRepositoryError,
     FeatureUpdateError,
-    RepositoryError,
 )
 from src.apps.feature.interactors.base_interactor import BaseInteractor
+from src.apps.feature.mapper import FeatureMapper
 
 
 class UpdateFeatureInteractor(BaseInteractor):
     async def execute(self, dto: FeatureUpdateDTO) -> None:
-        feature = await self._repository.get_by_id(feature_id=dto.id)
+        feature = await self._repository.get_entity(feature_id=dto.id)
         if not feature:
             raise FeatureDoesNotExistError(dto.id)
 
@@ -19,6 +20,12 @@ class UpdateFeatureInteractor(BaseInteractor):
             raise FeatureUpdateError(context=e) from None
 
         try:
-            await self._repository.update(feature_id=dto.id, feature=feature)
-        except RepositoryError as e:
+            attrs = FeatureMapper.entity_to_attrs_dto(feature)
+            await self._repository.validate_workspace_consistency(attrs=attrs)
+        except FeatureRepositoryError as e:
+            raise FeatureUpdateError(context=e) from None
+
+        try:
+            await self._repository.update(feature=feature)
+        except FeatureRepositoryError as e:
             raise FeatureUpdateError(context=e) from None

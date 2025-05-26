@@ -25,15 +25,17 @@ from src.apps.user.services import (
 from src.apps.user.services.password_reset_user_service import PasswordResetUserService
 from src.apps.user.services.remove_user_service import RemoveUserService
 from src.apps.workspace.domain.entities.workspace_invite import StatusInvite
-from src.apps.workspace.dtos.workspace_dtos import CreateWorkspaceAppDTO
+from src.apps.workspace.dtos.workspace_dtos import CreateWorkspaceDTO
 from src.apps.workspace.dtos.workspace_invite_dtos import UpdateWorkspaceInviteAppDTO
-from src.apps.workspace.use_cases.workspace_invite_use_cases import (
-    GetWorkspaceIdByInviteCodeUseCase,
-    UpdateWorkspaceInviteUseCase,
+from src.apps.workspace.interactors.workspace_interactors import (
+    CreateWorkspaceInteractor,
 )
-from src.apps.workspace.use_cases.workspace_use_cases import CreateWorkspaceUseCase
-from src.apps.workspace.use_cases.workspace_use_cases.add_member_in_workspace import (
-    AddMemberInWorkspaceUseCase,
+from src.apps.workspace.interactors.workspace_interactors.add_member_in_workspace import (
+    AddMemberInWorkspaceInteractor,
+)
+from src.apps.workspace.interactors.workspace_invite_interactors import (
+    GetWorkspaceIdByInviteCodeInteractor,
+    UpdateWorkspaceInviteInteractor,
 )
 
 router = APIRouter(route_class=DishkaRoute)
@@ -68,6 +70,7 @@ async def logout_user(
     response: Response,
     token_service: FromDishka[JWTService],
 ) -> dict[str, str]:
+    email: str | bytes | None
     user_agent = request.headers.get('User-Agent')
     access_token = request.cookies.get('sup_access_token')
     if access_token:
@@ -177,15 +180,14 @@ async def create_user_by_admin(
     get_user_service: FromDishka[GetUserService],
     authorize_service: FromDishka[AuthorizeUserService],
     create_user_service: FromDishka[CreateUserService],
-    create_workspace_use_case: FromDishka[CreateWorkspaceUseCase],
+    create_workspace_interactor: FromDishka[CreateWorkspaceInteractor],
 ) -> dict[str, str]:
     user = await authenticate_and_create_tokens(request, get_user_service)
     await authorize_service.get_access_admin(user)
-    user_id, username, user_email, user_password = await create_user_service.create_user_by_admin(create_user_dto)
-    await create_workspace_use_case.execute(CreateWorkspaceAppDTO(
-        owner_id=user_id,
-        name=username
-    ))
+    user_id, username, user_email, user_password = await create_user_service.create_user_by_admin(
+        create_user_dto
+    )
+    await create_workspace_interactor.execute(CreateWorkspaceDTO(owner_id=user_id, name=username))
     return {'detail': f'Пользователь зарегистрирован email: {user_email} пароль: {user_password}'}
 
 
@@ -193,28 +195,26 @@ async def create_user_by_admin(
 async def create_user_by_invite(
     create_user_dto: UserCreateDTO,
     create_user_service: FromDishka[CreateUserService],
-    workspace_invite_use_case: FromDishka[GetWorkspaceIdByInviteCodeUseCase],
-    workspace_use_case: FromDishka[CreateWorkspaceUseCase],
-    add_member_use_case: FromDishka[AddMemberInWorkspaceUseCase],
-    update_status_invite_use_case: FromDishka[UpdateWorkspaceInviteUseCase],
+    workspace_invite_interactor: FromDishka[GetWorkspaceIdByInviteCodeInteractor],
+    workspace_interactor: FromDishka[CreateWorkspaceInteractor],
+    add_member_interactor: FromDishka[AddMemberInWorkspaceInteractor],
+    update_status_invite_interactor: FromDishka[UpdateWorkspaceInviteInteractor],
     invite_token: UUID = Path(...),
 ) -> UserResponseDTO:
-    workspace_id_for_invite = await workspace_invite_use_case.execute(invite_token)
+    workspace_id, invite_id = await workspace_invite_interactor.execute(invite_token)
     new_user = await create_user_service.create_user(dto=create_user_dto)
-
-    await workspace_use_case.execute(
-        CreateWorkspaceAppDTO(
+    await workspace_interactor.execute(
+        CreateWorkspaceDTO(
             name=f'{new_user.first_name} {new_user.last_name}',
             owner_id=new_user.id,
         )
     )
-    await add_member_use_case.execute(workspace_id_for_invite[0], new_user.id)
-    await update_status_invite_use_case.execute(
-        workspace_id_for_invite[1],
-        workspace_id_for_invite[0],
-        UpdateWorkspaceInviteAppDTO(status=StatusInvite.USED),
+    await add_member_interactor.execute(workspace_id, new_user.id)
+    await update_status_invite_interactor.execute(
+        UpdateWorkspaceInviteAppDTO(
+            id_=invite_id, workspace_id=workspace_id, status=StatusInvite.USED
+        ),
     )
-
     return UserResponseDTO.model_validate(new_user)
 
 
@@ -222,11 +222,11 @@ async def create_user_by_invite(
 async def create_user_with_workspace(
     create_user_dto: UserCreateDTO,
     create_user_service: FromDishka[CreateUserService],
-    workspace_use_case: FromDishka[CreateWorkspaceUseCase],
+    workspace_interactor: FromDishka[CreateWorkspaceInteractor],
 ) -> UserResponseDTO:
     new_user = await create_user_service.create_user(dto=create_user_dto)
-    await workspace_use_case.execute(
-        CreateWorkspaceAppDTO(
+    await workspace_interactor.execute(
+        CreateWorkspaceDTO(
             name=f'{new_user.first_name} {new_user.last_name}',
             owner_id=new_user.id,
         )
