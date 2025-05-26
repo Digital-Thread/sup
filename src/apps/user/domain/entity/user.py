@@ -1,7 +1,7 @@
 import re
 from dataclasses import dataclass, field
 from datetime import datetime
-from uuid import uuid4, UUID
+from uuid import UUID, uuid4
 
 from src.apps.user.exceptions import (
     InvalidEmailFormatError,

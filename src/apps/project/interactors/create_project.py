@@ -32,10 +32,10 @@ class CreateProjectInteractor:
             raise ProjectException(str(error)) from error
 
     async def _check_user_in_workspace(
-            self,
-            assigned_to: UUID | None,
-            workspace_id: WorkspaceId,
-            participants_ids: list[UUID] | None
+        self,
+        assigned_to: UUID | None,
+        workspace_id: WorkspaceId,
+        participants_ids: list[UUID] | None,
     ) -> None:
         user_ids = ProjectMapper.map_to_set_users(assigned_to, participants_ids)
 

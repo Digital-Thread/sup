@@ -1,7 +1,7 @@
-from src.apps.comment.repository import ICommentRepository
-from src.apps.comment.dtos import FetchTaskCommentDto, CommentOutDto
 from src.apps.comment.domain import TaskId
+from src.apps.comment.dtos import CommentOutDto, FetchTaskCommentDto
 from src.apps.comment.interactors.base_interactor import BaseInteractor
+from src.apps.comment.repository import ICommentRepository
 
 
 class GetCommentsByTaskIdInteractor(BaseInteractor):

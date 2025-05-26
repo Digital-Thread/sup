@@ -8,6 +8,7 @@ class IBaseRepository[T, ID](ABC):
     T - это экземпляр сущности,
     ID - это id экземпляра сущности
     """
+
     @abstractmethod
     async def save(self, entity: T) -> None:
         raise NotImplementedError

@@ -82,7 +82,9 @@ class ProjectEntity:
     @workspace_id.setter
     def workspace_id(self, new_workspace_id: WorkspaceId) -> None:
         if self.workspace_id is not None:
-            raise AttributeError('Идентификатор рабочего пространство для этого проекта уже установлен')
+            raise AttributeError(
+                'Идентификатор рабочего пространство для этого проекта уже установлен'
+            )
 
         self._workspace_id = new_workspace_id
 

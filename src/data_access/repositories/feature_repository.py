@@ -15,12 +15,12 @@ from src.apps.feature.domain import FeatureEntity, FeatureId, WorkspaceId
 from src.apps.feature.exceptions import FeatureRepositoryError
 from src.data_access.mappers.feature_mapper import FeatureMapper
 from src.data_access.models import (
+    CommentModel,
     FeatureModel,
     ProjectModel,
     TagModel,
     UserModel,
     WorkspaceMemberModel,
-    CommentModel,
 )
 from src.data_access.models.feature import Priority, Status
 
@@ -34,7 +34,7 @@ class FeatureRepository(IFeatureRepository):
 
     async def _get_m2m_objects[M, ID](self, list_ids: list[ID] | None, model: type[M]) -> list[M]:
         if list_ids:
-            query = select(model).where(model.id.in_(list_ids))
+            query = select(model).where(model.id.in_(list_ids))  # type: ignore[attr-defined]
             result = await self._session.execute(query)
             m2m_objects = result.scalars().all()
             return list(m2m_objects)
@@ -118,12 +118,14 @@ class FeatureRepository(IFeatureRepository):
             raise FeatureRepositoryError(message=f'Не найдена фича с id: {feature_id}')
 
     async def delete_comments(self, feature_id: FeatureId) -> None:
-        await self._session.execute(delete(CommentModel).where(CommentModel.feature_id == feature_id))
+        await self._session.execute(
+            delete(CommentModel).where(CommentModel.feature_id == feature_id)
+        )
 
     async def get_by_workspace_id(
-            self,
-            workspace_id: WorkspaceId,
-            query: FeatureListQuery,
+        self,
+        workspace_id: WorkspaceId,
+        query: FeatureListQuery,
     ) -> list[FeatureInWorkspaceOutputDTO] | None:
         conditions = [self.model.workspace_id == workspace_id]
 
@@ -168,9 +170,9 @@ class FeatureRepository(IFeatureRepository):
         )
 
     def _make_stmt_for_validation(
-            self,
-            attrs: FeatureAttrsWithWorkspace,
-    ) -> 'Select':
+        self,
+        attrs: FeatureAttrsWithWorkspace,
+    ) -> Select[tuple[int, int, int, int, int]]:
         project_subq = (
             select(func.count())
             .select_from(ProjectModel)
@@ -238,8 +240,8 @@ class FeatureRepository(IFeatureRepository):
         return stmt
 
     async def validate_workspace_consistency(
-            self,
-            attrs: FeatureAttrsWithWorkspace,
+        self,
+        attrs: FeatureAttrsWithWorkspace,
     ) -> None:
         """
         Проверяет, что:

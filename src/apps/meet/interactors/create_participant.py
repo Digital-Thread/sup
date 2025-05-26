@@ -1,8 +1,5 @@
 from ..dtos import ParticipantInputDTO
-from ..exceptions import (
-    MeetRepositoryError,
-    ParticipantCreateError,
-)
+from ..exceptions import MeetRepositoryError, ParticipantCreateError
 from ..mappers import ParticipantMapper
 from ..repositories import IParticipantRepository
 from .base_interactor import BaseInteractor

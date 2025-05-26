@@ -28,7 +28,14 @@ class UpdateUserService:
                     user_data.email = value.lower()
 
                 setattr(user, key, getattr(user_data, key))
-                if key in ['first_name', 'last_name', 'email', 'username_tg', 'nick_tg', 'nick_gmeet']:
+                if key in [
+                    'first_name',
+                    'last_name',
+                    'email',
+                    'username_tg',
+                    'nick_tg',
+                    'nick_gmeet',
+                ]:
                     user.validate_length(value, key)
                     if key in ['first_name', 'last_name']:
                         user.validate_name(value)

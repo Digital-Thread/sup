@@ -7,12 +7,12 @@ from .base import Base
 from .mixins import DatetimeFieldsMixin, UUIDPkMixin
 
 if TYPE_CHECKING:
+    from .comment import CommentModel
     from .feature import FeatureModel
     from .meet import MeetModel, ParticipantModel
     from .task import TaskModel
     from .workspace_models.user_workspace_role import UserWorkspaceRoleModel
     from .workspace_models.workspace import WorkspaceModel
-    from .comment import CommentModel
 
 
 class UserModel(Base, DatetimeFieldsMixin, UUIDPkMixin):

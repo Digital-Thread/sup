@@ -4,26 +4,21 @@ from typing import Self
 from src.apps.comment import (
     CommentAssociatedWithBothError,
     CommentNotAssociatedError,
-    InvalidContentError,
     IDAlreadyExistsError,
+    InvalidContentError,
 )
 
-from .types_ids import (
-    AuthorId,
-    CommentId,
-    FeatureId,
-    TaskId,
-)
+from .types_ids import AuthorId, CommentId, FeatureId, TaskId
 
 
 class CommentEntity:
 
     def __init__(
-            self,
-            user_id: AuthorId,
-            task_id: TaskId | None,
-            feature_id: FeatureId | None,
-            content: str,
+        self,
+        user_id: AuthorId,
+        task_id: TaskId | None,
+        feature_id: FeatureId | None,
+        content: str,
     ) -> None:
         if not task_id and not feature_id:
             raise CommentNotAssociatedError()
@@ -55,7 +50,11 @@ class CommentEntity:
     @content.setter
     def content(self, new_content: str) -> None:
         max_len = 1000
-        if not isinstance(new_content, str) or not new_content.strip() or len(new_content) > max_len:
+        if (
+            not isinstance(new_content, str)
+            or not new_content.strip()
+            or len(new_content) > max_len
+        ):
             raise InvalidContentError()
 
         self._content = new_content

@@ -18,10 +18,10 @@ class MeetRepository(IMeetRepository):
         self.converter = MeetMapper()
         self._context = context
 
-    def _base_select(self) -> Select:
+    def _base_select(self) -> Select[tuple[MeetModel]]:
         return select(self.model).where(self.model.workspace_id == self._context.workspace_id)
 
-    def _get_meet_by_id(self, meet_id: MeetId) -> Select:
+    def _get_meet_by_id(self, meet_id: MeetId) -> Select[tuple[MeetModel]]:
         return self._base_select().where(self.model.id == meet_id)
 
     async def save(self, meet: MeetEntity) -> MeetId:

@@ -8,7 +8,9 @@ from src.apps.project.exceptions import (
     ProjectNotFound,
     ProjectNotUpdated,
 )
-from src.apps.project.interactors.update_participants import UpdateParticipantsInteractor
+from src.apps.project.interactors.update_participants import (
+    UpdateParticipantsInteractor,
+)
 from src.apps.project.mapper import ProjectMapper
 from src.apps.project.project_repository import IProjectRepository
 from src.apps.workspace.exceptions.workspace_exceptions import WorkspaceMemberNotFound
@@ -16,10 +18,10 @@ from src.apps.workspace.exceptions.workspace_exceptions import WorkspaceMemberNo
 
 class UpdateProjectInteractor:
     def __init__(
-            self,
-            project_repository: IProjectRepository,
-            update_participants_interactor: UpdateParticipantsInteractor
-        ):
+        self,
+        project_repository: IProjectRepository,
+        update_participants_interactor: UpdateParticipantsInteractor,
+    ):
         self._project_repository = project_repository
         self._update_participants_interactor = update_participants_interactor
 
@@ -31,7 +33,7 @@ class UpdateProjectInteractor:
         await self._check_user_in_workspace(
             assigned_to=updated_data.assigned_to,
             participants_ids=updated_data.participant_ids,
-            workspace_id=WorkspaceId(updated_data.workspace_id)
+            workspace_id=WorkspaceId(updated_data.workspace_id),
         )
         await self._update_participants_interactor.execute(existing_project, updated_data)
         updated_project = self._apply_update_data_to_project(existing_project, updated_data)
@@ -45,8 +47,7 @@ class UpdateProjectInteractor:
         self, project_id: ProjectId, workspace_id: WorkspaceId
     ) -> ProjectEntity:
         existing_project = await self._project_repository.get_by_id(
-            project_id,
-            workspace_id=workspace_id
+            project_id, workspace_id=workspace_id
         )
 
         if not existing_project:
@@ -55,18 +56,17 @@ class UpdateProjectInteractor:
         return existing_project
 
     async def _check_user_in_workspace(
-            self,
-            assigned_to: UUID | None,
-            participants_ids: list[UUID] | None,
-            workspace_id: WorkspaceId
+        self,
+        assigned_to: UUID | None,
+        participants_ids: list[UUID] | None,
+        workspace_id: WorkspaceId,
     ) -> None:
         user_ids = ProjectMapper.map_to_set_users(assigned_to, participants_ids)
 
         if user_ids:
             try:
                 await self._project_repository.check_user_in_workspace(
-                    user_ids,
-                    workspace_id=workspace_id
+                    user_ids, workspace_id=workspace_id
                 )
             except WorkspaceMemberNotFound as error:
                 raise ProjectException(str(error)) from None

@@ -1,10 +1,7 @@
 from uuid import UUID
 
 from src.apps.project.domain.types_ids import ProjectId, WorkspaceId
-from src.apps.project.exceptions import (
-    ProjectException,
-    ProjectNotDeleted,
-)
+from src.apps.project.exceptions import ProjectException, ProjectNotDeleted
 from src.apps.project.project_repository import IProjectRepository
 
 

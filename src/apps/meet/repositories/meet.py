@@ -1,9 +1,7 @@
 from abc import ABC, abstractmethod
 
 from ..domain.meet import MeetEntity
-from ..domain.type_ids import (
-    MeetId,
-)
+from ..domain.type_ids import MeetId
 from ..query_parameters import MeetListQuery
 
 

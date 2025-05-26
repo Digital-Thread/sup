@@ -3,10 +3,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Literal, NamedTuple, TypedDict
 
-from .domain.type_ids import (
-    AssignedId,
-    CategoryId,
-)
+from .domain.type_ids import AssignedId, CategoryId
 
 
 class OrderByField(Enum):

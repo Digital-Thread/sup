@@ -3,8 +3,8 @@
 ## :books: Table of Contents
 
 - [Installation](#construction_worker-getting-started)
-    - [With docker](#construction-with-docker)
-    - [Manually](#wheelchair-manually)
+  - [With docker](#construction-with-docker)
+  - [Manually](#wheelchair-manually)
 - [Tests](#test_tube-tests)
 
 ## :construction_worker: Getting Started
@@ -13,7 +13,7 @@ First, rename the file `.env.template` to `.env`\
 Afterward, fill it with the required data.
 
 | Variable          | Type | Importance | Description                                                                                  |
-|-------------------|------|------------|----------------------------------------------------------------------------------------------|
+| ----------------- | ---- | ---------- | -------------------------------------------------------------------------------------------- |
 | POSTGRES_USER     | str  | True       | Username of the database owner                                                               |
 | POSTGRES_PASSWORD | str  | True       | Password from the database                                                                   |
 | POSTGRES_DB       | str  | True       | Database name                                                                                |
@@ -27,7 +27,7 @@ Afterward, fill it with the required data.
 | SMTP_PASS         | str  | True       | The password for the SMTP server                                                             |
 | SMTP_EMAIL        | str  | True       | The email address used for SMTP authentication                                               |
 | SMTP_TLS          | bool | True       | whether to use TLS for SMTP communication (e.g., true or false)                              |
-| SECRET_KEY        | str  | True       | 	a secret key used for securely signing tokens and other security-related operations         |
+| SECRET_KEY        | str  | True       | a secret key used for securely signing tokens and other security-related operations          |
 | ALGORITHM         | str  | True       | the algorithm used for encoding and decoding tokens (e.g., HS256 for HMAC SHA256)            |
 
 ### :construction: With docker
@@ -36,7 +36,7 @@ If the application is running in Docker, `DB_HOST` should be set to `postgres`
 
 If the application is running in Docker, `DB_PORT` should be set to `5432`
 
----
+______________________________________________________________________
 
 First clone the repository
 

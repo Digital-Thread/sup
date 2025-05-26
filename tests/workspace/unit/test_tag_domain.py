@@ -29,7 +29,9 @@ class TestTagCreation:
         assert tag_minimal._id is None
         assert tag_minimal._workspace_id == workspace_id
 
-    def test_tag_creation_with_full_data(self, tag_full: TagEntity, workspace_id: WorkspaceId) -> None:
+    def test_tag_creation_with_full_data(
+        self, tag_full: TagEntity, workspace_id: WorkspaceId
+    ) -> None:
         assert tag_full.name == 'Full Tag'
         assert tag_full.color == '#FAFAFA'
         assert tag_full._id == 1

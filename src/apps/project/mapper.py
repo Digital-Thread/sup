@@ -75,7 +75,7 @@ class ProjectMapper:
 
     @staticmethod
     def list_tuple_to_dto(
-        projects_with_participants: list[tuple[ProjectEntity, list[dict[str, str | UUID]] | None]]
+        projects_with_participants: list[tuple[ProjectEntity, list[dict[str, str]] | None]]
     ) -> list[ProjectWithParticipantsDTO]:
         return [
             ProjectWithParticipantsDTO(

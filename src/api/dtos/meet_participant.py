@@ -2,12 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
-from src.apps.meet.domain import (
-    MeetId,
-    ParticipantId,
-    Status,
-    UserId,
-)
+from src.apps.meet.domain import MeetId, ParticipantId, Status, UserId
 
 
 class CreateParticipantRequestDTO(BaseModel):
