@@ -6,9 +6,7 @@ from .dtos import (
     ParticipantOutputDTO,
     ParticipantUpdateDTO,
 )
-from .exceptions import (
-    MeetUpdateError,
-)
+from .exceptions import MeetUpdateError
 from .interactors import (
     CreateMeetInteractor,
     CreateParticipantInteractor,

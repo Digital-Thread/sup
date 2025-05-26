@@ -28,5 +28,6 @@ class RoleAlreadyExists(RoleException):
 class RoleCreatedException(RoleException):
     """Роль не создана"""
 
+
 class RoleNotFoundForWorkspaceMember(RoleException):
     """Роль для участника рабочего пространства не найдена"""

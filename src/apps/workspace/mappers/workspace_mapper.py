@@ -13,6 +13,7 @@ from src.apps.workspace.domain.types_ids import (
 )
 from src.apps.workspace.dtos.workspace_dtos import (
     MemberOutDTO,
+    OptionalWorkspaceUpdateFields,
     WorkspaceOutDTO,
 )
 
@@ -56,7 +57,7 @@ class WorkspaceMapper:
 
     @staticmethod
     def update_data(
-        updated_fields: dict[str, str], existing_workspace: WorkspaceEntity
+        updated_fields: OptionalWorkspaceUpdateFields, existing_workspace: WorkspaceEntity
     ) -> WorkspaceEntity:
         for field, value in updated_fields.items():
             setattr(existing_workspace, field, value)

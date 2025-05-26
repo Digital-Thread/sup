@@ -75,7 +75,7 @@ async def update_meet(
 ) -> None:
     update_data = MeetUpdateDTO(
         id=meet_id,
-        updated_fields=OptionalMeetUpdateFields(**dto.model_dump(exclude_unset=True)),
+        updated_fields=OptionalMeetUpdateFields(**dto.model_dump(exclude_unset=True)),  # type: ignore[typeddict-item]
     )
     await interactor.execute(update_data)
 

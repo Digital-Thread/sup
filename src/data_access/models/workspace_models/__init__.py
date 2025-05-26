@@ -1,11 +1,10 @@
-from .workspace import WorkspaceModel
-from .role import RoleModel
-from .workspace_members import WorkspaceMemberModel
-from .user_workspace_role import UserWorkspaceRoleModel
 from .category import CategoryModel
+from .role import RoleModel
 from .tag import TagModel
+from .user_workspace_role import UserWorkspaceRoleModel
+from .workspace import WorkspaceModel
 from .workspace_invite import WorkspaceInviteModel
-
+from .workspace_members import WorkspaceMemberModel
 
 __all__ = (
     'WorkspaceModel',

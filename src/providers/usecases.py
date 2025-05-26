@@ -32,7 +32,9 @@ from src.apps.project.interactors import (
     GetProjectByWorkspaceInteractor,
     UpdateProjectInteractor,
 )
-from src.apps.project.interactors.update_participants import UpdateParticipantsInteractor
+from src.apps.project.interactors.update_participants import (
+    UpdateParticipantsInteractor,
+)
 from src.apps.project.use_cases.get_project_by_id import GetProjectByIdUseCase
 from src.apps.task import (
     CreateTaskInteractor,

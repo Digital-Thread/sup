@@ -8,7 +8,7 @@ class DeleteMeetInteractor(BaseInteractor):
     def __init__(self, meet_repository: IMeetRepository):
         self._repository = meet_repository
 
-    async def execute(self, meet_id: MeetId):
+    async def execute(self, meet_id: MeetId) -> None:
         try:
             await self._repository.delete(meet_id)
         except MeetRepositoryError as e:

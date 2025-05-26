@@ -37,7 +37,10 @@ class TestWorkspaceInviteCreation:
         assert workspace_invite_minimal.workspace_id == workspace_id
 
     def test_workspace_invite_creation_with_full_data(
-        self, workspace_invite_full: WorkspaceInviteEntity, workspace_id: WorkspaceId, invite_code: UUID
+        self,
+        workspace_invite_full: WorkspaceInviteEntity,
+        workspace_id: WorkspaceId,
+        invite_code: UUID,
     ) -> None:
         assert workspace_invite_full.workspace_id == workspace_id
         assert workspace_invite_full._id == InviteId(1)
@@ -59,7 +62,8 @@ class TestWorkspaceInviteCreation:
         )
         assert (
             workspace_invite_minimal.expired_at
-            == workspace_invite_minimal.created_at + timedelta(days=WorkspaceInviteEntity.EXPIRATION_DAYS)
+            == workspace_invite_minimal.created_at
+            + timedelta(days=WorkspaceInviteEntity.EXPIRATION_DAYS)
         )
 
     def test_workspace_invite_creation_missing_required_fields(self) -> None:

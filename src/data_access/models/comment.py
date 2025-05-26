@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, String, TIMESTAMP
+from sqlalchemy import TIMESTAMP, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
@@ -18,6 +18,4 @@ class CommentModel(Base, IntIdPkMixin):
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True))
 
-    user: Mapped['UserModel'] = relationship(
-        back_populates='comments', foreign_keys=[user_id]
-    )
+    user: Mapped['UserModel'] = relationship(back_populates='comments', foreign_keys=[user_id])

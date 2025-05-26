@@ -17,12 +17,14 @@ class MeetParticipantRepository(IParticipantRepository):
         self.model = ParticipantModel
         self.converter = MeetParticipantMapper()
 
-    def _base_select(self) -> Select:
+    def _base_select(self) -> Select[tuple[ParticipantModel]]:
         return select(self.model).where(
             ParticipantModel.meet.has(MeetModel.workspace_id == self._context.workspace_id)
         )
 
-    def _get_participant_by_id(self, participant_id: ParticipantId) -> Select:
+    def _get_participant_by_id(
+        self, participant_id: ParticipantId
+    ) -> Select[tuple[ParticipantModel]]:
         return self._base_select().where(self.model.id == participant_id)
 
     async def save(self, participant: ParticipantEntity) -> ParticipantId:

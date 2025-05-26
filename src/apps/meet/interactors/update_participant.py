@@ -1,5 +1,9 @@
 from ..dtos import ParticipantUpdateDTO
-from ..exceptions import MeetRepositoryError, ParticipantNotFoundError, ParticipantUpdateError
+from ..exceptions import (
+    MeetRepositoryError,
+    ParticipantNotFoundError,
+    ParticipantUpdateError,
+)
 from ..repositories import IParticipantRepository
 from .base_interactor import BaseInteractor
 

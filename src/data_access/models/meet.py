@@ -2,8 +2,9 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import TIMESTAMP, ForeignKey, Index, String
+from sqlalchemy import TIMESTAMP
 from sqlalchemy import UUID as SQL_UUID
+from sqlalchemy import ForeignKey, Index, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.data_access.models import Base

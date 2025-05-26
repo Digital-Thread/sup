@@ -1,11 +1,6 @@
 from abc import ABC, abstractmethod
 
-from src.apps.comment.domain import (
-    CommentEntity,
-    CommentId,
-    TaskId,
-    FeatureId,
-)
+from src.apps.comment.domain import CommentEntity, CommentId, FeatureId, TaskId
 from src.apps.comment.dtos import CommentOutDto
 
 
@@ -49,7 +44,7 @@ class ICommentRepository(ABC):
 
     @abstractmethod
     async def get_by_task_id(
-            self, task_id: TaskId, page: int, page_size: int
+        self, task_id: TaskId, page: int, page_size: int
     ) -> list[CommentOutDto]:
         """
         Получить список комментариев для задачи
@@ -62,7 +57,7 @@ class ICommentRepository(ABC):
 
     @abstractmethod
     async def get_by_feature_id(
-            self, feature_id: FeatureId, page: int, page_size: int
+        self, feature_id: FeatureId, page: int, page_size: int
     ) -> list[CommentOutDto]:
         """
         Получить список комментариев для фичи

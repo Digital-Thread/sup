@@ -12,7 +12,9 @@ class GetRoleByIdInteractor:
         self._role_repository = role_repository
 
     async def execute(self, role_id: int, workspace_id: UUID) -> RoleOutDTO:
-        role_entity = await self._role_repository.get_by_id(RoleId(role_id), WorkspaceId(workspace_id))
+        role_entity = await self._role_repository.get_by_id(
+            RoleId(role_id), WorkspaceId(workspace_id)
+        )
 
         try:
             role_out_dto = RoleMapper.entity_to_dto(role_entity)

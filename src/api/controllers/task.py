@@ -74,7 +74,7 @@ async def update_task(
 ) -> None:
     update_data = TaskUpdateDTO(
         id=task_id,
-        updated_fields=OptionalTaskUpdateFields(**dto.model_dump(exclude_unset=True)),
+        updated_fields=OptionalTaskUpdateFields(**dto.model_dump(exclude_unset=True)),  # type: ignore[typeddict-item]
     )
     await interactor.execute(update_data)
 

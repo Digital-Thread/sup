@@ -1,9 +1,6 @@
 from ..domain import MeetId
 from ..dtos import MeetInputDTO
-from ..exceptions import (
-    MeetCreateError,
-    MeetRepositoryError,
-)
+from ..exceptions import MeetCreateError, MeetRepositoryError
 from ..mappers import MeetMapper
 from ..repositories import IMeetRepository
 from .base_interactor import BaseInteractor

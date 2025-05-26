@@ -8,7 +8,7 @@ class DeleteParticipantInteractor(BaseInteractor):
     def __init__(self, participant_repository: IParticipantRepository):
         self._repository = participant_repository
 
-    async def execute(self, participant_id: ParticipantId):
+    async def execute(self, participant_id: ParticipantId) -> None:
         try:
             await self._repository.delete(participant_id)
         except MeetRepositoryError as e:

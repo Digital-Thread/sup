@@ -11,13 +11,12 @@ class GetProjectByWorkspaceInteractor:
         self._project_repository = project_repository
 
     async def execute(
-            self,
-            workspace_id: UUID,
-            pagination_data: PaginationDTO) -> list[ProjectWithParticipantsDTO]:
+        self, workspace_id: UUID, pagination_data: PaginationDTO
+    ) -> list[ProjectWithParticipantsDTO]:
         projects = await self._project_repository.get_by_workspace_id(
-                workspace_id=WorkspaceId(workspace_id),
-                page=pagination_data.page,
-                page_size=pagination_data.page_size
-            )
+            workspace_id=WorkspaceId(workspace_id),
+            page=pagination_data.page,
+            page_size=pagination_data.page_size,
+        )
         projects_with_participants_dto = ProjectMapper.list_tuple_to_dto(projects)
         return projects_with_participants_dto

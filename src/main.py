@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from contextlib import asynccontextmanager
-from typing import AsyncIterator
+from typing import Any, AsyncIterator
 
 import structlog
 import uvicorn
@@ -20,8 +20,8 @@ from src.providers.adapters import (
 )
 from src.providers.usecases import (
     CategoryUseCaseProvider,
-    FeatureInteractorProvider,
     CommentInteractorProvider,
+    FeatureInteractorProvider,
     ProjectInteractorProvider,
     RoleUseCaseProvider,
     TagUseCaseProvider,
@@ -83,7 +83,7 @@ async def start_server(app: FastAPI) -> None:
     await server.serve()
 
 
-def customize_openapi(app: FastAPI):
+def customize_openapi(app: FastAPI) -> dict[str, Any]:
     """
     Настраивает OpenAPI схему для добавления заголовка X-Workspace-Id.
     """
@@ -96,14 +96,14 @@ def customize_openapi(app: FastAPI):
         description=app.description,
         routes=app.routes,
     )
-    openapi_schema["components"]["securitySchemes"] = {
-        "WorkspaceHeader": {
-            "type": "apiKey",
-            "name": "X-Workspace-Id",
-            "in": "header",
+    openapi_schema['components']['securitySchemes'] = {
+        'WorkspaceHeader': {
+            'type': 'apiKey',
+            'name': 'X-Workspace-Id',
+            'in': 'header',
         }
     }
-    openapi_schema["security"] = [{"WorkspaceHeader": []}]
+    openapi_schema['security'] = [{'WorkspaceHeader': []}]
 
     app.openapi_schema = openapi_schema
     return app.openapi_schema
@@ -117,7 +117,7 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
         docs_url='/',
     )
-    app.openapi = lambda: customize_openapi(app)
+    app.openapi = lambda: customize_openapi(app)  # type: ignore[method-assign]
 
     init_services(app)
     init_di(app)

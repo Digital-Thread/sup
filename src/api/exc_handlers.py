@@ -1,19 +1,19 @@
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
-from src.apps.comment import (
-    InvalidContentError,
-    CommentNotFoundError,
-    CommentRepositoryError,
-    CommentNotAssociatedError,
-    CommentAssociatedWithBothError,
-    FeatureOrTaskDoesNotExistsError,
-)
 from src.apps import ApplicationException
 from src.apps.auth.exceptions import (
     InvalidTokenError,
     TokenExpireError,
     TokenRefreshExpireError,
+)
+from src.apps.comment import (
+    CommentAssociatedWithBothError,
+    CommentNotAssociatedError,
+    CommentNotFoundError,
+    CommentRepositoryError,
+    FeatureOrTaskDoesNotExistsError,
+    InvalidContentError,
 )
 from src.apps.feature.exceptions import (
     FeatureCreateError,
@@ -21,7 +21,11 @@ from src.apps.feature.exceptions import (
     FeatureDoesNotExistError,
     FeatureUpdateError,
 )
-from src.apps.project.exceptions import ProjectException, ProjectNotFound, WorkspaceForProjectNotFound
+from src.apps.project.exceptions import (
+    ProjectException,
+    ProjectNotFound,
+    WorkspaceForProjectNotFound,
+)
 from src.apps.task.exceptions import (
     TaskCreateError,
     TaskDeleteError,

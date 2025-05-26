@@ -9,9 +9,7 @@ class UpdateParticipantsInteractor:
     def __init__(self, project_repository: IProjectRepository):
         self._project_repository = project_repository
 
-    async def execute(
-            self, existing_project: ProjectEntity, update_data: ProjectUpdateDTO
-    ) -> None:
+    async def execute(self, existing_project: ProjectEntity, update_data: ProjectUpdateDTO) -> None:
         if self._has_participants_changed(existing_project, update_data):
             try:
                 await self._project_repository.update_participants(
@@ -24,11 +22,11 @@ class UpdateParticipantsInteractor:
 
     @staticmethod
     def _has_participants_changed(
-            existing_project: ProjectEntity, update_data: ProjectUpdateDTO
+        existing_project: ProjectEntity, update_data: ProjectUpdateDTO
     ) -> bool:
         if (
-                update_data.participant_ids
-                and existing_project.participant_ids != update_data.participant_ids
+            update_data.participant_ids
+            and existing_project.participant_ids != update_data.participant_ids
         ):
             return True
 

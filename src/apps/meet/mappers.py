@@ -22,9 +22,11 @@ class MeetMapper:
             meet_at=entity.meet_at,
             category_id=entity.category_id,
             assigned_to=entity.assigned_to,
-            participants=[ParticipantMapper.entity_to_dto(p) for p in entity.participants]
-            if entity.participants
-            else None,
+            participants=(
+                [ParticipantMapper.entity_to_dto(p) for p in entity.participants]
+                if entity.participants
+                else None
+            ),
         )
 
     @staticmethod
@@ -36,9 +38,11 @@ class MeetMapper:
             category_id=CategoryId(dto.category_id),
             owner_id=OwnerId(dto.owner_id),
             assigned_to=AssignedId(dto.assigned_to),
-            participants=[ParticipantMapper.dto_to_entity(p) for p in dto.participants]
-            if dto.participants
-            else None,
+            participants=(
+                [ParticipantMapper.dto_to_entity(p) for p in dto.participants]
+                if dto.participants
+                else None
+            ),
         )
 
 

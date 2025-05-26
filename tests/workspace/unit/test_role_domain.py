@@ -16,7 +16,9 @@ def role_minimal(workspace_id: WorkspaceId) -> RoleEntity:
 
 @pytest.fixture()
 def role_full(workspace_id: WorkspaceId) -> RoleEntity:
-    return RoleEntity(_workspace_id=workspace_id, _name='Full Role', _color='#FAFAFA', _id=RoleId(1))
+    return RoleEntity(
+        _workspace_id=workspace_id, _name='Full Role', _color='#FAFAFA', _id=RoleId(1)
+    )
 
 
 class TestRoleCreation:
@@ -29,7 +31,9 @@ class TestRoleCreation:
         assert role_minimal._id is None
         assert role_minimal._workspace_id == workspace_id
 
-    def test_role_creation_with_full_data(self, role_full: RoleEntity, workspace_id: WorkspaceId) -> None:
+    def test_role_creation_with_full_data(
+        self, role_full: RoleEntity, workspace_id: WorkspaceId
+    ) -> None:
         assert role_full.name == 'Full Role'
         assert role_full.color == '#FAFAFA'
         assert role_full._id == 1

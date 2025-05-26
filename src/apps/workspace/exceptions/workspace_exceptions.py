@@ -28,5 +28,6 @@ class WorkspaceAlreadyExists(WorkspaceException):
 class WorkspaceCreatedException(WorkspaceException):
     """Рабочее пространство не создано"""
 
+
 class WorkspaceMemberNotFound(WorkspaceException):
     """Участник отсутствует в этом рабочем пространстве"""

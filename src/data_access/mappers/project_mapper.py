@@ -29,7 +29,10 @@ class ProjectMapper:
             _status=StatusProject(project_model.status),
             created_at=project_model.created_at,
             assigned_to=AssignedId(project_model.assigned_to),
-            participant_ids=[ParticipantId(participant.participant_id) for participant in project_model.participants],
+            participant_ids=[
+                ParticipantId(participant.participant_id)
+                for participant in project_model.participants
+            ],
         )
         return project
 
@@ -70,35 +73,36 @@ class ProjectMapper:
     @staticmethod
     def list_to_entity(
         projects: Sequence[ProjectModel],
-        participants: Sequence[Row[tuple[int, UUID, str, str, str]]]
+        participants: Sequence[Row[tuple[int, UUID, str, str, str]]],
     ) -> list[tuple[ProjectEntity, list[dict[str, str]] | None]]:
         project_participants_map = defaultdict(list)
 
         for project_id, participant_id, first_name, last_name, avatar in participants:
-             project_participants_map[project_id].append(
+            project_participants_map[project_id].append(
                 {
-                     'participant_id': participant_id,
-                     'first_name': first_name,
-                     'last_name': last_name,
-                     'avatar': avatar
+                    'participant_id': participant_id,
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'avatar': avatar,
                 }
-             )
+            )
 
         projects_with_participants = [
             (
                 ProjectEntity(
-                   _id=ProjectId(project.id),
-                   _name=project.name,
-                   _owner_id=OwnerId(project.owner_id),
-                   _workspace_id=WorkspaceId(project.workspace_id),
-                   _description=project.description,
-                   logo=project.logo,
-                   _status=StatusProject(project.status),
-                   created_at=project.created_at,
-                   assigned_to=project.assigned_to,
+                    _id=ProjectId(project.id),
+                    _name=project.name,
+                    _owner_id=OwnerId(project.owner_id),
+                    _workspace_id=WorkspaceId(project.workspace_id),
+                    _description=project.description,
+                    logo=project.logo,
+                    _status=StatusProject(project.status),
+                    created_at=project.created_at,
+                    assigned_to=AssignedId(project.assigned_to),
                 ),
-                project_participants_map.get(project.id, None)
-            ) for project in projects
+                project_participants_map.get(project.id, None),
+            )
+            for project in projects
         ]
 
         return projects_with_participants

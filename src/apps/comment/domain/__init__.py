@@ -1,10 +1,5 @@
 from .comment import CommentEntity
-from .types_ids import (
-    AuthorId,
-    CommentId,
-    FeatureId,
-    TaskId,
-)
+from .types_ids import AuthorId, CommentId, FeatureId, TaskId
 
 __all__ = (
     'CommentEntity',

@@ -27,7 +27,9 @@ from src.apps.user.services.remove_user_service import RemoveUserService
 from src.apps.workspace.domain.entities.workspace_invite import StatusInvite
 from src.apps.workspace.dtos.workspace_dtos import CreateWorkspaceDTO
 from src.apps.workspace.dtos.workspace_invite_dtos import UpdateWorkspaceInviteAppDTO
-from src.apps.workspace.interactors.workspace_interactors import CreateWorkspaceInteractor
+from src.apps.workspace.interactors.workspace_interactors import (
+    CreateWorkspaceInteractor,
+)
 from src.apps.workspace.interactors.workspace_interactors.add_member_in_workspace import (
     AddMemberInWorkspaceInteractor,
 )
@@ -68,6 +70,7 @@ async def logout_user(
     response: Response,
     token_service: FromDishka[JWTService],
 ) -> dict[str, str]:
+    email: str | bytes | None
     user_agent = request.headers.get('User-Agent')
     access_token = request.cookies.get('sup_access_token')
     if access_token:
@@ -181,11 +184,10 @@ async def create_user_by_admin(
 ) -> dict[str, str]:
     user = await authenticate_and_create_tokens(request, get_user_service)
     await authorize_service.get_access_admin(user)
-    user_id, username, user_email, user_password = await create_user_service.create_user_by_admin(create_user_dto)
-    await create_workspace_interactor.execute(CreateWorkspaceDTO(
-        owner_id=user_id,
-        name=username
-    ))
+    user_id, username, user_email, user_password = await create_user_service.create_user_by_admin(
+        create_user_dto
+    )
+    await create_workspace_interactor.execute(CreateWorkspaceDTO(owner_id=user_id, name=username))
     return {'detail': f'Пользователь зарегистрирован email: {user_email} пароль: {user_password}'}
 
 
@@ -209,7 +211,9 @@ async def create_user_by_invite(
     )
     await add_member_interactor.execute(workspace_id, new_user.id)
     await update_status_invite_interactor.execute(
-        UpdateWorkspaceInviteAppDTO(id_=invite_id, workspace_id=workspace_id, status=StatusInvite.USED),
+        UpdateWorkspaceInviteAppDTO(
+            id_=invite_id, workspace_id=workspace_id, status=StatusInvite.USED
+        ),
     )
     return UserResponseDTO.model_validate(new_user)
 

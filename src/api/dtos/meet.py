@@ -57,17 +57,14 @@ class PageLimits(StrEnum):
 
     @property
     def limit_by(self) -> Literal[4, 8, 16, 24, None]:
-        match self:
-            case self.ALL:
-                return None
-            case self.FOUR:
-                return 4
-            case self.EIGHT:
-                return 8
-            case self.SIXTEEN:
-                return 16
-            case self.TWENTYFOUR:
-                return 24
+        limits: dict[PageLimits, Literal[4, 8, 16, 24, None]] = {
+            PageLimits.ALL: None,
+            PageLimits.FOUR: 4,
+            PageLimits.EIGHT: 8,
+            PageLimits.SIXTEEN: 16,
+            PageLimits.TWENTYFOUR: 24,
+        }
+        return limits[self]
 
 
 class QueryParams(BaseModel):

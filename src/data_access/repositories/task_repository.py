@@ -15,11 +15,11 @@ from src.apps.task import (
 from src.apps.task.domain import FeatureId, TagId, TaskEntity, TaskId
 from src.data_access.mappers.task_mapper import TaskMapper
 from src.data_access.models import (
+    CommentModel,
     FeatureModel,
     TagModel,
     TaskModel,
     WorkspaceMemberModel,
-    CommentModel,
 )
 from src.data_access.models.task import Priority, Status
 
@@ -32,8 +32,8 @@ class TaskRepository(ITaskRepository):
         self.mapper = TaskMapper()
 
     async def _get_tags(
-            self,
-            list_ids: list[TagId] | None,
+        self,
+        list_ids: list[TagId] | None,
     ) -> list[TagModel]:
         if list_ids:
             query = select(TagModel).where(TagModel.id.in_(list_ids))
@@ -121,7 +121,7 @@ class TaskRepository(ITaskRepository):
         await self._session.execute(delete(CommentModel).where(CommentModel.task_id == task_id))
 
     async def get_by_feature_id(
-            self, feature_id: FeatureId, query: TaskListQuery
+        self, feature_id: FeatureId, query: TaskListQuery
     ) -> list[TaskInFeatureOutputDTO] | None:
 
         stmt = (
@@ -145,9 +145,9 @@ class TaskRepository(ITaskRepository):
         return [self.mapper.map_model_to_for_feature_dto(t) for t in tasks] if tasks else None
 
     def _make_stmt_for_validation(
-            self,
-            attrs: TaskAttrsWithWorkspace,
-    ) -> 'Select':
+        self,
+        attrs: TaskAttrsWithWorkspace,
+    ) -> Select[tuple[int, int, int, int]]:
         feature_subq = (
             select(func.count())
             .select_from(FeatureModel)
@@ -200,8 +200,8 @@ class TaskRepository(ITaskRepository):
         return stmt
 
     async def validate_workspace_consistency(
-            self,
-            attrs: TaskAttrsWithWorkspace,
+        self,
+        attrs: TaskAttrsWithWorkspace,
     ) -> None:
         """
         Проверяет, что:
