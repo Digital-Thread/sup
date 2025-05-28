@@ -10,5 +10,5 @@ class GetListMeetsInteractor(BaseInteractor):
         self._repository = meet_repository
 
     async def execute(self, query: MeetListQuery) -> list[MeetOutputDTO] | None:
-        meet = await self._repository.get_list(query)
+        meet = await self._repository.get_all(query)
         return [MeetMapper.entity_to_dto(m) for m in meet] if meet else None

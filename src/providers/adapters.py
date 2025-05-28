@@ -16,7 +16,6 @@ from src.apps.auth import JWTService
 from src.apps.comment import ICommentRepository
 from src.apps.feature import IFeatureRepository
 from src.apps.meet import IMeetRepository, IParticipantRepository
-from src.apps.meet.protocols import WorkspaceService, WorkspaceServiceProtocol
 from src.apps.project.project_repository import IProjectRepository
 from src.apps.send_mail.service import SendMailService
 from src.apps.task import ITaskRepository
@@ -248,7 +247,3 @@ class RepositoriesProvider(Provider):
         self, session: AsyncSession, context: WorkspaceContext
     ) -> IParticipantRepository:
         return MeetParticipantRepository(session, context)
-
-    @provide(scope=scope)
-    def provide_temp_workspace_service(self) -> WorkspaceServiceProtocol:
-        return WorkspaceService()
