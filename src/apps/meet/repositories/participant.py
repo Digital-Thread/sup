@@ -14,12 +14,8 @@ class IParticipantRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_list(self, meet_id: MeetId) -> list[ParticipantEntity]:
+    async def get_all(self, meet_id: MeetId) -> list[ParticipantEntity]:
         raise NotImplementedError
-
-    # @abstractmethod
-    # async def add_bulk(self, participants: list[ParticipantEntity]) -> list[ParticipantId]:
-    #     raise NotImplementedError
 
     @abstractmethod
     async def update(self, participant: ParticipantEntity) -> None:
