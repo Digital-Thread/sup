@@ -45,7 +45,7 @@ class MeetRepository(IMeetRepository):
 
         raise MeetRepositoryError(message=f'Not found meet with id: {meet_id}')
 
-    async def get_list(
+    async def get_all(
         self,
         query: MeetListQuery,
     ) -> list[MeetEntity]:
