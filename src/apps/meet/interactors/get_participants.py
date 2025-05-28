@@ -10,5 +10,5 @@ class GetListParticipantsInteractor(BaseInteractor):
         self._repository = meet_repository
 
     async def execute(self, meet_id: MeetId) -> list[ParticipantOutputDTO] | None:
-        participants = await self._repository.get_list(meet_id)
+        participants = await self._repository.get_all(meet_id)
         return [ParticipantMapper.entity_to_dto(p) for p in participants] if participants else None

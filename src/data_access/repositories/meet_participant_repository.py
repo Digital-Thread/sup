@@ -46,7 +46,7 @@ class MeetParticipantRepository(IParticipantRepository):
 
         raise MeetRepositoryError(message=f'Not found participant with id: {participant_id}')
 
-    async def get_list(self, meet_id: MeetId) -> list[ParticipantEntity]:
+    async def get_all(self, meet_id: MeetId) -> list[ParticipantEntity]:
         stmt = self._base_select().where(self.model.meet_id == meet_id)
         result = await self._session.execute(stmt)
         models = result.scalars().all()
